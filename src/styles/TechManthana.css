@@ -1,0 +1,217 @@
+/* ========================================================= */
+/* 🌟 TECH MANTHANA MAIN CONTAINER (WHITE SMOKE THEME) */
+/* ========================================================= */
+
+.techmanthana-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  background: #f5f5f5; /* ✅ White Smoke Background */
+  color: #2A241A;      /* Brand Brown */
+
+  padding: 100px 80px;
+  min-height: 100vh;
+  gap: 60px;
+  flex-wrap: wrap;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ========================================================= */
+/* ✅ LEFT SECTION */
+/* ========================================================= */
+
+.left-section {
+  flex: 1;
+  min-width: 340px;
+}
+
+.brand-title {
+  color: #F6B800;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.brand-subtitle {
+  color: #6c5f40;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.main-heading {
+  font-size: 46px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #2A241A;
+}
+
+.description {
+  color: #4c4130;
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+}
+
+.features-list li {
+  font-size: 17px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #2A241A;
+}
+
+.features-list .icon {
+  color: #F6B800;
+  font-size: 20px;
+}
+
+.extra-info {
+  margin-top: 20px;
+  color: #6c5f40;
+  font-size: 15px;
+}
+
+.company-name {
+  margin-top: 25px;
+  font-weight: 700;
+  color: #2A241A;
+}
+
+/* ========================================================= */
+/* ✅ RIGHT SECTION (Glass Cards Same as ALFA) */
+/* ========================================================= */
+
+.right-section {
+  flex: 1;
+  min-width: 340px;
+}
+
+.right-heading {
+  font-size: 40px;
+  font-weight: 800;
+  color: #2A241A;
+  margin-bottom: 25px;
+}
+
+.right-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.right-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+
+  /* ✅ Same card style as ALFA */
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(18px);
+  border-radius: 12px;
+  padding: 14px;
+  border: 1px solid rgba(246, 184, 0, 0.35);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+
+  color: #2A241A;
+}
+
+.icon.yellow { color: #F6B800; }
+.icon.purple { color: #B87433; } /* Adjusted to warm brown */
+.icon.blue   { color: #A87D3A; } /* Muted gold-brown */
+
+/* ========================================================= */
+/* ✅ Highlight Text */
+/* ========================================================= */
+.highlight-text {
+  margin: 25px 0;
+  font-size: 15px;
+  color: #4c4130;
+}
+
+/* ========================================================= */
+/* ✅ PLANS SECTION (Glass Cards Matching ALFA) */
+/* ========================================================= */
+
+.plans {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.plan-card {
+  flex: 1;
+  min-width: 180px;
+  text-align: center;
+  padding: 20px;
+
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 14px;
+
+  border: 1px solid rgba(246, 184, 0, 0.35);
+
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  transition: 0.3s ease;
+
+  color: #2A241A;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 26px rgba(246, 184, 0, 0.35);
+}
+
+.plan-card h4 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.plan-card p {
+  font-size: 14px;
+  color: #6c5f40;
+}
+
+.plan-icon {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+/* ========================================================= */
+/* ✅ Plan Color Themes (Soft Gold Versions) */
+/* ========================================================= */
+
+.free h4         { color: #F6B800; }
+.free .plan-icon { color: #F6B800; }
+
+.premium h4         { color: #B87433; }
+.premium .plan-icon { color: #B87433; }
+
+.platinum h4        { color: #2A241A; }
+.platinum .plan-icon { color: #2A241A; }
+
+/* ========================================================= */
+/* ✅ RESPONSIVE */
+/* ========================================================= */
+
+@media (max-width: 900px) {
+  .techmanthana-container {
+    flex-direction: column;
+    padding: 40px 25px;
+  }
+
+  .right-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plans {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,294 @@
+/* ========================================================= */
+/* 🌟 ALFA MAIN CONTAINER (WHITE SMOKE BACKGROUND) */
+/* ========================================================= */
+.alfa-container {
+  width: 100%;
+  min-height: 90vh;
+
+  /* ✅ White smoke clean background */
+  background: #f5f5f5;
+
+  color: #2A241A; /* Brand deep brown */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 0;
+  overflow: hidden;
+}
+
+/* 🔁 Swap Toggle Button */
+.toggle-area {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.swap-btn {
+  background: rgba(255, 255, 255, 0.7);
+  color: #F6B800;
+  border: 2px solid rgba(246, 184, 0, 0.5);
+  border-radius: 50%;
+  font-size: 1.4rem;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.swap-btn:hover {
+  background: rgba(246, 184, 0, 0.25);
+  box-shadow: 0 0 20px rgba(246, 184, 0, 0.6);
+  transform: rotate(180deg) scale(1.1);
+}
+
+/* ========================================================= */
+/* 🧩 MAIN LAYOUT */
+/* ========================================================= */
+.alfa-layout {
+  display: flex;
+  justify-content: space-between;
+  width: 85%;
+  max-width: 1300px;
+  transition: all 0.6s ease;
+  gap: 25px;
+}
+
+.alfa-layout.swapped {
+  flex-direction: row-reverse;
+}
+
+/* ========================================================= */
+/* 🧠 CARDS (Glassmorphic Gold Theme — unchanged) */
+/* ========================================================= */
+.workspace-panel,
+.response-panel {
+  flex: 1;
+
+  /* ✅ Card color unchanged */
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(18px);
+
+  border-radius: 16px;
+  padding: 25px;
+
+  border: 1px solid rgba(246, 184, 0, 0.32);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.4s ease;
+  min-height: 65vh;
+}
+
+.workspace-panel:hover,
+.response-panel:hover {
+  box-shadow: 0 6px 24px rgba(246, 184, 0, 0.35);
+}
+
+/* ========================================================= */
+/* 📌 HEADINGS */
+/* ========================================================= */
+.workspace-panel h2,
+.response-panel h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #F6B800;
+  letter-spacing: 1px;
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-shadow: 0 0 8px rgba(246, 184, 0, 0.35);
+}
+
+/* ========================================================= */
+/* 📝 WORKSPACE INPUT */
+/* ========================================================= */
+.workspace-input {
+  width: 90%;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(246, 184, 0, 0.35);
+  color: #2A241A;
+  padding: 15px;
+  border-radius: 10px;
+  resize: none;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.workspace-input:focus {
+  box-shadow: 0 0 15px rgba(246, 184, 0, 0.45);
+}
+
+/* ========================================================= */
+/* 💬 RESPONSE BOX */
+/* ========================================================= */
+.response-box {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(246, 184, 0, 0.3);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  overflow-y: auto;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #2A241A;
+  transition: all 0.3s ease;
+}
+
+.response-box:hover {
+  box-shadow: 0 0 20px rgba(246, 184, 0, 0.28);
+}
+
+/* ========================================================= */
+/* 💡 PROMPT BOX */
+/* ========================================================= */
+.prompt-box {
+  display: flex;
+  gap: 10px;
+}
+
+.prompt-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(246, 184, 0, 0.38);
+  border-radius: 10px;
+  padding: 12px 15px;
+  color: #2A241A;
+  outline: none;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.prompt-input:focus {
+  box-shadow: 0 0 12px rgba(246, 184, 0, 0.45);
+}
+
+/* ========================================================= */
+/* 🚀 SEND BUTTON */
+/* ========================================================= */
+.send-btn {
+  background: linear-gradient(90deg, #F6B800, #FFD34A);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 25px;
+  color: #2A241A;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 0 25px rgba(246, 184, 0, 0.45);
+}
+
+/* ========================================================= */
+/* 📱 RESPONSIVE */
+/* ========================================================= */
+@media (max-width: 900px) {
+  .alfa-layout {
+    flex-direction: column !important;
+  }
+
+  .workspace-panel,
+  .response-panel {
+    min-height: 45vh;
+  }
+}
+
+/* ========================================================= */
+/* ✨ LOGIN MODAL (Light Gold Version) */
+/* ========================================================= */
+.login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.login-modal {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(246, 184, 0, 0.35);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2.5rem 3rem;
+  text-align: center;
+  color: #2A241A;
+  box-shadow: 0 0 35px rgba(246, 184, 0, 0.35);
+  width: 90%;
+  max-width: 420px;
+}
+
+.login-modal h3 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #F6B800, #FFD34A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-modal p {
+  font-size: 1rem;
+  opacity: 0.85;
+  margin-bottom: 1.5rem;
+}
+
+/* ========================================================= */
+/* ✨ MODAL BUTTONS */
+/* ========================================================= */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.login-btn,
+.cancel-btn {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+/* ✅ Login Button */
+.login-btn {
+  background: linear-gradient(90deg, #F6B800, #FFD34A);
+  color: #2A241A;
+  box-shadow: 0 0 15px rgba(246, 184, 0, 0.3);
+}
+
+.login-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 25px rgba(246, 184, 0, 0.45);
+}
+
+/* ✅ Cancel Button */
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(246, 184, 0, 0.2);
+  color: #2A241A;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.7);
+  transform: scale(1.08);
+}

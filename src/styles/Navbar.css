@@ -1,0 +1,228 @@
+/* ===================== Main Navbar (NEUTILL DARK + CONTRAST) ===================== */
+.navbar {
+  width: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(20, 25, 45, 0.95),
+    rgba(35, 40, 70, 0.95)
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  padding: 14px 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+
+  /* ✅ Gold border for contrast */
+  border-bottom: 1px solid rgba(246, 184, 0, 0.45);
+
+  /* ✅ Stronger shadow so header separates from body */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.65);
+
+  transition: all 0.4s ease;
+  margin-left: -20px;
+}
+
+.navbar.scrolled {
+  background: rgba(28, 33, 58, 0.97);
+  border-bottom: 1px solid rgba(246, 184, 0, 0.65);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.75);
+}
+
+/* ===================== Container ===================== */
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ===================== Logo ===================== */
+.nav-logo {
+  width: 65px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: drop-shadow(0 0 8px rgba(246, 184, 0, 0.6)); /* Gold glow */
+}
+
+.nav-logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 14px rgba(246, 184, 0, 1));
+}
+
+/* ===================== Desktop Links ===================== */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #f4e9c9; /* Soft gold-white text */
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  position: relative;
+  transition: all 0.2s ease-out;
+}
+
+.nav-links li a::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  bottom: -5px;
+  left: 0;
+  background: linear-gradient(90deg, #F6B800, #FFD34A);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.nav-links li a:hover {
+  color: #F6B800;
+  text-shadow: 0 0 12px rgba(246, 184, 0, 0.75);
+}
+
+.nav-links li a:hover::after {
+  width: 100%;
+}
+
+/* ===================== Buttons ===================== */
+.login-btn,
+.subscribe-btn {
+  padding: 10px 50px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.3s ease, box-shadow 0.3s ease;
+  margin-right: 80px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Login Button */
+.login-btn {
+  border: 2px solid #F6B800;
+  color: #F6B800;
+  margin-left: 20px;
+}
+
+.login-btn:hover {
+  background: linear-gradient(90deg, #F6B800, #FFD34A);
+  color: #2A241A;
+  box-shadow: 0 0 20px rgba(246, 184, 0, 0.8);
+}
+
+/* Subscribe Button */
+.subscribe-btn {
+  border: 2px solid #8C5A23;
+  color: #8C5A23;
+  margin-left: -100px;
+}
+
+.subscribe-btn:hover {
+  background: linear-gradient(90deg, #8C5A23, #B87433);
+  color: white;
+  box-shadow: 0 0 20px rgba(140, 90, 35, 0.8);
+}
+
+/* ===================== Hamburger (Mobile) ===================== */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1002;
+  transition: transform 0.2s ease-out;
+}
+
+.nav-toggle:hover {
+  transform: scale(1.1);
+}
+
+.bar {
+  width: 26px;
+  height: 3px;
+  background-color: #f4e9c9; /* soft gold-white */
+  margin: 3px 0;
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+
+.nav-toggle:hover .bar {
+  background-color: #F6B800; /* gold */
+  box-shadow: 0 0 5px #F6B800;
+}
+
+/* active */
+.nav-toggle.active .bar:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.nav-toggle.active .bar:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.active .bar:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ===================== Mobile Version ===================== */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 10px 20px;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 75%;
+    height: 100vh;
+    flex-direction: column;
+    align-items: flex-start;
+
+    background: linear-gradient(135deg, #0a0d19, #0d1330);
+    backdrop-filter: blur(15px);
+
+    padding: 100px 30px 20px;
+    box-shadow: -6px 0 25px rgba(0, 0, 0, 0.8);
+    transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .nav-links.open {
+    display: flex;
+    right: 0;
+  }
+
+  .nav-links li {
+    width: 100%;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .nav-links li a {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f4e9c9;
+  }
+
+  .login-btn,
+  .subscribe-btn {
+    width: 100%;
+    margin: 15px 0;
+    padding: 14px 0;
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
