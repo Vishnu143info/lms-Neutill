@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
 import "../styles/Navbar.css";
-import logo from "../assets/logo.png";
+import logo from "../assets/logo1.png";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,13 +24,15 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* ✅ Navigation items */
+  /* ✅ Navigation items - Added Home */
   const navItems = [
+    { type: "scroll", to: "hero", label: "Home" },
     { type: "scroll", to: "whatwedo", label: "What We Do" },
     { type: "scroll", to: "services", label: "Services" },
     { type: "scroll", to: "industries", label: "Industries" },
-    { path: "/tech-manthana", label: "Tech Manthana" },
-    { path: "/alfa", label: "ALFA" },
+   
+    { type: "scroll", to: "alfa", label: "ALFA" },
+     { type: "scroll", to: "tech-manthana", label: "Tech Manthana" },
     { type: "scroll", to: "contact", label: "Contact Us" },
   ];
 

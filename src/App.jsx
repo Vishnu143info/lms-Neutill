@@ -9,15 +9,18 @@ import Industries from "./pages/Industries";
 import Login from "./pages/Login";
 import Logout from "./pages/Logout";
 
+import ServiceDetail from "./components/Service/ServiceDetails";
+import IndustryDetail from "./components/Industries/IndustriesDetails";
+
 import ConsumerDashboard from "./layouts/ConsumerDashboard";
 import AdminDashboard from "./layouts/AdminDashboard";
 import TutorDashboard from "./layouts/TutorDashboard";
 
 import { useAuth } from "./context/AuthContext";
 import TechManthanaPage from "./pages/TechManthanaPage";
-import ALFASection from "./pages/ALFASection";
+import ALFASection from "./pages/Alfa/ALFASection";
 import ScrollToTop from "./components/ScrollToTop";
-
+import BlogPage from "./pages/BlogPage";
 
 // ✅ Protected Route Wrapper
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -37,7 +40,7 @@ const App = () => {
 
       <Routes>
 
-        {/* ✅ PUBLIC ROUTES (With Public Layout) */}
+        {/* PUBLIC ROUTES */}
         <Route
           path="/"
           element={
@@ -56,6 +59,7 @@ const App = () => {
           }
         />
 
+        {/* SERVICES ROUTES */}
         <Route
           path="/services"
           element={
@@ -65,11 +69,32 @@ const App = () => {
           }
         />
 
+        {/* ✅ ADD INDIVIDUAL SERVICE DETAIL ROUTES */}
+        <Route
+          path="/services/:serviceId"
+          element={
+            <PublicLayout>
+              <ServiceDetail />
+            </PublicLayout>
+          }
+        />
+
+        {/* INDUSTRIES ROUTES */}
         <Route
           path="/industries"
           element={
             <PublicLayout>
               <Industries />
+            </PublicLayout>
+          }
+        />
+
+        {/* ✅ ADD INDIVIDUAL INDUSTRY DETAIL ROUTES */}
+        <Route
+          path="/industries/:industryId"
+          element={
+            <PublicLayout>
+              <IndustryDetail />
             </PublicLayout>
           }
         />
@@ -83,7 +108,17 @@ const App = () => {
           }
         />
 
-        {/* ✅ LOGOUT (Public Layout) */}
+        {/* BLOG PAGE ROUTE */}
+        <Route
+          path="/tech-manthana/blog"
+          element={
+            <PublicLayout>
+              <BlogPage />
+            </PublicLayout>
+          }
+        />
+
+        {/* LOGOUT */}
         <Route
           path="/logout"
           element={
@@ -93,8 +128,7 @@ const App = () => {
           }
         />
 
-
-        {/* ✅ DASHBOARD ROUTES (Without Public Layout) */}
+        {/* DASHBOARD ROUTES */}
         <Route
           path="/dashboard/consumer"
           element={
@@ -122,8 +156,7 @@ const App = () => {
           }
         />
 
-
-        {/* ✅ ALFA PAGE (INSIDE CONSUMER DASHBOARD LAYOUT) */}
+        {/* ALFA PAGE */}
         <Route
           path="/alfa"
           element={
@@ -135,8 +168,7 @@ const App = () => {
           }
         />
 
-
-        {/* ✅ FALLBACK */}
+        {/* FALLBACK */}
         <Route
           path="*"
           element={
@@ -145,17 +177,6 @@ const App = () => {
             </PublicLayout>
           }
         />
-
-<Route
-  path="/alfa"
-  element={
-    <ProtectedRoute allowedRoles={["consumer"]}>
-      <ConsumerDashboard>
-        <ALFASection />
-      </ConsumerDashboard>
-    </ProtectedRoute>
-  }
-/>
 
       </Routes>
     </>

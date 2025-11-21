@@ -1,40 +1,33 @@
 /* ========================================================= */
-/* 🌟 TECH MANTHANA MAIN CONTAINER (WHITE SMOKE THEME) */
+/* 🌟 TECH MANTHANA EXACT COLOR MATCH (from image) */
 /* ========================================================= */
 
 .techmanthana-container {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-
-  background: #f5f5f5; /* ✅ White Smoke Background */
-  color: #2A241A;      /* Brand Brown */
-
-  padding: 100px 80px;
-  min-height: 100vh;
+  background: #0C0D25; /* EXACT dark navy background */
+  color: #D8E0FF; 
+  padding: 80px 60px;
   gap: 60px;
   flex-wrap: wrap;
   font-family: 'Poppins', sans-serif;
 }
 
-/* ========================================================= */
-/* ✅ LEFT SECTION */
-/* ========================================================= */
-
+/* LEFT SECTION */
 .left-section {
   flex: 1;
   min-width: 340px;
 }
 
 .brand-title {
-  color: #F6B800;
+  color: #32A9FF; /* Blue heading from image */
   font-size: 28px;
   font-weight: 700;
-  letter-spacing: 1px;
 }
 
 .brand-subtitle {
-  color: #6c5f40;
+  color: #99A2C8; /* Muted subtitle */
   font-size: 16px;
   margin-bottom: 20px;
 }
@@ -42,19 +35,14 @@
 .main-heading {
   font-size: 46px;
   font-weight: 800;
+  color: #FFFFFF; /* Pure white */
   margin-bottom: 20px;
-  color: #2A241A;
 }
 
 .description {
-  color: #4c4130;
+  color: #D8E0FF;
   font-size: 16px;
   margin-bottom: 15px;
-}
-
-.features-list {
-  list-style: none;
-  padding: 0;
 }
 
 .features-list li {
@@ -63,39 +51,39 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #2A241A;
+  color: #FFFFFF;
 }
 
 .features-list .icon {
-  color: #F6B800;
-  font-size: 20px;
+  color: #FFCC33; /* GOLD EXACT */
+  font-size: 22px;
 }
 
 .extra-info {
+  color: #99A2C8;
   margin-top: 20px;
-  color: #6c5f40;
-  font-size: 15px;
 }
 
 .company-name {
   margin-top: 25px;
   font-weight: 700;
-  color: #2A241A;
+  color: #FFFFFF;
 }
 
 /* ========================================================= */
-/* ✅ RIGHT SECTION (Glass Cards Same as ALFA) */
+/* RIGHT SECTION */
 /* ========================================================= */
 
 .right-section {
   flex: 1;
   min-width: 340px;
+  color: #FFFFFF;
 }
 
 .right-heading {
-  font-size: 40px;
+  font-size: 38px;
   font-weight: 800;
-  color: #2A241A;
+  color: #FFFFFF;
   margin-bottom: 25px;
 }
 
@@ -103,7 +91,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .right-item {
@@ -112,37 +100,32 @@
   gap: 12px;
   font-size: 15px;
 
-  /* ✅ Same card style as ALFA */
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
   border-radius: 12px;
   padding: 14px;
-  border: 1px solid rgba(246, 184, 0, 0.35);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 
-  color: #2A241A;
+  color: #D8E0FF;
 }
 
-.icon.yellow { color: #F6B800; }
-.icon.purple { color: #B87433; } /* Adjusted to warm brown */
-.icon.blue   { color: #A87D3A; } /* Muted gold-brown */
+/* ICON COLORS EXACT */
+.icon.yellow { color: #FFC233; }
+.icon.purple { color: #C27BFF; }
+.icon.blue   { color: #53A9FF; }
 
-/* ========================================================= */
-/* ✅ Highlight Text */
-/* ========================================================= */
 .highlight-text {
   margin: 25px 0;
-  font-size: 15px;
-  color: #4c4130;
+  color: #D8E0FF;
 }
 
 /* ========================================================= */
-/* ✅ PLANS SECTION (Glass Cards Matching ALFA) */
+/* PLANS */
 /* ========================================================= */
 
 .plans {
   display: flex;
-  gap: 18px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
@@ -152,66 +135,101 @@
   text-align: center;
   padding: 20px;
 
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 
-  border: 1px solid rgba(246, 184, 0, 0.35);
-
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  color: #FFFFFF;
   transition: 0.3s ease;
-
-  color: #2A241A;
 }
 
 .plan-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 26px rgba(246, 184, 0, 0.35);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
 }
 
-.plan-card h4 {
-  margin-bottom: 10px;
-  font-size: 18px;
-  font-weight: 700;
-}
+/* EXACT COLORS PER PLAN */
+.free h4, 
+.free .plan-icon { color: #53A9FF; }
 
-.plan-card p {
-  font-size: 14px;
-  color: #6c5f40;
-}
+.premium h4, 
+.premium .plan-icon { color: #C27BFF; }
 
-.plan-icon {
-  font-size: 30px;
-  margin-bottom: 10px;
-}
+.platinum h4, 
+.platinum .plan-icon { color: #FFC233; }
 
-/* ========================================================= */
-/* ✅ Plan Color Themes (Soft Gold Versions) */
-/* ========================================================= */
-
-.free h4         { color: #F6B800; }
-.free .plan-icon { color: #F6B800; }
-
-.premium h4         { color: #B87433; }
-.premium .plan-icon { color: #B87433; }
-
-.platinum h4        { color: #2A241A; }
-.platinum .plan-icon { color: #2A241A; }
-
-/* ========================================================= */
-/* ✅ RESPONSIVE */
-/* ========================================================= */
-
+/* Responsive */
 @media (max-width: 900px) {
   .techmanthana-container {
     flex-direction: column;
     padding: 40px 25px;
   }
-
   .right-grid {
     grid-template-columns: 1fr;
   }
-
   .plans {
     flex-direction: column;
   }
+}
+/* BLOG PAGE */
+.blog-page-container {
+  padding: 60px;
+  background: #0C0D25;
+  min-height: 100vh;
+  color: #D8E0FF;
+}
+
+.blog-page-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #53A9FF;
+  margin-bottom: 20px;
+}
+
+.blog-page-content {
+  font-size: 17px;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+.explore-btn {
+  margin-top: 25px;
+  padding: 12px 26px;
+  background: #53A9FF; /* same blue theme */
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #0C0D25;
+  transition: 0.3s ease;
+}
+
+.explore-btn:hover {
+  background: #78c1ff;
+  transform: translateY(-3px);
+}
+.blog-buttons {
+  margin-top: 20px;
+}
+
+.blog-button {
+  background-color: #0056ff;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.blog-button:hover {
+  background-color: #003ebb;
+}
+
+.blog-content-box {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f5f7ff;
+  border-radius: 10px;
+  line-height: 1.6;
 }
