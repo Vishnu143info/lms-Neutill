@@ -1,82 +1,227 @@
-import React from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import {
+  Home,
+  Video,
+  FileText,
+  MessageSquare,
+  Bell,
+  LogOut,
+  Menu,
+  X,
+  ChevronRight,
+  Users,
+  Calendar,
+  Clock,
+  Award,
+  TrendingUp,
+  CheckCircle,
+  Download,
+  Eye,
+  Settings,
+  HelpCircle,
+} from "lucide-react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
-const TutorDashboard = () => {
+const NAV_ITEMS = [
+  { label: "Dashboard", icon: Home, path: "/dashboard/tutor/page" },
+  { label: "Classes", icon: Video, path: "/dashboard/tutor/classes" },
+  { label: "Assignments", icon: FileText, path: "/dashboard/tutor/assignments" },
+  { label: "Student Queries", icon: MessageSquare, path: "/dashboard/tutor/queries" },
+  // { label: "Schedule", icon: Calendar, path: "/dashboard/tutor/schedule" },
+  // { label: "Students", icon: Users, path: "/dashboard/tutor/students" },
+];
+
+const NavItem = ({ label, Icon, active, onClick }) => (
+  <motion.button
+    whileHover={{ x: 4 }}
+    whileTap={{ scale: 0.98 }}
+    onClick={onClick}
+    className={`relative flex items-center gap-3 p-3 rounded-xl cursor-pointer w-full text-left transition-all duration-300 ${
+      active
+        ? "bg-gradient-to-r from-orange-50 to-amber-50 text-orange-600 border-l-4 border-orange-500"
+        : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+    }`}
+  >
+    <div className={`p-2 rounded-lg ${
+      active 
+        ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white" 
+        : "bg-gray-100 text-gray-600"
+    }`}>
+      <Icon className="w-4 h-4" />
+    </div>
+    <span className="font-medium flex-1">{label}</span>
+    {active && (
+      <ChevronRight className="w-4 h-4 text-orange-500" />
+    )}
+  </motion.button>
+);
+
+export default function TutorDashboard() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { pathname } = useLocation();
 
-  const cards = [
-    { icon: "📅", title: "Class Schedule", desc: "Plan and manage upcoming sessions.", color: "#f97316" },
-    { icon: "📝", title: "Assignments", desc: "Create, review, and grade tasks.", color: "#16a34a" },
-    { icon: "🎥", title: "Recordings", desc: "Upload and manage session videos.", color: "#2563eb" },
-    { icon: "📩", title: "Student Mailer", desc: "Send quick updates to students.", color: "#9333ea" }
-  ];
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const sidebar = (
+    <nav className="flex flex-col h-full p-4">
+      {/* User Profile */}
+    
+
+      {/* Navigation */}
+      <div className="flex-1 space-y-1">
+        {NAV_ITEMS.map((item) => (
+          <NavItem
+            key={item.label}
+            label={item.label}
+            Icon={item.icon}
+            active={pathname === item.path}
+            onClick={() => {
+              navigate(item.path);
+              setIsMenuOpen(false);
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Stats */}
+    
+
+      {/* Logout */}
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => navigate("/")}
+        className="mt-4 flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-red-50 to-pink-50 hover:from-red-100 hover:to-pink-100 text-red-600 rounded-xl font-medium transition-all duration-300 border border-red-200"
+      >
+        <LogOut className="w-4 h-4" />
+        <span>Logout</span>
+      </motion.button>
+    </nav>
+  );
 
   return (
-    <div style={wrap}>
-      <aside style={{ ...sidebar, background: "rgba(255,255,255,0.85)" }}>
-        <div style={{ ...brand, color: "#b45309" }}>🧑‍🏫 Tutor</div>
-        <nav style={nav}>
-          <a style={navItemActive}>🏠 Dashboard</a>
-          <a style={navItem}>📅 Classes</a>
-          <a style={navItem}>📝 Assignments</a>
-          <a style={navItem}>🎥 Recordings</a>
-          <a style={navItem}>📩 Email</a>
-          <a style={navItem}>📊 Reports</a>
-        </nav>
-        <button style={logoutBtn} onClick={() => { logout(); navigate("/"); }}>Logout</button>
+    <div className="min-h-screen flex bg-gradient-to-br from-orange-50/30 to-amber-50/30 font-sans">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex flex-col w-72 h-screen fixed bg-white shadow-2xl border-r border-gray-100 z-40">
+        {/* Sidebar Header */}
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white">
+              👨‍🏫
+            </div>
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                Tutor Portal
+              </h1>
+              <p className="text-xs text-gray-500">Teaching Dashboard</p>
+            </div>
+          </div>
+        </div>
+
+        {sidebar}
       </aside>
 
-      <main style={main}>
-        <header style={topbar}>
-          <h1 style={{ ...title, color: "#7c2d12" }}>Tutor Dashboard</h1>
-          <div style={crumbs}>Home / Tutor</div>
-        </header>
+      {/* Mobile Sidebar */}
+      <motion.div
+        initial={{ x: "-100%" }}
+        animate={{ x: isMenuOpen ? 0 : "-100%" }}
+        transition={{ type: "spring", damping: 25 }}
+        className="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl z-50 lg:hidden flex flex-col"
+      >
+        <div className="p-6 flex justify-between items-center border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white">
+              👨‍🏫
+            </div>
+            <h1 className="text-xl font-bold text-gray-800">Tutor Portal</h1>
+          </div>
+          <button 
+            onClick={toggleMenu}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-700" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {sidebar}
+        </div>
+      </motion.div>
 
-        <section style={grid}>
-          {cards.map((c, i) => (
-            <motion.div
-              key={c.title}
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-              style={card}
-            >
-              <div style={{ ...badge, background: c.color }}>{c.icon}</div>
-              <div style={cardTitle}>{c.title}</div>
-              <div style={cardDesc}>{c.desc}</div>
-            </motion.div>
-          ))}
-        </section>
-      </main>
+      {/* Mobile Overlay */}
+      {isMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-72 p-4 md:p-6 min-h-screen">
+        {/* Fixed Mobile Header */}
+        <div className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-lg z-30 border-b border-gray-100">
+          <div className="flex justify-between items-center p-4">
+            <div className="flex items-center gap-3">
+              <button
+                className="p-2 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 shadow-sm"
+                onClick={toggleMenu}
+              >
+                <Menu className="w-5 h-5 text-gray-700" />
+              </button>
+              <div>
+                <h1 className="font-bold text-gray-800">Tutor Portal</h1>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Bell className="w-5 h-5 text-gray-600 cursor-pointer hover:text-orange-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold text-sm">
+                T
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Container */}
+        <div className="lg:pt-0 pt-16">
+          {/* Desktop Header */}
+          <header className="hidden lg:flex justify-between items-center mb-8 p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-900 bg-clip-text text-transparent">
+                Welcome, Tutor!
+              </h1>
+              <p className="text-gray-500 text-sm mt-1">Manage your classes and help students succeed</p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-orange-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold">
+                  T
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800">Tutor User</p>
+                  <p className="text-xs text-gray-500">Senior Instructor</p>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Nested pages render here */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100 p-4 md:p-6">
+            <Outlet />
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
-
-// Shared baseline styles (reuse from Admin to keep consistency)
-const wrap = { display: "flex", minHeight: "100vh", background: "linear-gradient(135deg,#fff7ed,#fff)" };
-const sidebar = {
-  position: "fixed", top: 0, left: 0, width: 260, height: "100vh",
-  backdropFilter: "blur(12px)",
-  borderRight: "1px solid #f5d9b1", boxShadow: "2px 0 16px rgba(124,45,18,0.08)",
-  padding: "22px 16px", display: "flex", flexDirection: "column", gap: 14
-};
-const brand = { fontWeight: 800, fontSize: 20 };
-const nav = { display: "flex", flexDirection: "column", gap: 8, marginTop: 8 };
-const baseItem = { padding: "10px 12px", borderRadius: 10, textDecoration: "none", fontWeight: 700, fontSize: 14, color: "#78350f", cursor: "pointer" };
-const navItem = baseItem;
-const navItemActive = { ...baseItem, background: "#ffedd5", boxShadow: "inset 0 0 0 1px #fed7aa" };
-const logoutBtn = { marginTop: "300px", padding: "12px 14px", borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontWeight: 700, cursor: "pointer" };
-const main = { marginLeft: 260, flex: 1, padding: "28px 32px" };
-const topbar = { display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 22 };
-const title = { fontSize: 28, fontWeight: 800 };
-const crumbs = { color: "#7c2d12", opacity: 0.7, fontSize: 13, fontWeight: 600 };
-const grid = { display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))" };
-const card = { borderRadius: 16, padding: 20, background: "white", boxShadow: "0 10px 24px rgba(124,45,18,0.07)", border: "1px solid #fde68a40" };
-const badge = { width: 52, height: 52, borderRadius: 12, color: "#fff", fontSize: 26, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 18px rgba(0,0,0,.12)", marginBottom: 12 };
-const cardTitle = { fontWeight: 800, fontSize: 18, color: "#1f2937" };
-const cardDesc = { marginTop: 6, color: "#6b7280", lineHeight: 1.5, fontSize: 14 };
-
-export default TutorDashboard;
+}

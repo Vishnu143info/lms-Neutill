@@ -1,182 +1,260 @@
-import React from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { 
+  Home, 
+  BookOpen, 
+  Calendar, 
+  FileText, 
+  MessageSquare,
+  LogOut,
+  User,
+  Bell,
+  ChevronRight,
+  Menu,
+  X,
+  Book,
+  Video,
+  Award,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  Download,
+  Zap,
+  Settings,
+  HelpCircle
+} from "lucide-react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const ConsumerDashboard = ({ children }) => {
-  const { userProfile, logout } = useAuth();
+const NAV_ITEMS = [
+  { label: "Dashboard", path: "/dashboard/consumer/page", icon: Home },
+  { label: "My Modules", path: "/dashboard/consumer/modules", icon: BookOpen },
+  { label: "My Schedule", path: "/dashboard/consumer/schedule", icon: Calendar },
+  { label: "Ask Tutor", path: "/dashboard/consumer/ask", icon: MessageSquare },
+  { label: "Resume", path: "/dashboard/consumer/resume", icon: Award },
+];
+
+const NavItem = ({ label, path, icon: Icon, active, onClick }) => (
+  <motion.div
+    whileHover={{ x: 4 }}
+    whileTap={{ scale: 0.98 }}
+    onClick={onClick}
+    className={`relative flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300 ${
+      active
+        ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 border-l-4 border-blue-500"
+        : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+    }`}
+  >
+    <div className={`p-2 rounded-lg ${
+      active 
+        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white" 
+        : "bg-gray-100 text-gray-600"
+    }`}>
+      <Icon className="w-4 h-4" />
+    </div>
+    <span className="font-medium">{label}</span>
+    {active && (
+      <ChevronRight className="w-4 h-4 ml-auto text-blue-500" />
+    )}
+  </motion.div>
+);
+
+export default function ConsumerDashboard() {
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const go = (path) => navigate(path);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const sidebar = (
+    <nav className="flex flex-col h-full p-4">
+      {/* User Profile */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold">
+              {user?.name?.charAt(0) || 'S'}
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+          </div>
+          <div>
+            <p className="font-bold text-gray-800">{user?.name || 'Student User'}</p>
+            <p className="text-sm text-gray-600">Premium Plan</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-500">Progress</span>
+          <span className="font-bold text-blue-600">65%</span>
+        </div>
+        <div className="mt-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: "65%" }}
+            className="h-full bg-gradient-to-r from-blue-500 to-indigo-500"
+          />
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex-1 space-y-1">
+        {NAV_ITEMS.map((item) => (
+          <NavItem
+            key={item.label}
+            label={item.label}
+            path={item.path}
+            icon={item.icon}
+            active={pathname === item.path || pathname.startsWith(`${item.path}/`)}
+            onClick={() => {
+              navigate(item.path);
+              setIsMenuOpen(false);
+            }}
+          />
+        ))}
+      </div>
+
+    
+
+      {/* Help & Support */}
+    
+
+      {/* Logout */}
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={() => {
+          logout();
+          navigate("/");
+        }}
+        className="mt-4 flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-red-50 to-pink-50 hover:from-red-100 hover:to-pink-100 text-red-600 rounded-xl font-medium transition-all duration-300 border border-red-200"
+      >
+        <LogOut className="w-4 h-4" />
+        Logout
+      </motion.button>
+    </nav>
+  );
 
   return (
-    <div style={wrap}>
-      {/* ✅ FIXED SIDEBAR */}
-      <aside style={sidebar}>
-        <div style={brand}>🎓 Student</div>
-
-        {/* ✅ MENU */}
-        <nav style={menu}>
-          <div style={menuItem} onClick={() => go("/dashboard/consumer")}>
-            🏠 Dashboard
+    <div className="min-h-screen flex bg-gradient-to-br from-gray-50 to-blue-50 font-sans">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex flex-col w-72 h-screen fixed bg-white shadow-2xl border-r border-gray-100 z-40">
+        {/* Sidebar Header */}
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white">
+              🎓
+            </div>
+            <div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                Student Portal
+              </h1>
+              <p className="text-xs text-gray-500">Learning Dashboard</p>
+            </div>
           </div>
+        </div>
 
-          <div style={menuItem} onClick={() => go("/modules")}>
-            📚 My Modules
-          </div>
-
-          <div style={menuItem} onClick={() => go("/notes")}>
-            📝 Notes
-          </div>
-
-          <div style={menuItem} onClick={() => go("/progress")}>
-            📈 Progress
-          </div>
-
-          <div style={menuItem} onClick={() => go("/alfa")}>
-            🤖 AI Study Bot
-          </div>
-        </nav>
-
-        {/* ✅ LOGOUT BUTTON */}
-        <button
-          style={logoutBtn}
-          onClick={() => {
-            logout();
-            navigate("/");
-          }}
-        >
-          Logout
-        </button>
+        {sidebar}
       </aside>
 
-      {/* ✅ MAIN CONTENT (Shows Dashboard OR Children) */}
-      <main style={main}>
-        {!children ? (
-          <>
-            <header style={topHeader}>
-              <h1 style={title}>Welcome, {userProfile?.name || "Learner"}</h1>
-              <p style={subtitle}>Your Personal Learning Dashboard</p>
-            </header>
+      {/* Mobile Sidebar */}
+      <motion.div
+        initial={{ x: "-100%" }}
+        animate={{ x: isMenuOpen ? 0 : "-100%" }}
+        transition={{ type: "spring", damping: 25 }}
+        className="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl z-50 lg:hidden flex flex-col"
+      >
+        <div className="p-6 flex justify-between items-center border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white">
+              🎓
+            </div>
+            <h1 className="text-xl font-bold text-gray-800">Student Portal</h1>
+          </div>
+          <button 
+            onClick={toggleMenu}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-700" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {sidebar}
+        </div>
+      </motion.div>
 
-            {/* ✅ Default Dashboard Widgets */}
-            <section style={grid}>
-              <motion.div
-                style={card}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                <h3 style={cardTitle}>📚 Your Modules</h3>
-                <p style={cardText}>Continue your learning journey.</p>
-              </motion.div>
+      {/* Mobile Overlay */}
+      {isMenuOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
 
-              <motion.div
-                style={card}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-72 p-4 md:p-6 min-h-screen">
+        {/* Fixed Mobile Header */}
+        <div className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-lg z-30 border-b border-gray-100">
+          <div className="flex justify-between items-center p-4">
+            <div className="flex items-center gap-3">
+              <button
+                className="p-2 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 shadow-sm"
+                onClick={toggleMenu}
               >
-                <h3 style={cardTitle}>📈 Your Progress</h3>
-                <p style={cardText}>Track your daily improvements.</p>
-              </motion.div>
+                <Menu className="w-5 h-5 text-gray-700" />
+              </button>
+              <div>
+                <h1 className="font-bold text-gray-800">Student Portal</h1>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Bell className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+                {user?.name?.charAt(0) || 'S'}
+              </div>
+            </div>
+          </div>
+        </div>
 
-              <motion.div
-                style={card}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <h3 style={cardTitle}>🤖 AI Study Bot</h3>
-                <p style={cardText}>Ask ALFA anything to learn faster.</p>
-              </motion.div>
-            </section>
-          </>
-        ) : (
-          // ✅ If a child page exists → render inside dashboard
-          <div style={{ paddingTop: 20 }}>{children}</div>
-        )}
-      </main>
+        {/* Main Content Container */}
+        <div className="lg:pt-0 pt-16">
+          {/* Desktop Header */}
+          <header className="hidden lg:flex justify-between items-center mb-8 p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-900 bg-clip-text text-transparent">
+                Welcome Back, {user?.name?.split(' ')[0] || 'Student'}! 👋
+              </h1>
+              <p className="text-gray-500 text-sm mt-1">Track your progress and continue learning</p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold">
+                  {user?.name?.charAt(0) || 'S'}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800">{user?.name || 'Student User'}</p>
+                  <p className="text-xs text-gray-500">Premium Plan • Online</p>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Nested pages render here */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100 p-4 md:p-6">
+            <Outlet />
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
-
-/* ✅ Styles */
-const wrap = {
-  display: "flex",
-  minHeight: "100vh",
-  background: "#eef6ff",
-  fontFamily: "Arial, sans-serif",
-};
-
-const sidebar = {
-  width: 260,
-  background: "#ffffff",
-  padding: 20,
-  position: "fixed",
-  top: 0,
-  bottom: 0,
-  left: 0,
-  boxShadow: "2px 0 10px rgba(0,0,0,0.08)",
-  display: "flex",
-  flexDirection: "column",
-};
-
-const brand = {
-  fontSize: 22,
-  fontWeight: 800,
-  color: "#0369a1",
-  marginBottom: 20,
-};
-
-const menu = { display: "flex", flexDirection: "column", gap: 12 };
-
-const menuItem = {
-  padding: "12px 14px",
-  borderRadius: 10,
-  fontSize: 15,
-  cursor: "pointer",
-  background: "#f1faff",
-  fontWeight: 600,
-  color: "#0c4a6e",
-  transition: "0.2s",
-};
-
-const logoutBtn = {
-  marginTop: "auto",
-  padding: "12px",
-  background: "#ef4444",
-  color: "white",
-  border: "none",
-  borderRadius: 10,
-  cursor: "pointer",
-  fontWeight: 700,
-};
-
-const main = {
-  flex: 1,
-  marginLeft: 260,
-  padding: "30px 40px",
-};
-
-const topHeader = { marginBottom: 30 };
-
-const title = { fontSize: 28, fontWeight: 800, color: "#0f172a" };
-const subtitle = { fontSize: 14, color: "#475569" };
-
-const grid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-  gap: 20,
-};
-
-const card = {
-  background: "#ffffff",
-  padding: 20,
-  borderRadius: 14,
-  boxShadow: "0 8px 16px rgba(0,0,0,0.05)",
-};
-
-const cardTitle = { fontSize: 18, fontWeight: 700, color: "#0f172a" };
-const cardText = { color: "#475569", fontSize: 14, marginTop: 6 };
-
-export default ConsumerDashboard;
+}

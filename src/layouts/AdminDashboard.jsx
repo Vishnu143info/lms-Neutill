@@ -1,256 +1,280 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
   Zap,
   BookOpen,
-  BarChart3,
   Wallet,
   Menu,
   X,
   Bell,
   LogOut,
+  ChevronRight,
+  Settings,
+  Calendar,
+  FileText,
+  ChevronLeft,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
-/* ✅ Card Data */
-const CARD_DATA = [
-  { title: "Manage Content", icon: BookOpen, desc: "Create, edit, and organize modules.", color: "bg-blue-600" },
-  { title: "Attendance", icon: BarChart3, desc: "Monitor real-time student activity.", color: "bg-emerald-500" },
-  { title: "Subscriptions", icon: Wallet, desc: "Manage plans, billing, and privileges.", color: "bg-amber-500" },
-  { title: "Automation", icon: Zap, desc: "Automate emails & notification triggers.", color: "bg-violet-600" },
-  { title: "User Control", icon: Users, desc: "Manage admin, tutor & student access.", color: "bg-red-500" },
-];
-
-/* ✅ Navigation Items */
 const NAV_ITEMS = [
-  { label: "Dashboard", icon: LayoutDashboard, active: true },
-  { label: "Content", icon: BookOpen, active: false },
-  { label: "Attendance", icon: BarChart3, active: false },
-  { label: "Subscriptions", icon: Wallet, active: false },
-  { label: "Automation", icon: Zap, active: false },
-  { label: "Users", icon: Users, active: false },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard/admin/page" },
+  { label: "Content", icon: BookOpen, path: "/dashboard/admin/content" },
+  { label: "Schedule", icon: Calendar, path: "/dashboard/admin/schedule" },
+  { label: "Subscriptions", icon: Wallet, path: "/dashboard/admin/subscriptions" },
+  { label: "Automation", icon: Zap, path: "/dashboard/admin/posters" },
+  { label: "Users", icon: Users, path: "/dashboard/admin/users" },
+  { label: "Resumes", icon: FileText, path: "/dashboard/admin/resume" },
 ];
 
-/* ✅ Beautiful Logout Confirmation Modal */
-const ConfirmLogoutModal = ({ visible, onConfirm, onCancel }) => {
-  if (!visible) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[999]">
-      <motion.div
-        initial={{ scale: 0.85, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.2 }}
-        className="bg-white rounded-2xl shadow-2xl p-7 w-[90%] max-w-md text-center"
-      >
-        <h3 className="text-2xl font-bold text-red-600 mb-4">
-          Confirm Logout
-        </h3>
-
-        <p className="text-gray-700 mb-6">
-          Are you sure you want to log out?
-        </p>
-
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={onCancel}
-            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 transition rounded-xl font-semibold"
-          >
-            Cancel
-          </button>
-
-          <button
-            onClick={onConfirm}
-            className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white transition rounded-xl font-semibold"
-          >
-            Logout
-          </button>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-/* ✅ Sidebar Navigation Item */
-const NavItem = ({ label, Icon, active, onClick }) => (
-  <div
+const NavItem = ({ label, Icon, active, onClick, collapsed }) => (
+  <motion.button
+    whileHover={{ x: collapsed ? 0 : 4 }}
+    whileTap={{ scale: 0.98 }}
     onClick={onClick}
-    className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer font-semibold transition-all duration-200 ${
+    className={`relative flex items-center gap-3 p-3 rounded-lg cursor-pointer w-full text-left transition-all duration-300 group ${
       active
-        ? "bg-blue-100 text-blue-700 shadow-inner shadow-blue-50 border border-blue-200"
-        : "text-gray-600 hover:bg-white hover:shadow-md"
+        ? "bg-white shadow-lg text-blue-600"
+        : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
     }`}
   >
-    <Icon className="w-5 h-5" />
-    <span>{label}</span>
-  </div>
+    {active && !collapsed && (
+      <motion.div
+        layoutId="activeTab"
+        className="absolute left-0 w-1 h-8 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-r-full"
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      />
+    )}
+    <div className={`p-2 rounded-lg transition-all duration-300 ${
+      active 
+        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white" 
+        : "bg-gray-100 group-hover:bg-gray-200 text-gray-600"
+    }`}>
+      <Icon className="w-4 h-4" />
+    </div>
+    {!collapsed && (
+      <>
+        <span className="font-medium flex-1 text-left">{label}</span>
+        <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${
+          active ? "text-blue-500" : "text-gray-400 group-hover:text-gray-600"
+        }`} />
+      </>
+    )}
+    {collapsed && active && (
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
+      />
+    )}
+  </motion.button>
 );
 
-/* ✅ Navbar */
-const DashboardNavbar = ({ role, onMenuToggle, onLogoutClick }) => {
-  return (
-    <header className="flex justify-between items-center h-16 sticky top-0 bg-white/80 backdrop-blur-md z-30 px-0 sm:px-4">
-      <button
-        onClick={onMenuToggle}
-        className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
-
-      <div className="hidden lg:block text-xl font-bold text-gray-800">
-        {role} Panel
-      </div>
-
-      <div className="flex items-center gap-4">
-        <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
-          <Bell className="w-5 h-5" />
-        </button>
-
-        <button
-          onClick={onLogoutClick}
-          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold flex items-center gap-2 transition-all"
-        >
-          <LogOut className="w-4 h-4" /> Logout
-        </button>
-
-        <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-          A
-        </div>
-      </div>
-    </header>
-  );
-};
-
-/* ✅ FULL Dashboard Component */
-const AdminDashboard = () => {
+export default function AdminDashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
-  /* ✅ Logout Modal Controls */
-  const openLogoutModal = () => setShowConfirm(true);
-  const closeLogoutModal = () => setShowConfirm(false);
+  const sidebar = (collapsed = false) => (
+    <nav className="flex flex-col h-full">
+      {/* Sidebar Header - Only show in desktop expanded mode */}
+      {!collapsed && (
+        <div className="p-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white">
+              <Settings className="w-4 h-4" />
+            </div>
+            <div>
+              <h1 className="font-bold text-gray-800 text-sm">Admin</h1>
+            </div>
+          </div>
+        </div>
+      )}
 
-  const confirmLogout = () => {
-    console.log("Logged out");
-    navigate("/");
-  };
+      {/* User Profile */}
+      <div className={`p-4 ${collapsed ? "pt-6" : ""}`}>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className={`${collapsed ? "w-8 h-8" : "w-10 h-10"} rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold`}>
+              A
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+          </div>
+          {!collapsed && (
+            <div className="transition-all duration-300">
+              <p className="font-semibold text-gray-800 text-sm">Administrator</p>
+              <p className="text-xs text-gray-500">Online</p>
+            </div>
+          )}
+        </div>
+      </div>
 
-  /* ✅ Sidebar */
-  const sidebar = (
-    <nav className="flex flex-col gap-3 p-4 h-full">
-      {NAV_ITEMS.map((item, index) => (
-        <NavItem
-          key={index}
-          label={item.label}
-          Icon={item.icon}
-          active={item.active}
-          onClick={() => {
-            if (isMenuOpen) toggleMenu();
-          }}
-        />
-      ))}
+      {/* Navigation Items */}
+      <div className="flex-1 px-2 space-y-1 overflow-y-auto">
+        {NAV_ITEMS.map((item) => (
+          <NavItem
+            key={item.label}
+            label={item.label}
+            Icon={item.icon}
+            active={pathname === item.path}
+            collapsed={collapsed}
+            onClick={() => {
+              navigate(item.path);
+              setIsMenuOpen(false);
+            }}
+          />
+        ))}
+      </div>
 
-      <button
-        onClick={openLogoutModal}
-        className="mt-auto p-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold transition-all text-center flex items-center justify-center gap-2"
-      >
-        <LogOut className="w-4 h-4" /> Logout
-      </button>
+      {/* Logout Button */}
+      <div className="p-4">
+        <motion.button
+          whileHover={{ scale: collapsed ? 1.05 : 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate("/")}
+          className={`flex items-center gap-3 p-3 bg-gradient-to-r from-red-50 to-pink-50 hover:from-red-100 hover:to-pink-100 text-red-600 rounded-lg font-semibold transition-all duration-300 w-full border border-red-200 ${
+            collapsed ? "justify-center" : ""
+          }`}
+        >
+          <LogOut className="w-4 h-4" />
+          {!collapsed && <span>Logout</span>}
+        </motion.button>
+      </div>
     </nav>
   );
 
+  // Mobile overlay
+  const mobileOverlay = (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isMenuOpen ? 1 : 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+      onClick={() => setIsMenuOpen(false)}
+    />
+  );
+
   return (
-    <div className="min-h-screen flex bg-gray-50 font-sans">
+    <div className="min-h-screen flex bg-gradient-to-br from-gray-50 to-blue-50 font-sans">
+      {/* Mobile Overlay */}
+      {isMenuOpen && mobileOverlay}
 
-      {/* ✅ Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 h-screen fixed top-0 left-0 p-6 bg-white shadow-xl z-20">
-        <div className="text-3xl font-extrabold text-blue-800 mb-8">⚙️ Admin</div>
-        {sidebar}
-      </aside>
-
-      {/* ✅ Mobile Sidebar */}
-      <motion.div
-        initial={false}
-        animate={{ x: isMenuOpen ? 0 : "-100%" }}
-        transition={{ duration: 0.3 }}
-        className="fixed inset-0 w-64 bg-white shadow-2xl z-50 lg:hidden flex flex-col h-screen"
+      {/* Desktop Sidebar */}
+      <motion.aside
+        animate={{ width: isCollapsed ? "80px" : "280px" }}
+        className="hidden lg:flex flex-col h-screen fixed bg-white shadow-2xl border-r border-gray-100 z-40"
       >
-        <div className="p-6 flex justify-between items-center border-b">
-          <div className="text-3xl font-extrabold text-blue-800">⚙️ Admin</div>
-          <button onClick={toggleMenu} className="p-2 rounded-full hover:bg-gray-100">
-            <X className="w-6 h-6 text-gray-700" />
-          </button>
+        {sidebar(isCollapsed)}
+        
+        {/* Collapse Button */}
+        <button
+          onClick={toggleCollapse}
+          className="absolute -right-3 top-6 p-2 bg-white shadow-lg rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+        >
+          <ChevronLeft className={`w-4 h-4 text-gray-600 transition-transform duration-300 ${
+            isCollapsed ? "rotate-180" : ""
+          }`} />
+        </button>
+      </motion.aside>
+
+      {/* Mobile Sidebar */}
+      <motion.div
+        initial={{ x: "-100%" }}
+        animate={{ x: isMenuOpen ? 0 : "-100%" }}
+        transition={{ type: "spring", damping: 25 }}
+        className="fixed inset-y-0 left-0 w-72 bg-white shadow-2xl z-50 lg:hidden flex flex-col"
+      >
+        {/* Mobile Header */}
+        
+        
+        {/* Mobile Sidebar Content */}
+        <div className="flex-1 overflow-y-auto">
+          {sidebar(false)}
         </div>
-        {sidebar}
       </motion.div>
 
-      {/* ✅ Main Content */}
-      <div className="flex-1 lg:ml-64 p-4 sm:p-8 pt-0 min-w-0">
-        <DashboardNavbar
-          role="Admin"
-          onMenuToggle={toggleMenu}
-          onLogoutClick={openLogoutModal}
-        />
-
-        <main className="mt-4">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900">
-            Welcome Back, Admin 👋
-          </h1>
-
-          <p className="text-base sm:text-lg mb-8 text-gray-500">
-            Control your Learning Management System efficiently using the tools below.
-          </p>
-
-          {/* ✅ Cards */}
-          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {CARD_DATA.map((c, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.4 }}
-                className="bg-white p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:scale-[1.02] cursor-pointer border border-gray-100"
+      {/* Main Content */}
+      <div className={`flex-1 transition-all duration-300 ${
+        isCollapsed ? "lg:ml-20" : "lg:ml-80"
+      } p-4 md:p-6 min-h-screen`}>
+        {/* Fixed Mobile Header */}
+        <div className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-lg z-30 border-b border-gray-100">
+          <div className="flex justify-between items-center p-4">
+            <div className="flex items-center gap-3">
+              <button
+                className="p-2 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 shadow-sm"
+                onClick={toggleMenu}
               >
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-white mb-4 ${c.color}`}>
-                  <c.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">{c.title}</h3>
-                <p className="text-sm text-gray-500">{c.desc}</p>
-              </motion.div>
-            ))}
-          </section>
-
-          {/* ✅ Recent Activity */}
-          <div className="mt-10 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Recent Activity</h2>
-            <div className="h-40 flex items-center justify-center text-gray-400">
-              Activity log or chart placeholder
+                <Menu className="w-5 h-5 text-gray-700" />
+              </button>
+              <div>
+                <h1 className="font-bold text-gray-800">Admin</h1>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Bell className="w-5 h-5 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+                A
+              </div>
             </div>
           </div>
-        </main>
+        </div>
+
+        {/* Main Content Container - Adjusted for fixed mobile header */}
+        <div className={`${isMobile ? 'pt-16' : ''}`}>
+          {/* Desktop Header - Hidden on mobile */}
+          <header className="hidden lg:flex justify-between items-center mb-8 p-4 bg-white rounded-2xl shadow-lg border border-gray-100">
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-900 bg-clip-text text-transparent">
+                Dashboard
+              </h1>
+              <p className="text-gray-500 text-sm mt-1">Welcome back! Here's what's happening.</p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold">
+                  A
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800">Administrator</p>
+                  <p className="text-xs text-gray-500">Online</p>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Nested pages render here */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-100 p-4 md:p-6">
+            <Outlet />
+          </div>
+        </div>
       </div>
-
-      {/* ✅ Logout Confirmation Modal */}
-      <ConfirmLogoutModal
-        visible={showConfirm}
-        onConfirm={confirmLogout}
-        onCancel={closeLogoutModal}
-      />
-
-      {isMenuOpen && (
-        <div
-          onClick={toggleMenu}
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-        />
-      )}
     </div>
   );
-};
-
-export default AdminDashboard;
+}
