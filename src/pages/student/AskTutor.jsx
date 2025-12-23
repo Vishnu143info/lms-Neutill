@@ -1,483 +1,597 @@
-import React, { useState, useRef, useEffect } from "react";
-import { 
-  Send, 
-  Paperclip, 
-  Smile, 
-  Image as ImageIcon,
-  Mic,
-  Video,
-  FileText,
-  Calendar,
-  Clock,
-  User,
-  CheckCircle,
-  HelpCircle,
-  ThumbsUp,
-  ThumbsDown,
-  MoreVertical,
-  Star,
-  Phone,
-  MessageSquare,
-  Bot,
-  Sparkles,
-  ChevronRight,
-  Search,
-  Filter,
-  Download
-} from "lucide-react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { db, auth } from "../../firebase";
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+  doc,
+  where,
+  setDoc,
+  updateDoc,
+  getDoc,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { Send, Loader2, GraduationCap, Check, CheckCheck, Search, Bell, ChevronRight } from "lucide-react";
 
-const MessageBubble = ({ message, isStudent, timestamp, isRead }) => {
+/* ---------------- Message Bubble ---------------- */
+const MessageBubble = ({ text, isMe, timestamp, status, isLastOfUser }) => {
+  const [timeString, setTimeString] = useState("");
+
+  useEffect(() => {
+    if (timestamp) {
+      const date = timestamp.toDate();
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      if (diffMins < 60) {
+        setTimeString(`${diffMins}m ago`);
+      } else if (date.toDateString() === now.toDateString()) {
+        setTimeString(date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+      } else {
+        setTimeString(date.toLocaleDateString([], { month: "short", day: "numeric" }));
+      }
+    }
+  }, [timestamp]);
+
+  return (
+    <div className={`flex ${isMe ? "justify-end" : "justify-start"} mb-2 px-4`}>
+      <div className={`flex flex-col max-w-[70%] ${isMe ? "items-end" : "items-start"}`}>
+        <div
+          className={`relative group rounded-2xl px-4 py-3 transition-all duration-200 ${
+            isMe
+              ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-br-none shadow-sm"
+              : "bg-white text-gray-800 border border-gray-100 rounded-bl-none shadow-sm"
+          } ${!isLastOfUser ? "mb-1" : "mb-3"}`}
+        >
+          <p className="text-sm whitespace-pre-wrap">{text}</p>
+          <div className="flex items-center justify-end mt-2 gap-2">
+            <span className="text-xs opacity-80">
+              {timeString}
+            </span>
+            {isMe && (
+              <span className="text-xs">
+                {status === "sent" && <Check size={12} className="text-gray-400" />}
+                {status === "delivered" && <CheckCheck size={12} className="text-gray-400" />}
+                {status === "read" && <CheckCheck size={12} className="text-blue-400" />}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ---------------- Tutor Card ---------------- */
+const TutorCard = ({ tutor, isActive, unreadCount, onClick, lastMessage }) => {
   const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: true 
-    });
+    if (!timestamp) return "";
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (date.toDateString() === now.toDateString()) {
+        return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+      return date.toLocaleDateString([], { month: "short", day: "numeric" });
+    } catch (error) {
+      return "";
+    }
   };
 
   return (
-    <div className={`flex ${isStudent ? 'justify-end' : 'justify-start'} mb-4`}>
-      <div className={`max-w-[70%] ${isStudent ? 'ml-auto' : ''}`}>
-        <div className={`rounded-2xl px-4 py-3 ${
-          isStudent 
-            ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-br-none'
-            : 'bg-gray-100 text-gray-800 rounded-bl-none'
-        }`}>
-          <p className="text-sm">{message}</p>
-        </div>
-        
-        <div className={`flex items-center gap-2 mt-1 text-xs ${isStudent ? 'justify-end' : 'justify-start'}`}>
-          <span className="text-gray-500">{formatTime(timestamp)}</span>
-          {isStudent && (
-            <CheckCircle className={`w-3 h-3 ${isRead ? 'text-green-500' : 'text-gray-400'}`} />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const TutorCard = ({ name, role, status, avatarColor, responseTime, rating }) => {
-  return (
-    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-3">
-        <div className={`w-12 h-12 rounded-full ${avatarColor} flex items-center justify-center text-white font-bold text-lg`}>
-          {name.charAt(0)}
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-gray-800">{name}</h4>
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              status === 'online' ? 'bg-green-100 text-green-800' :
-              status === 'away' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
-              {status}
-            </span>
-          </div>
-          <p className="text-gray-600 text-sm">{role}</p>
-          <div className="flex items-center gap-4 mt-2">
-            <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3 text-gray-400" />
-              <span className="text-xs text-gray-600">~{responseTime}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-              <span className="text-xs text-gray-600">{rating}/5</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const QuickQuestion = ({ question, icon: Icon, onClick }) => {
-  return (
-    <button
+    <div
       onClick={onClick}
-      className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl border border-blue-100 transition-all duration-300 text-left group"
+      className={`p-4 cursor-pointer transition-all duration-200 border-l-4 ${
+        isActive
+          ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-500"
+          : "hover:bg-gray-50 border-transparent hover:border-l-indigo-200"
+      }`}
     >
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-white rounded-lg group-hover:scale-110 transition-transform">
-          <Icon className="w-4 h-4 text-blue-600" />
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white font-semibold">
+              {tutor.displayName?.charAt(0) || "T"}
+            </div>
+            {unreadCount > 0 && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs animate-pulse">
+                {unreadCount}
+              </div>
+            )}
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-800">
+              {tutor.displayName}
+            </h3>
+            <p className="text-xs text-gray-500">Tutor</p>
+          </div>
         </div>
-        <span className="text-sm font-medium text-gray-800">{question}</span>
+        <div className="flex flex-col items-end">
+          {lastMessage?.timestamp && (
+            <span className="text-xs text-gray-400 whitespace-nowrap">
+              {formatTime(lastMessage.timestamp)}
+            </span>
+          )}
+          <ChevronRight 
+            size={16} 
+            className={`text-gray-300 transition-transform ${
+              isActive ? "rotate-90" : ""
+            }`} 
+          />
+        </div>
       </div>
-    </button>
+      {lastMessage?.text && (
+        <p className="text-sm text-gray-600 truncate line-clamp-2 pl-13">
+          {lastMessage.text}
+        </p>
+      )}
+    </div>
   );
 };
 
 export default function AskTutor() {
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hi! I need help with React hooks. Can you explain useState?", sender: "student", timestamp: new Date(Date.now() - 3600000), isRead: true },
-    { id: 2, text: "Hello! Of course. useState is a Hook that lets you add React state to function components.", sender: "tutor", timestamp: new Date(Date.now() - 3500000), isRead: true },
-    { id: 3, text: "What about useEffect? I'm having trouble understanding dependencies.", sender: "student", timestamp: new Date(Date.now() - 3400000), isRead: true },
-    { id: 4, text: "useEffect runs after every render. The dependency array controls when it re-runs. Want me to show an example?", sender: "tutor", timestamp: new Date(Date.now() - 3300000), isRead: true },
-  ]);
-  
+  const [user, setUser] = useState(null);
+  const [tutors, setTutors] = useState([]);
+  const [activeTutor, setActiveTutor] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [activeTutor, setActiveTutor] = useState("John Smith");
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [unreadCounts, setUnreadCounts] = useState({});
+  const [lastMessages, setLastMessages] = useState({});
+  const [messageStats, setMessageStats] = useState({ total: 0, unread: 0 });
+  const [filter, setFilter] = useState("all");
+  const bottomRef = useRef(null);
 
-  const tutors = [
-    { name: "John Smith", role: "React Specialist", status: "online", avatarColor: "bg-gradient-to-r from-blue-500 to-indigo-500", responseTime: "5 min", rating: 4.8 },
-    { name: "Sarah Chen", role: "JavaScript Expert", status: "away", avatarColor: "bg-gradient-to-r from-purple-500 to-pink-500", responseTime: "15 min", rating: 4.9 },
-    { name: "Mike Johnson", role: "Full Stack Developer", status: "offline", avatarColor: "bg-gradient-to-r from-green-500 to-emerald-500", responseTime: "2 hours", rating: 4.7 },
-  ];
+  /* 🔐 Auth */
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, setUser);
+    return () => unsub();
+  }, []);
 
-  const quickQuestions = [
-    { id: 1, question: "Explain useState with example", icon: HelpCircle },
-    { id: 2, question: "Async/await best practices", icon: HelpCircle },
-    { id: 3, question: "Project structure advice", icon: HelpCircle },
-    { id: 4, question: "Schedule 1:1 session", icon: Calendar },
-    { id: 5, question: "Share code file", icon: FileText },
-    { id: 6, question: "Need video explanation", icon: Video },
-  ];
+  /* 👨‍🏫 Tutors */
+  useEffect(() => {
+    const q = query(
+      collection(db, "users"),
+      where("role", "==", "tutor"),
+      where("approved", "==", true)
+    );
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    
-    const newMessage = {
-      id: Date.now(),
-      text: input,
-      sender: "student",
-      timestamp: new Date(),
-      isRead: false
+    const unsub = onSnapshot(q, (snap) => {
+      const tutorList = snap.docs.map((d) => ({
+        id: d.id,
+        displayName: d.data().profile?.name || "Tutor",
+        subjects: d.data().profile?.subjects || [],
+        rating: d.data().profile?.rating || 0,
+      }));
+      setTutors(tutorList);
+      setLoading(false);
+    });
+
+    return () => unsub();
+  }, []);
+
+  /* 📊 Fetch Unread Counts and Last Messages */
+  useEffect(() => {
+    if (!user || tutors.length === 0) return;
+
+    const unreadSubscriptions = [];
+    let totalUnread = 0;
+    let processedTutors = 0;
+
+    tutors.forEach((tutor) => {
+      const chatId = `${user.uid}_${tutor.id}`;
+      const chatRef = doc(db, "chats", chatId);
+      
+      // Subscribe to chat document to get last message
+      const chatUnsub = onSnapshot(chatRef, (chatSnap) => {
+        if (chatSnap.exists()) {
+          const chatData = chatSnap.data();
+          
+          // Get last message from chat data
+          if (chatData.lastMessage) {
+            setLastMessages(prev => ({
+              ...prev,
+              [tutor.id]: {
+                text: chatData.lastMessage,
+                timestamp: chatData.lastUpdated
+              }
+            }));
+          }
+        }
+      });
+
+      // Subscribe to unread messages
+      const messagesRef = collection(db, "chats", chatId, "messages");
+      const unreadQuery = query(
+        messagesRef, 
+        where("senderId", "==", tutor.id),
+        where("read", "==", false)
+      );
+      
+      const unreadUnsub = onSnapshot(unreadQuery, (unreadSnap) => {
+        const count = unreadSnap.size;
+        setUnreadCounts(prev => ({...prev, [tutor.id]: count}));
+        
+        // Update total unread count
+        totalUnread += count;
+        processedTutors++;
+        
+        if (processedTutors === tutors.length) {
+          setMessageStats({
+            total: tutors.length,
+            unread: totalUnread
+          });
+        }
+      });
+
+      unreadSubscriptions.push(() => {
+        chatUnsub();
+        unreadUnsub();
+      });
+    });
+
+    return () => {
+      unreadSubscriptions.forEach(unsub => unsub());
     };
-    
-    setMessages([...messages, newMessage]);
-    setInput("");
-    
-    // Simulate tutor typing
-    setIsTyping(true);
-    
-    // Simulate tutor response after delay
-    setTimeout(() => {
-      setIsTyping(false);
-      const tutorResponse = {
-        id: Date.now() + 1,
-        text: getRandomResponse(input),
-        sender: "tutor",
-        timestamp: new Date(),
-        isRead: false
-      };
-      setMessages(prev => [...prev, tutorResponse]);
-    }, 2000);
-  };
+  }, [user, tutors]);
 
-  const getRandomResponse = (question) => {
-    const responses = [
-      "That's a great question! Let me explain that in detail.",
-      "I understand your confusion. Here's how it works:",
-      "Good question! The concept you're asking about is important. Let me break it down.",
-      "I can help with that! Here's my explanation:",
-      "Thanks for asking! This is a common point of confusion. Here's what you need to know:"
-    ];
-    return responses[Math.floor(Math.random() * responses.length)];
-  };
+  /* 💬 Messages */
+  useEffect(() => {
+    if (!activeTutor || !user) return;
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+    const chatId = `${user.uid}_${activeTutor.id}`;
+    const q = query(
+      collection(db, "chats", chatId, "messages"),
+      orderBy("timestamp", "asc")
+    );
+
+    const unsub = onSnapshot(q, async (snap) => {
+      const newMessages = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setMessages(newMessages);
+      
+      // Mark messages as read when user views them
+      const unreadMessages = snap.docs
+        .filter(doc => doc.data().senderId === activeTutor.id && !doc.data().read)
+        .map(doc => doc.id);
+
+      // Update all unread messages as read
+      for (const msgId of unreadMessages) {
+        try {
+          await updateDoc(doc(db, "chats", chatId, "messages", msgId), {
+            read: true,
+            readAt: serverTimestamp()
+          });
+        } catch (error) {
+          console.error("Error marking message as read:", error);
+        }
+      }
+
+      // Reset unread count for this tutor
+      if (unreadMessages.length > 0) {
+        setUnreadCounts(prev => ({...prev, [activeTutor.id]: 0}));
+      }
+
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ 
+          behavior: "smooth",
+          block: "end" 
+        });
+      }, 100);
+    });
+
+    return () => unsub();
+  }, [activeTutor, user]);
+
+  /* 📤 Send Message */
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!input.trim() || !user || !activeTutor) return;
+
+    const chatId = `${user.uid}_${activeTutor.id}`;
+    const messageRef = collection(db, "chats", chatId, "messages");
+
+    try {
+      await addDoc(messageRef, {
+        text: input,
+        senderId: user.uid,
+        senderName: user.displayName || user.email,
+        senderRole: "student",
+        timestamp: serverTimestamp(),
+        read: false,
+        delivered: false,
+      });
+
+      await setDoc(
+        doc(db, "chats", chatId),
+        {
+          lastMessage: input,
+          lastUpdated: serverTimestamp(),
+          lastSenderId: user.uid,
+          studentId: user.uid,
+          tutorId: activeTutor.id,
+          studentName: user.displayName || user.email,
+          tutorName: activeTutor.displayName,
+        },
+        { merge: true }
+      );
+
+      setInput("");
+    } catch (error) {
+      console.error("Error sending message:", error);
     }
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  /* 🔍 Filter and Search Tutors */
+  const filteredTutors = useMemo(() => {
+    let filtered = tutors.filter(tutor =>
+      tutor.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tutor.subjects?.some(subject => 
+        subject.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (filter === "unread") {
+      filtered = filtered.filter(tutor => unreadCounts[tutor.id] > 0);
+    } else if (filter === "today") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      filtered = filtered.filter(tutor => {
+        const lastMsg = lastMessages[tutor.id];
+        if (!lastMsg?.timestamp) return false;
+        const msgDate = lastMsg.timestamp.toDate ? lastMsg.timestamp.toDate() : new Date(lastMsg.timestamp.seconds * 1000);
+        return msgDate >= today;
+      });
+    }
 
-  const handleQuickQuestion = (question) => {
-    setInput(question);
-  };
+    return filtered;
+  }, [tutors, searchQuery, filter, unreadCounts, lastMessages]);
+
+  if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <Loader2 className="animate-spin text-indigo-600 mx-auto mb-4" size={48} />
+          <p className="text-gray-600">Loading tutors...</p>
+        </div>
+      </div>
+    );
 
   return (
-    <div className="p-6 h-full max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-blue-900 bg-clip-text text-transparent mb-2">
-            💬 Ask Tutor - Instant Help
-          </h1>
-          <p className="text-gray-600">Get real-time help from expert tutors. Average response time: 5 minutes</p>
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Tutors Sidebar */}
+      <div className="w-96 bg-white/90 backdrop-blur-sm border-r border-gray-200 flex flex-col">
+        {/* Header */}
+        <div className="p-6 border-b">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                <GraduationCap className="text-white" size={24} />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-800">Ask Tutor</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+                    {messageStats.total} tutors
+                  </span>
+                  {messageStats.unread > 0 && (
+                    <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                      {messageStats.unread} unread
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <Bell size={20} className="text-gray-600" />
+            </button>
+          </div>
+
+          {/* Search and Filter */}
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search tutors or subjects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-200 text-sm"
+              />
+            </div>
+            <div className="flex gap-2">
+              {["all", "unread", "today"].map((filterOption) => (
+                <button
+                  key={filterOption}
+                  onClick={() => setFilter(filterOption)}
+                  className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                    filter === filterOption
+                      ? "bg-indigo-500 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-        
-        <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-300 font-medium flex items-center gap-2">
-            <Phone className="w-4 h-4" />
-            Voice Call
-          </button>
-          <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 font-medium flex items-center gap-2">
-            <Video className="w-4 h-4" />
-            Video Chat
-          </button>
+
+        {/* Tutors List */}
+        <div className="flex-1 overflow-y-auto">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-4">
+            Available Tutors ({filteredTutors.length})
+          </h3>
+          {filteredTutors.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+              <GraduationCap className="text-gray-300 mb-4" size={48} />
+              <h3 className="text-gray-400 font-medium mb-2">
+                {searchQuery ? "No matching tutors" : "No tutors available"}
+              </h3>
+              <p className="text-sm text-gray-400 max-w-xs">
+                {searchQuery 
+                  ? "Try searching with different keywords"
+                  : "Check back later for available tutors"}
+              </p>
+            </div>
+          ) : (
+            filteredTutors.map((tutor) => (
+              <TutorCard
+                key={tutor.id}
+                tutor={tutor}
+                isActive={activeTutor?.id === tutor.id}
+                unreadCount={unreadCounts[tutor.id] || 0}
+                lastMessage={lastMessages[tutor.id]}
+                onClick={() => setActiveTutor(tutor)}
+              />
+            ))
+          )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-180px)]">
-        {/* Left Sidebar - Available Tutors */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Available Tutors */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-bold text-gray-800">Available Tutors</h3>
-              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                3 Online
-              </span>
-            </div>
-            
-            <div className="space-y-4">
-              {tutors.map((tutor, index) => (
-                <div 
-                  key={index}
-                  onClick={() => setActiveTutor(tutor.name)}
-                  className={`cursor-pointer transition-all duration-300 ${
-                    activeTutor === tutor.name ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
-                  }`}
-                >
-                  <TutorCard {...tutor} />
-                </div>
-              ))}
-            </div>
-            
-            <button className="w-full mt-6 px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 rounded-xl transition-all duration-300 font-medium flex items-center justify-center gap-2">
-              <MessageSquare className="w-4 h-4" />
-              View All Tutors
-            </button>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-            <div className="flex items-center gap-3 mb-6">
-              <Sparkles className="w-5 h-5 text-blue-600" />
-              <h3 className="font-bold text-gray-800">Your Support Stats</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Questions Asked</span>
-                <span className="font-bold text-gray-800">24</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Avg. Response Time</span>
-                <span className="font-bold text-gray-800">4.2 min</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Session Rating</span>
-                <span className="font-bold text-gray-800">4.8★</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Tutors Helped</span>
-                <span className="font-bold text-gray-800">8</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Chat Area */}
-        <div className="lg:col-span-2 flex flex-col">
-          {/* Chat Header */}
-          <div className="bg-white rounded-t-2xl p-6 border border-gray-100 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
-                  {activeTutor.charAt(0)}
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-800">{activeTutor}</h3>
-                  <div className="flex items-center gap-2">
-                    <span className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-green-600">Online</span>
-                    </span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-sm text-gray-600">Typing {isTyping ? "..." : ""}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <Search className="w-5 h-5 text-gray-400" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <Filter className="w-5 h-5 text-gray-400" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <MoreVertical className="w-5 h-5 text-gray-400" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Messages Container */}
-          <div className="flex-1 bg-gradient-to-b from-gray-50 to-white p-6 overflow-y-auto border-x border-gray-100">
-            <div className="space-y-1">
-              {messages.map((msg) => (
-                <MessageBubble
-                  key={msg.id}
-                  message={msg.text}
-                  isStudent={msg.sender === "student"}
-                  timestamp={msg.timestamp}
-                  isRead={msg.isRead}
-                />
-              ))}
-              
-              {isTyping && (
-                <div className="flex justify-start mb-4">
-                  <div className="max-w-[70%]">
-                    <div className="bg-gray-100 rounded-2xl px-4 py-3 rounded-bl-none">
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                      </div>
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col bg-white/80 backdrop-blur-sm">
+        {activeTutor ? (
+          <>
+            {/* Chat Header */}
+            <div className="p-4 border-b bg-white/90">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white font-semibold text-lg">
+                      {activeTutor.displayName?.charAt(0) || "T"}
                     </div>
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                   </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-bold text-gray-800">
+                        {activeTutor.displayName}
+                      </h2>
+                      <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
+                        Tutor
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      {activeTutor.subjects?.length > 0 
+                        ? activeTutor.subjects.join(", ")
+                        : "Expert tutor"
+                      }
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <Bell size={20} className="text-gray-600" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white to-gray-50/50">
+              {messages.length === 0 ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center max-w-md">
+                    <GraduationCap className="mx-auto mb-4 text-gray-300" size={64} />
+                    <h3 className="text-gray-400 font-medium text-lg mb-2">
+                      Start the conversation
+                    </h3>
+                    <p className="text-gray-400">
+                      No messages yet. Send your first message to {activeTutor.displayName}.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-4">
+                  {messages.map((msg, index) => {
+                    const isLastOfUser = 
+                      index === messages.length - 1 || 
+                      messages[index + 1].senderId !== msg.senderId;
+                    
+                    return (
+                      <MessageBubble
+                        key={msg.id}
+                        text={msg.text}
+                        isMe={msg.senderId === user.uid}
+                        timestamp={msg.timestamp}
+                        status={msg.read ? "read" : msg.delivered ? "delivered" : "sent"}
+                        isLastOfUser={isLastOfUser}
+                      />
+                    );
+                  })}
+                  <div ref={bottomRef} />
                 </div>
               )}
-              
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
-
-          {/* Input Area */}
-          <div className="bg-white rounded-b-2xl p-6 border border-gray-100 shadow-sm">
-            {/* Quick Questions */}
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-3">Quick questions:</p>
-              <div className="grid grid-cols-2 gap-2">
-                {quickQuestions.slice(0, 4).map((q) => (
-                  <QuickQuestion
-                    key={q.id}
-                    question={q.question}
-                    icon={q.icon}
-                    onClick={() => handleQuickQuestion(q.question)}
-                  />
-                ))}
-              </div>
             </div>
 
             {/* Message Input */}
-            <div className="flex items-end gap-3">
-              <div className="flex-1 bg-gray-50 rounded-xl border border-gray-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition-all">
-                <textarea
-                  className="w-full bg-transparent p-4 focus:outline-none resize-none"
-                  placeholder="Type your question here..."
-                  rows="2"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                />
-                <div className="flex items-center justify-between p-3 border-t border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                      <Paperclip className="w-4 h-4 text-gray-500" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                      <ImageIcon className="w-4 h-4 text-gray-500" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                      <Smile className="w-4 h-4 text-gray-500" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                      <Mic className="w-4 h-4 text-gray-500" />
-                    </button>
+            <div className="p-4 border-t bg-white">
+              <form onSubmit={sendMessage} className="space-y-3">
+                <div className="flex gap-2 items-center">
+                  <div className="flex-1 relative">
+                    <input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          sendMessage(e);
+                        }
+                      }}
+                      className="w-full bg-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-transparent text-sm"
+                      placeholder="Type your message here..."
+                    />
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {input.length}/500
-                  </div>
+                  <button
+                    type="submit"
+                    disabled={!input.trim()}
+                    className={`p-3 rounded-xl transition-all duration-200 ${
+                      input.trim()
+                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 shadow-md"
+                        : "bg-gray-200 cursor-not-allowed"
+                    }`}
+                  >
+                    <Send size={20} className="text-white" />
+                  </button>
                 </div>
+                <div className="flex items-center justify-between text-xs text-gray-400 px-2">
+                  <span>Press Enter to send</span>
+                  <span>{input.length}/1000</span>
+                </div>
+              </form>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center p-8">
+            <div className="w-40 h-40 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mb-6">
+              <GraduationCap size={80} className="text-gray-300" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-400 mb-3">Welcome!</h3>
+            <p className="text-gray-400 text-center max-w-md mb-8">
+              Select a tutor from the sidebar to start a conversation. 
+              Get help with your subjects and clarify your doubts instantly.
+            </p>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span>Online tutors available</span>
               </div>
-              
-              <button
-                onClick={sendMessage}
-                disabled={!input.trim()}
-                className="p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-              >
-                <Send className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <GraduationCap size={16} />
+                <span>{messageStats.total} tutors online</span>
+              </div>
             </div>
           </div>
-        </div>
-
-        {/* Right Sidebar - Quick Help & Resources */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* AI Assistant */}
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
-            <div className="flex items-center gap-3 mb-6">
-              <Bot className="w-5 h-5 text-purple-600" />
-              <h3 className="font-bold text-gray-800">AI Assistant</h3>
-            </div>
-            <p className="text-gray-700 text-sm mb-4">
-              Get instant answers to common questions while waiting for tutor response
-            </p>
-            <button className="w-full px-4 py-3 bg-white text-gray-800 rounded-xl hover:bg-gray-50 transition-all duration-300 font-medium border border-purple-200">
-              Ask AI Assistant
-            </button>
-          </div>
-
-          {/* Quick Resources */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <h3 className="font-bold text-gray-800 mb-6">Quick Resources</h3>
-            <div className="space-y-3">
-              <button className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <FileText className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <span className="font-medium text-gray-800">React Hooks Guide</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Video className="w-4 h-4 text-green-600" />
-                  </div>
-                  <span className="font-medium text-gray-800">Video Tutorials</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-green-600" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Download className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <span className="font-medium text-gray-800">Code Examples</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
-              </button>
-            </div>
-          </div>
-
-          {/* Feedback */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <h3 className="font-bold text-gray-800 mb-6">Session Feedback</h3>
-            <p className="text-gray-600 text-sm mb-4">
-              How helpful was this session?
-            </p>
-            <div className="flex gap-2 mb-4">
-              <button className="flex-1 p-3 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl transition-colors flex items-center justify-center gap-2">
-                <ThumbsUp className="w-4 h-4" />
-                Helpful
-              </button>
-              <button className="flex-1 p-3 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl transition-colors flex items-center justify-center gap-2">
-                <ThumbsDown className="w-4 h-4" />
-                Not Helpful
-              </button>
-            </div>
-            <button className="w-full px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 text-gray-700 rounded-xl transition-all duration-300 font-medium">
-              End Session
-            </button>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ const Header = () => {
     { type: "scroll", to: "services", label: "Services" },
     { type: "scroll", to: "industries", label: "Industries" },
     { type: "scroll", to: "alfa", label: "ALFA" },
-    { type: "scroll", to: "tech-manthana", label: "Tech Manthana" },
+    { type: "path", to: "/tech-manthana/blog", label: "Tech Manthana" },
     { type: "scroll", to: "contact", label: "Contact Us" },
   ];
 
@@ -97,12 +97,15 @@ const Header = () => {
                       <span className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent transition-all duration-500 transform scale-x-0 group-hover:scale-x-100 group-hover:h-0.5"></span>
                     </ScrollLink>
                   ) : (
-                    <RouterLink
-                      to={item.path}
-                      className="text-gray-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-white/10"
-                    >
-                      {item.label}
-                    </RouterLink>
+                   <RouterLink
+  to={item.to}
+  onClick={handleClose}
+  className="text-gray-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-white/10"
+>
+  {item.label}
+</RouterLink>
+
+                    
                   )}
                 </div>
               ))}
@@ -156,13 +159,14 @@ const Header = () => {
                     {item.label}
                   </ScrollLink>
                 ) : (
-                  <RouterLink
-                    to={item.path}
-                    onClick={handleClose}
-                    className="text-gray-200 hover:text-white block px-4 py-2 rounded-lg text-base font-medium transition-all duration-300 hover:bg-white/10"
-                  >
-                    {item.label}
-                  </RouterLink>
+                 <RouterLink
+  to={item.to}
+  onClick={handleClose}
+  className="text-gray-200 hover:text-white block px-4 py-2 rounded-lg text-base font-medium transition-all duration-300 hover:bg-white/10"
+>
+  {item.label}
+</RouterLink>
+
                 )}
               </div>
             ))}

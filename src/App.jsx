@@ -3,32 +3,34 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import PublicLayout from "./layouts/PublicLayout";
 
+/* -------- PUBLIC PAGES -------- */
 import Home from "./pages/Home";
 import Industries from "./pages/Industries";
 import Login from "./pages/Login";
 import Logout from "./pages/Logout";
+import SignUp from "./components/SignUp";
 
 import ServiceDetail from "./components/Service/ServiceDetails";
 import IndustryDetail from "./components/Industries/IndustriesDetails";
 
+import TechManthanaPage from "./pages/TechManthanaPage";
+import ALFASection from "./pages/Alfa/ALFASection";
+import BlogPage from "./pages/BlogPage";
+import ScrollToTop from "./components/ScrollToTop";
+
+/* -------- DASHBOARD LAYOUTS -------- */
 import ConsumerDashboard from "./layouts/ConsumerDashboard";
 import AdminDashboard from "./layouts/AdminDashboard";
 import TutorDashboard from "./layouts/TutorDashboard";
 
-import { useAuth } from "./context/AuthContext";
-import TechManthanaPage from "./pages/TechManthanaPage";
-import ALFASection from "./pages/Alfa/ALFASection";
-import ScrollToTop from "./components/ScrollToTop";
-import BlogPage from "./pages/BlogPage";
-
-/* -------- STUDENT PAGES -------- */
+/* -------- STUDENT (CONSUMER) -------- */
 import ConsumerDashboardPage from "./pages/student/Dashboard";
 import MyModules from "./pages/student/MyModules";
 import MySchedule from "./pages/student/MySchedule";
 import ResumeUpload from "./pages/student/ResumeUpload";
 import AskTutor from "./pages/student/AskTutor";
 
-/* -------- ADMIN PAGES -------- */
+/* -------- ADMIN -------- */
 import Dashboard from "./pages/admin/Dashboard";
 import Posters from "./pages/admin/Posters";
 import ContentManager from "./pages/admin/ContentManager";
@@ -37,18 +39,34 @@ import Subscriptions from "./pages/admin/Subscriptions";
 import ResumeManager from "./pages/admin/ResumeManager";
 import Users from "./pages/admin/Users";
 
-/* -------- TUTOR PAGES -------- */
-import TutorDashboardPage from "./pages/tutor/Dashboard";
+/* -------- TUTOR -------- */
+import TutorDashboardPage from "../src/pages/tutor/DashboardTutor"
 import Classes from "./pages/tutor/Classes";
 import Assignments from "./pages/tutor/Assignments";
 import StudentQueries from "./pages/tutor/StudentQueries";
 
-/* -------- PROTECTED ROUTE -------- */
+/* =====================================================
+   PROTECTED ROUTE (LocalStorage Based)
+===================================================== */
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { isAuthenticated, userRole } = useAuth();
+  const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
+  const userRole = localStorage.getItem("userRole");
 
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (!allowedRoles.includes(userRole)) return <div>Access Denied</div>;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!allowedRoles.includes(userRole)) {
+    return (
+      <div style={{ padding: "40px", textAlign: "center" }}>
+        <h2>Access Denied</h2>
+        <p>
+          Required role: <b>{allowedRoles.join(", ")}</b>
+        </p>
+        <p>Your role: <b>{userRole}</b></p>
+      </div>
+    );
+  }
 
   return children;
 };
@@ -59,10 +77,10 @@ const App = () => {
       <ScrollToTop />
 
       <Routes>
-
-        {/* PUBLIC ROUTES */}
+        {/* ================= PUBLIC ================= */}
         <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
         <Route path="/login" element={<PublicLayout><Login /></PublicLayout>} />
+        <Route path="/signup" element={<PublicLayout><SignUp /></PublicLayout>} />
         <Route path="/logout" element={<PublicLayout><Logout /></PublicLayout>} />
 
         <Route path="/services/:serviceId" element={<PublicLayout><ServiceDetail /></PublicLayout>} />
@@ -72,7 +90,7 @@ const App = () => {
         <Route path="/tech-manthana" element={<PublicLayout><TechManthanaPage /></PublicLayout>} />
         <Route path="/tech-manthana/blog" element={<PublicLayout><BlogPage /></PublicLayout>} />
 
-        {/* STUDENT DASHBOARD (nested) */}
+        {/* ================= CONSUMER ================= */}
         <Route
           path="/dashboard/consumer"
           element={
@@ -81,9 +99,7 @@ const App = () => {
             </ProtectedRoute>
           }
         >
-
-          <Route index element={<MyModules />} />
-          <Route path="page" element={<ConsumerDashboardPage />} />
+          <Route index element={<ConsumerDashboardPage />} />
           <Route path="modules" element={<MyModules />} />
           <Route path="schedule" element={<MySchedule />} />
           <Route path="resume" element={<ResumeUpload />} />
@@ -102,7 +118,7 @@ const App = () => {
           <Route index element={<ALFASection />} />
         </Route>
 
-        {/* ADMIN DASHBOARD */}
+        {/* ================= ADMIN ================= */}
         <Route
           path="/dashboard/admin"
           element={
@@ -111,17 +127,16 @@ const App = () => {
             </ProtectedRoute>
           }
         >
-          <Route index element={<ContentManager />} />
-          <Route path="page" element={<Dashboard />} />
+          <Route index element={<Dashboard />} />
           <Route path="content" element={<ContentManager />} />
           <Route path="posters" element={<Posters />} />
           <Route path="schedule" element={<ScheduleManager />} />
           <Route path="subscriptions" element={<Subscriptions />} />
-          <Route path="resumes" element={<ResumeManager />} />
+          <Route path="resume" element={<ResumeManager />} />
           <Route path="users" element={<Users />} />
         </Route>
 
-        {/* TUTOR DASHBOARD */}
+        {/* ================= TUTOR ================= */}
         <Route
           path="/dashboard/tutor"
           element={
@@ -130,16 +145,15 @@ const App = () => {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Classes />} />
+          <Route index element={<TutorDashboardPage />} />
           <Route path="page" element={<TutorDashboardPage />} />
           <Route path="classes" element={<Classes />} />
           <Route path="assignments" element={<Assignments />} />
           <Route path="queries" element={<StudentQueries />} />
         </Route>
 
-        {/* FALLBACK */}
-        <Route path="*" element={<PublicLayout><Home /></PublicLayout>} />
-
+        {/* ================= FALLBACK ================= */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );

@@ -1,72 +1,52 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { 
-  Upload, 
-  FileText, 
-  CheckCircle, 
-  XCircle, 
-  Eye,
-  Download,
-  Trash2,
-  Cloud,
-  AlertCircle,
-  UserCheck,
-  Calendar,
-  Shield,
-  Star,
-  Clock
+  Upload, FileText, CheckCircle, XCircle, Eye, 
+  Download, Trash2, Cloud, Shield, Star, Clock, 
+  UserCheck, Calendar, Loader2 
 } from "lucide-react";
 
-const FileUploadCard = ({ file, onRemove }) => {
+// --- FIREBASE IMPORTS ---
+import { db, storage, auth } from "../../firebase"; 
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
+import { doc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+
+const FileUploadCard = ({ fileData, onRemove }) => {
   const getFileIcon = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
-    switch(ext) {
-      case 'pdf': return <FileText className="w-6 h-6 text-red-500" />;
-      case 'doc':
-      case 'docx': return <FileText className="w-6 h-6 text-blue-500" />;
-      case 'txt': return <FileText className="w-6 h-6 text-gray-500" />;
-      default: return <FileText className="w-6 h-6 text-indigo-500" />;
-    }
+    if (ext === 'pdf') return <FileText className="w-6 h-6 text-red-500" />;
+    if (['doc', 'docx'].includes(ext)) return <FileText className="w-6 h-6 text-blue-500" />;
+    return <FileText className="w-6 h-6 text-gray-500" />;
   };
 
   const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    if (!bytes) return '0 Bytes';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + ['Bytes', 'KB', 'MB', 'GB'][i];
   };
 
   return (
-    <div className="bg-white rounded-xl p-4 border-2 border-green-100 shadow-lg">
+    <div className="bg-white rounded-xl p-4 border-2 border-green-100 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-green-50 rounded-lg">
-            {getFileIcon(file.name)}
-          </div>
+          <div className="p-2 bg-green-50 rounded-lg">{getFileIcon(fileData.name)}</div>
           <div>
-            <p className="font-medium text-gray-800 truncate max-w-xs">{file.name}</p>
-            <p className="text-sm text-gray-500">{formatFileSize(file.size)}</p>
+            <p className="font-medium text-gray-800 truncate max-w-[150px] sm:max-w-xs">{fileData.name}</p>
+            <p className="text-sm text-gray-500">{formatFileSize(fileData.size)}</p>
           </div>
         </div>
-        <CheckCircle className="w-6 h-6 text-green-500" />
+        <div className="flex items-center gap-2">
+           <a href={fileData.url} target="_blank" rel="noreferrer" className="p-2 hover:bg-blue-50 rounded-lg text-blue-600">
+             <Eye className="w-5 h-5" />
+           </a>
+           <CheckCircle className="w-6 h-6 text-green-500" />
+        </div>
       </div>
       
-      <div className="flex items-center justify-between text-sm text-gray-600">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            Uploaded just now
-          </span>
-          <span className="flex items-center gap-1">
-            <Shield className="w-4 h-4" />
-            Secure
-          </span>
-        </div>
-        <button
-          onClick={onRemove}
-          className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-        >
-          <Trash2 className="w-4 h-4 text-red-500" />
+      <div className="flex items-center justify-between text-xs text-gray-500">
+        <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Encrypted</span>
+        <button onClick={() => onRemove(fileData)} className="p-2 hover:bg-red-50 rounded-lg text-red-500 transition-colors">
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
     </div>
@@ -74,6 +54,7 @@ const FileUploadCard = ({ file, onRemove }) => {
 };
 
 export default function ResumeUpload() {
+  const [currentUser, setCurrentUser] = useState(null);
   const [file, setFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -81,349 +62,159 @@ export default function ResumeUpload() {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
+  // 1. Listen for Auth State
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      if (user) {
+        // 2. Real-time sync of uploaded files from Firestore
+        const userRef = doc(db, "users", user.uid);
+        return onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUploadedFiles(docSnap.data().resumes || []);
+          }
+        });
+      }
+    });
+    return () => unsub();
+  }, []);
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
-      const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
-      
-      if (!validTypes.includes(selectedFile.type)) {
-        alert('Please upload PDF, DOC, DOCX, or TXT files only');
-        return;
-      }
-
-      if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
-        alert('File size must be less than 5MB');
-        return;
-      }
-
+      if (selectedFile.size > 5 * 1024 * 1024) return alert("File too large (>5MB)");
       setFile(selectedFile);
     }
   };
 
-  const simulateUpload = () => {
-    if (!file) return;
-    
+  // 3. ACTUAL FIREBASE UPLOAD LOGIC
+  const handleUpload = async () => {
+    if (!file || !currentUser) return;
+
     setIsUploading(true);
-    setUploadProgress(0);
-    
-    const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsUploading(false);
-          setUploadedFiles(prev => [...prev, {
-            id: Date.now(),
-            file: file,
-            uploadedAt: new Date().toISOString()
-          }]);
-          setFile(null);
-          return 0;
-        }
-        return prev + 10;
+    const storagePath = `resumes/${currentUser.uid}/${Date.now()}_${file.name}`;
+    const storageRef = ref(storage, storagePath);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on("state_changed", 
+      (snapshot) => {
+        setUploadProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100));
+      }, 
+      (error) => {
+        console.error(error);
+        setIsUploading(false);
+      }, 
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        const fileMetadata = {
+          id: Date.now().toString(),
+          name: file.name,
+          url: downloadURL,
+          size: file.size,
+          path: storagePath, // stored for deletion later
+          uploadedAt: new Date().toISOString()
+        };
+
+        const userDoc = doc(db, "users", currentUser.uid);
+        await updateDoc(userDoc, {
+          resumes: arrayUnion(fileMetadata)
+        });
+
+        setFile(null);
+        setIsUploading(false);
+        setUploadProgress(0);
+      }
+    );
+  };
+
+  // 4. ACTUAL DELETE LOGIC
+  const handleRemoveFile = async (fileObj) => {
+    if (!window.confirm("Delete this file?")) return;
+    try {
+      // Delete from Storage
+      const fileRef = ref(storage, fileObj.path);
+      await deleteObject(fileRef);
+
+      // Remove metadata from Firestore
+      const userDoc = doc(db, "users", currentUser.uid);
+      await updateDoc(userDoc, {
+        resumes: arrayRemove(fileObj)
       });
-    }, 100);
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
+    } catch (err) {
+      console.error("Delete failed:", err);
     }
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const droppedFile = e.dataTransfer.files[0];
-      const event = { target: { files: [droppedFile] } };
-      handleFileChange(event);
-    }
-  };
+  // Helper UI functions
+  const handleDrag = (e) => { e.preventDefault(); setDragActive(e.type === "dragenter" || e.type === "dragover"); };
+  const handleDrop = (e) => { e.preventDefault(); setDragActive(false); if (e.dataTransfer.files?.[0]) handleFileChange({ target: { files: e.dataTransfer.files } }); };
 
-  const handleRemoveFile = (fileId) => {
-    setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
-  };
-
-  const handleBrowseClick = () => {
-    fileInputRef.current.click();
-  };
+  if (!currentUser) return <div className="p-20 text-center"><Loader2 className="animate-spin mx-auto mb-4" /> Loading Profile...</div>;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent mb-3">
-          📄 Resume & Portfolio Upload
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Upload your resume and portfolio files to share with tutors and enhance your learning profile
-        </p>
+    <div className="p-4 sm:p-8 max-w-6xl mx-auto bg-gray-50 min-h-screen">
+      <div className="mb-10 text-center">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Resume & Portfolio</h1>
+        <p className="text-gray-500">Your documents are visible to approved tutors.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Upload Section */}
-        <div className="lg:col-span-2">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Files Uploaded</p>
-                  <p className="text-2xl font-bold text-gray-800">{uploadedFiles.length}</p>
-                </div>
-                <Cloud className="w-6 h-6 text-blue-600" />
-              </div>
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Upload Box */}
+          <div 
+            className={`border-2 border-dashed rounded-3xl p-10 text-center transition-all ${dragActive ? 'border-indigo-500 bg-indigo-50 scale-[1.02]' : 'border-gray-300 bg-white'}`}
+            onDragOver={handleDrag} onDragEnter={handleDrag} onDragLeave={handleDrag} onDrop={handleDrop}
+          >
+            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Upload className="text-indigo-600 w-8 h-8" />
             </div>
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Storage Used</p>
-                  <p className="text-2xl font-bold text-gray-800">2.4 MB</p>
-                </div>
-                <FileText className="w-6 h-6 text-green-600" />
-              </div>
-            </div>
-            <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-4 border border-purple-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Profile Views</p>
-                  <p className="text-2xl font-bold text-gray-800">48</p>
-                </div>
-                <Eye className="w-6 h-6 text-purple-600" />
-              </div>
-            </div>
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 border border-amber-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Tutor Reviews</p>
-                  <p className="text-2xl font-bold text-gray-800">5</p>
-                </div>
-                <Star className="w-6 h-6 text-amber-600" />
-              </div>
-            </div>
+            <h3 className="text-lg font-bold mb-1">Select Resume</h3>
+            <p className="text-gray-400 text-sm mb-6">Drag & drop or click to browse</p>
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".pdf,.doc,.docx" />
+            <button onClick={() => fileInputRef.current.click()} className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg">Browse Files</button>
           </div>
 
-          {/* Upload Area */}
-          <div className={`rounded-2xl border-2 ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-dashed border-gray-300'} transition-all duration-300 p-8 mb-8`}
-               onDragEnter={handleDrag}
-               onDragLeave={handleDrag}
-               onDragOver={handleDrag}
-               onDrop={handleDrop}>
-            <div className="text-center">
-              <div className="mb-6">
-                <div className="w-20 h-20 mx-auto bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mb-4">
-                  <Upload className="w-10 h-10 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Upload Your Resume</h3>
-                <p className="text-gray-600 mb-6">
-                  Drag and drop your file here, or click to browse
-                </p>
-              </div>
-
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept=".pdf,.doc,.docx,.txt"
-                className="hidden"
-              />
-              
-              <button
-                onClick={handleBrowseClick}
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl mb-4"
-              >
-                Browse Files
-              </button>
-              
-              <p className="text-sm text-gray-500">
-                Supports: PDF, DOC, DOCX, TXT • Max size: 5MB
-              </p>
-            </div>
-          </div>
-
-          {/* Selected File Preview */}
+          {/* Pending File Preview */}
           {file && (
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-gray-800 text-lg">Selected File</h3>
-                <button
-                  onClick={() => setFile(null)}
-                  className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <XCircle className="w-5 h-5 text-red-500" />
-                </button>
-              </div>
-              
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-                  <FileText className="w-8 h-8 text-blue-600" />
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-indigo-100 animate-in fade-in slide-in-from-bottom-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <FileText className="text-indigo-500 w-8 h-8" />
+                  <div>
+                    <p className="font-bold text-gray-800">{file.name}</p>
+                    <p className="text-xs text-gray-400">{(file.size/1024).toFixed(1)} KB</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-800">{file.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {(file.size / 1024).toFixed(2)} KB • Last modified: {new Date(file.lastModified).toLocaleDateString()}
-                  </p>
-                </div>
+                <button onClick={() => setFile(null)}><XCircle className="text-gray-300 hover:text-red-500" /></button>
               </div>
-
-              {/* Upload Progress */}
               {isUploading ? (
-                <div className="mb-6">
-                  <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Uploading...</span>
-                    <span>{uploadProgress}%</span>
-                  </div>
-                  <div className="relative pt-1">
-                    <div className="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-gray-200">
-                      <div 
-                        style={{ width: `${uploadProgress}%` }}
-                        className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300"
-                      ></div>
-                    </div>
-                  </div>
+                <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                  <div className="bg-indigo-600 h-full transition-all" style={{width: `${uploadProgress}%`}} />
                 </div>
               ) : (
-                <button
-                  onClick={simulateUpload}
-                  disabled={isUploading}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  <Upload className="w-5 h-5" />
-                  Upload Resume
+                <button onClick={handleUpload} className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                  <Cloud className="w-5 h-5" /> Confirm & Upload
                 </button>
               )}
             </div>
           )}
 
-          {/* Uploaded Files List */}
-          {uploadedFiles.length > 0 && (
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-gray-800 text-lg">Your Uploaded Files</h3>
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                  {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''}
-                </span>
-              </div>
-              
-              <div className="space-y-4">
-                {uploadedFiles.map((uploadedFile) => (
-                  <FileUploadCard 
-                    key={uploadedFile.id}
-                    file={uploadedFile.file}
-                    onRemove={() => handleRemoveFile(uploadedFile.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Files List */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {uploadedFiles.map(f => <FileUploadCard key={f.id} fileData={f} onRemove={handleRemoveFile} />)}
+          </div>
         </div>
 
-        {/* Right Column - Tips & Guidelines */}
+        {/* Sidebar Info */}
         <div className="space-y-6">
-          {/* Tips Card */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-            <div className="flex items-center gap-3 mb-6">
-              <UserCheck className="w-6 h-6 text-blue-600" />
-              <h3 className="font-bold text-gray-800">Tips for Success</h3>
-            </div>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                <span className="text-gray-700">Update your resume with recent projects</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                <span className="text-gray-700">Include links to GitHub or portfolio</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                <span className="text-gray-700">Highlight relevant skills and certifications</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                <span className="text-gray-700">Keep file size under 5MB for quick access</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Privacy Card */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
-            <div className="flex items-center gap-3 mb-6">
-              <Shield className="w-6 h-6 text-green-600" />
-              <h3 className="font-bold text-gray-800">Privacy & Security</h3>
-            </div>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-green-600 mt-0.5" />
-                <span className="text-gray-700">Files are encrypted and securely stored</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-green-600 mt-0.5" />
-                <span className="text-gray-700">Only verified tutors can access your files</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-green-600 mt-0.5" />
-                <span className="text-gray-700">You can delete files anytime</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <h3 className="font-bold text-gray-800 mb-6">Quick Actions</h3>
-            <div className="space-y-3">
-              <button className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-left">
-                <Download className="w-5 h-5 text-gray-600" />
-                <span className="font-medium text-gray-800">Download Template</span>
-              </button>
-              <button className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-left">
-                <Eye className="w-5 h-5 text-gray-600" />
-                <span className="font-medium text-gray-800">Preview Profile</span>
-              </button>
-              <button className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors text-left">
-                <FileText className="w-5 h-5 text-gray-600" />
-                <span className="font-medium text-gray-800">View Upload History</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Statistics */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <h3 className="font-bold text-gray-800 mb-6">Upload Statistics</h3>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-sm text-gray-600 mb-1">
-                  <span>Profile Completion</span>
-                  <span>85%</span>
-                </div>
-                <div className="relative pt-1">
-                  <div className="overflow-hidden h-2 text-xs flex rounded-full bg-gray-200">
-                    <div 
-                      style={{ width: '85%' }}
-                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-blue-500 to-indigo-500"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <span className="text-gray-600">Last Updated</span>
-                <span className="font-medium text-gray-800">2 days ago</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Next Review</span>
-                <span className="font-medium text-gray-800 flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  In 1 week
-                </span>
-              </div>
-            </div>
-          </div>
+           <div className="bg-indigo-900 text-white p-6 rounded-3xl shadow-xl">
+              <h3 className="font-bold flex items-center gap-2 mb-4 text-lg"><Shield className="w-5 h-5 text-indigo-300" /> Secure Storage</h3>
+              <ul className="text-sm space-y-3 text-indigo-100">
+                <li className="flex items-start gap-2"> <CheckCircle className="w-4 h-4 mt-0.5 text-indigo-400" /> Only approved tutors can see files.</li>
+                <li className="flex items-start gap-2"> <CheckCircle className="w-4 h-4 mt-0.5 text-indigo-400" /> Files are scanned for security.</li>
+                <li className="flex items-start gap-2"> <CheckCircle className="w-4 h-4 mt-0.5 text-indigo-400" /> You can revoke access anytime.</li>
+              </ul>
+           </div>
         </div>
       </div>
     </div>
