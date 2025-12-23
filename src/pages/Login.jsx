@@ -15,7 +15,8 @@ import {
   FaEyeSlash
 } from "react-icons/fa";
 
-const ADMIN_DOC_ID = "gUBXRNzh4fYEM5QFUz4bqX79bcw2";
+const ADMIN_DOC_ID = "xGUSclC0q6S1IEI4iRb03pkiXIS2";
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
