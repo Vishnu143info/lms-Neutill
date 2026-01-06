@@ -1,20 +1,76 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Clock, Users, Plus, Edit2, Trash2, Video, Bell, CheckCircle } from "lucide-react";
+import { Calendar, Clock, Users, Plus, Edit2, Trash2, Video, Bell, CheckCircle, X } from "lucide-react";
 
-// --- IMPORTANT: Firebase Imports from your local file ---
+// 🔹 Your Firebase instance
+import { db } from "../../firebase";
+
+// 🔹 Firestore SDK helpers
 import {
-    db,
     collection,
     deleteDoc,
     doc,
-    setDoc, 
+    setDoc,
     query,
     onSnapshot,
     orderBy,
-} from "../../firebase"; 
+} from "firebase/firestore";
+
+// --- Toast Notification Component ---
+const Toast = ({ message, type = "success", onClose }) => {
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onClose();
+        }, 4000);
+        
+        return () => clearTimeout(timer);
+    }, [onClose]);
+
+    const bgColor = {
+        success: "bg-green-500",
+        error: "bg-red-500",
+        warning: "bg-yellow-500",
+        info: "bg-blue-500"
+    };
+
+    const icon = {
+        success: "✅",
+        error: "❌",
+        warning: "⚠️",
+        info: "ℹ️"
+    };
+
+    return (
+        <div className={`fixed top-6 right-6 ${bgColor[type]} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slideIn z-50 min-w-[300px] max-w-md`}>
+            <span className="text-lg">{icon[type]}</span>
+            <span className="flex-1">{message}</span>
+            <button 
+                onClick={onClose}
+                className="hover:bg-white/20 p-1 rounded-full transition-colors"
+            >
+                <X className="w-4 h-4" />
+            </button>
+        </div>
+    );
+};
+
+// Add this to your global CSS or style tag
+const addStyles = `
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.animate-slideIn {
+    animation: slideIn 0.3s ease-out;
+}
+`;
 
 // --- ScheduleCard Component (UI for each schedule item) ---
-
 const ScheduleCard = ({ schedule, onEdit, onDelete }) => {
     const [isAttending, setIsAttending] = useState(false);
 
@@ -128,12 +184,46 @@ const ScheduleCard = ({ schedule, onEdit, onDelete }) => {
     );
 };
 
-// --- Main ScheduleManager Component ---
+// --- Confirmation Modal Component ---
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
+    if (!isOpen) return null;
 
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 animate-fadeIn">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-red-100 rounded-lg">
+                        <Trash2 className="w-5 h-5 text-red-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+                </div>
+                
+                <p className="text-gray-600 mb-6">{message}</p>
+                
+                <div className="flex justify-end gap-3">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Main ScheduleManager Component ---
 export default function ScheduleManager() {
     const [schedules, setSchedules] = useState([]); 
     const [form, setForm] = useState({
-        id: null, // Firestore Document ID (for editing/deleting)
+        id: null,
         className: "",
         description: "",
         date: "",
@@ -143,60 +233,89 @@ export default function ScheduleManager() {
         duration: ""
     });
     const [isEditing, setIsEditing] = useState(false);
+    const [tutors, setTutors] = useState([]);
+    const [toast, setToast] = useState(null);
+    const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        scheduleId: null
+    });
 
-    const tutors = ["Alex Johnson", "Sarah Miller", "Mike Chen", "Emily Davis"];
     const classTypes = ["Live", "Recorded", "Workshop"];
 
-    // Function to sort the array by time (HH:MM format)
-    const sortByTime = (a, b) => {
-        if (a.time < b.time) return -1;
-        if (a.time > b.time) return 1;
-        return 0;
+    // Show toast notification
+    const showToast = (message, type = "success") => {
+        setToast({ message, type });
     };
 
-    // 1. Real-time Data Fetching (Read Operation)
-    useEffect(() => {
-        // Query the 'schedules' collection, ordered ONLY by date in Firestore
-        // This avoids the need for a composite index and prevents data from being skipped.
-        const q = query(collection(db, "schedules"), orderBy("date", "asc"));
+    // Close toast
+    const closeToast = () => {
+        setToast(null);
+    };
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            console.log("Schedules successfully fetched. Count:", snapshot.docs.length);
-            
-            let fetchedSchedules = snapshot.docs.map(doc => ({
-                id: doc.id, // Store Firestore's external document ID
-                ...doc.data()
-            }));
-
-            // Secondary sorting by time is done in React (client-side)
-            // Group by date and sort each group by time to handle same-day schedules correctly.
-            // A simpler overall time sort is often sufficient if dates are already ordered:
-            const sortedSchedules = fetchedSchedules.sort((a, b) => {
-                // Primary sort by date (already handled by Firestore, but good practice)
-                if (a.date < b.date) return -1;
-                if (a.date > b.date) return 1;
-
-                // Secondary sort by time (client-side)
-                return sortByTime(a, b);
-            });
-            
-            setSchedules(sortedSchedules);
-        }, (error) => {
-            console.error("Error fetching schedules: ", error);
-            // Check the console for this error. If present, Firebase setup or rules are the issue.
+    // Show delete confirmation modal
+    const confirmDelete = (scheduleId) => {
+        setDeleteModal({
+            isOpen: true,
+            scheduleId
         });
+    };
 
-        return () => unsubscribe(); // Cleanup function to detach listener
+    // Handle actual deletion
+    const handleDeleteConfirm = async () => {
+        try {
+            await deleteDoc(doc(db, "schedules", deleteModal.scheduleId));
+            showToast("Schedule deleted successfully!", "success");
+        } catch (error) {
+            console.error("Error deleting document: ", error);
+            showToast(`Failed to delete schedule: ${error.message}`, "error");
+        } finally {
+            setDeleteModal({ isOpen: false, scheduleId: null });
+        }
+    };
+
+    // Fetch schedules
+    useEffect(() => {
+        const q = query(
+            collection(db, "schedules"),
+            orderBy("date", "asc")
+        );
+
+        const unsubscribeSchedules = onSnapshot(
+            q,
+            (snapshot) => {
+                const fetchedSchedules = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+
+                // Sort by date + time
+                fetchedSchedules.sort((a, b) => {
+                    if (a.date < b.date) return -1;
+                    if (a.date > b.date) return 1;
+                    if (a.time < b.time) return -1;
+                    if (a.time > b.time) return 1;
+                    return 0;
+                });
+
+                setSchedules(fetchedSchedules);
+            },
+            (error) => {
+                console.error("Error fetching schedules:", error);
+                showToast("Error fetching schedules", "error");
+            }
+        );
+
+        return () => unsubscribeSchedules();
     }, []);
 
-    // 2. Add or Update Schedule (Write Operation)
+    // Add or Update Schedule
     const handleScheduleSubmit = async (e) => {
         if (e) {
-            e.preventDefault(); // Prevent form submission reload
+            e.preventDefault();
         }
         
         if (!form.className || !form.date || !form.time || !form.tutor) {
-            alert("Please fill in all required fields");
+            showToast("Please fill in all required fields", "warning");
             return;
         }
         
@@ -204,11 +323,9 @@ export default function ScheduleManager() {
         let finalDocId;
 
         if (isEditing && form.id) {
-            // Case 1: Editing existing document
             docRef = doc(db, "schedules", form.id);
             finalDocId = form.id;
         } else {
-            // Case 2: Creating a new document (pre-generate ID)
             docRef = doc(collection(db, "schedules"));
             finalDocId = docRef.id;
         }
@@ -228,30 +345,17 @@ export default function ScheduleManager() {
         try {
             await setDoc(docRef, scheduleData);
             
-            console.log(`Schedule ${isEditing ? 'updated' : 'added'} successfully with ID: ${finalDocId}!`);
-            alert(`Schedule ${isEditing ? 'updated' : 'added'} successfully!`);
+            showToast(
+                `Schedule ${isEditing ? 'updated' : 'added'} successfully!`,
+                "success"
+            );
 
         } catch (error) {
             console.error("Error writing document: ", error);
-            alert(`Failed to save schedule: ${error.message}`);
+            showToast(`Failed to save schedule: ${error.message}`, "error");
         } finally {
-            // Reset form
             setForm({ className: "", description: "", date: "", time: "", tutor: "", type: "Live", duration: "", id: null, attendees: null });
             setIsEditing(false);
-        }
-    };
-
-    // 3. Delete Schedule (Delete Operation)
-    const deleteSchedule = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this schedule?")) {
-            return;
-        }
-        try {
-            await deleteDoc(doc(db, "schedules", id));
-            console.log("Schedule deleted successfully!");
-        } catch (error) {
-            console.error("Error deleting document: ", error);
-            alert(`Failed to delete schedule: ${error.message}`);
         }
     };
 
@@ -259,6 +363,7 @@ export default function ScheduleManager() {
     const editSchedule = (schedule) => {
         setForm(schedule);
         setIsEditing(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     // Handle Enter key press in form fields
@@ -271,6 +376,20 @@ export default function ScheduleManager() {
 
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+            <style>{addStyles}</style>
+            
+            {/* Toast Notification */}
+            {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
+            
+            {/* Delete Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={deleteModal.isOpen}
+                onClose={() => setDeleteModal({ isOpen: false, scheduleId: null })}
+                onConfirm={handleDeleteConfirm}
+                title="Delete Schedule"
+                message="Are you sure you want to delete this schedule? This action cannot be undone."
+            />
+
             <div className="mb-8">
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-900 bg-clip-text text-transparent">
                     📅 Schedule Manager
@@ -323,15 +442,17 @@ export default function ScheduleManager() {
                             className="border border-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
 
-                        <select
+                       <select
                             value={form.tutor}
                             onChange={(e) => setForm({ ...form, tutor: e.target.value })}
                             onKeyDown={handleKeyDown}
-                            className="border border-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="border border-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select Tutor *</option>
                             {tutors.map((tutor) => (
-                                <option key={tutor} value={tutor}>{tutor}</option>
+                                <option key={tutor.id} value={tutor.name}>
+                                    {tutor.name}
+                                </option>
                             ))}
                         </select>
 
@@ -383,6 +504,7 @@ export default function ScheduleManager() {
                                 onClick={() => {
                                     setForm({ className: "", description: "", date: "", time: "", tutor: "", type: "Live", duration: "", id: null, attendees: null });
                                     setIsEditing(false);
+                                    showToast("Edit cancelled", "info");
                                 }}
                                 className="ml-4 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all duration-300"
                             >
@@ -402,13 +524,12 @@ export default function ScheduleManager() {
                 
                 {schedules.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {/* Map over the schedules array and render a ScheduleCard for each */}
                         {schedules.map(schedule => (
                             <ScheduleCard 
                                 key={schedule.id} 
                                 schedule={schedule}
                                 onEdit={editSchedule} 
-                                onDelete={deleteSchedule} 
+                                onDelete={confirmDelete} 
                             />
                         ))}
                     </div>

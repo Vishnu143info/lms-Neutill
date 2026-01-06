@@ -33,7 +33,8 @@ const ContactUs = () => {
       transition={{ duration: 1 }}
       viewport={{ once: true }}
       style={{
-        background: "linear-gradient(135deg, #001f3f, #003366, #0074D9)",
+        background: "linear-gradient(180deg, #10182A 0%, #0E1627 100%);",
+    
         padding: "100px 20px 60px",
         display: "flex",
         flexDirection: "column",
@@ -239,53 +240,7 @@ const ContactUs = () => {
         </motion.div>
       </div>
 
-      {/* 🌐 Social Media Links */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "30px",
-          marginTop: "60px",
-        }}
-      >
-        {[
-          {
-            icon: <FaFacebook />,
-            color: "#125af6ff",
-            url: "https://facebook.com",
-          },
-          {
-            icon: <SiX />, // X logo for Twitter
-            color: "#000",
-            url: "https://twitter.com",
-          },
-          {
-            icon: <FaLinkedin />,
-            color: "#210ee9ff",
-            url: "https://linkedin.com",
-          },
-          {
-            icon: <FaInstagram />,
-            color: "#e4405f",
-            url: "https://instagram.com",
-          },
-        ].map((s, i) => (
-          <motion.a
-            key={i}
-            href={s.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.2 }}
-            style={{
-              color: s.color,
-              fontSize: "2rem",
-              transition: "all 0.3s ease",
-            }}
-          >
-            {s.icon}
-          </motion.a>
-        ))}
-      </div>
+    
 
       
     </motion.section>

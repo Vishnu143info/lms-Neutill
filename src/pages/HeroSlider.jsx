@@ -175,13 +175,7 @@ const HeroSlider = () => {
 
         {/* Progress Bar */}
         <div className="progress-bar">
-          <motion.div 
-            className="progress-fill"
-            initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 5, ease: "linear" }}
-            key={index}
-          />
+         
         </div>
 
         {/* Dots */}

@@ -3,6 +3,20 @@ import { motion, useInView } from "framer-motion";
 import "../styles/Home.css";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import {
+  Cloud,
+  BrainCircuit,
+  Sparkles,
+  Wifi,
+  GraduationCap,
+  Truck,
+  Lightbulb,
+  FileText,
+  FlaskConical,
+} from "lucide-react";
+
+import { CloudCog } from "lucide-react";
+
 
 
 import ALFASection from "./Alfa/ALFASection";
@@ -30,6 +44,7 @@ import agricultureImg from "../assets/agri1.png";
 
 // NEW HERO SLIDER
 import HeroSlider from "./HeroSlider";
+import Footer from "../components/Footer";
 
 
 // Animation Variants
@@ -82,18 +97,72 @@ const Home = () => {
       }
     }
   }, [location]);
+const allServices = [
+  {
+    title: "Cloud Consulting",
+    image: cloudImg,
+    description: "Scalable cloud solutions for modern businesses",
+    icon: CloudCog,
+    color: "#00eaff",
+  },
+  {
+    title: "AI & Machine Learning",
+    image: aiImg,
+    description: "Intelligent systems that learn and adapt",
+    icon: BrainCircuit,
+    color: "#8f65ff",
+  },
+  {
+    title: "Generative AI",
+    image: genaiImg,
+    description: "Creative AI solutions for innovation",
+    icon: Sparkles,
+    color: "#ff6b6b",
+  },
+  {
+    title: "Internet of Things",
+    image: iotImg,
+    description: "Connect and automate your world",
+    icon: Wifi,
+    color: "#00ff88",
+  },
+  {
+    title: "ALFA Platform",
+    image: alfaImg,
+    description: "Comprehensive educational ecosystem",
+    icon: GraduationCap,
+    color: "#ffd93d",
+  },
+  {
+    title: "Supply Chain & Logistics",
+    image: marketingImg,
+    description: "Optimized marketing and logistics",
+    icon: Truck,
+    color: "#00b894",
+  },
+  {
+    title: "Upskilling & Outsourcing",
+    image: techn,
+    description: "Tech Manthana - Innovation hub",
+    icon: Lightbulb,
+    color: "#e17055",
+  },
+  {
+    title: "Content Management",
+    image: contentImg,
+    description: "Strategic content and PR solutions",
+    icon: FileText,
+    color: "#fd79a8",
+  },
+  {
+    title: "Research & Development",
+    image: researchImg,
+    description: "Cutting-edge technology research",
+    icon: FlaskConical,
+    color: "#6c5ce7",
+  },
+];
 
-  const allServices = [
-    { title: "Cloud Consulting", image: cloudImg, description: "Scalable cloud solutions for modern businesses", icon: "☁️", color: "#00eaff" },
-    { title: "AI & Machine Learning", image: aiImg, description: "Intelligent systems that learn and adapt", icon: "🤖", color: "#8f65ff" },
-    { title: "Generative AI", image: genaiImg, description: "Creative AI solutions for innovation", icon: "✨", color: "#ff6b6b" },
-    { title: "Internet of Things", image: iotImg, description: "Connect and automate your world", icon: "🌐", color: "#00ff88" },
-    { title: "ALFA Platform", image: alfaImg, description: "Comprehensive educational ecosystem", icon: "🎓", color: "#ffd93d" },
-    { title: "Supply Chain & Logistics", image: marketingImg, description: "Optimized marketing and logistics", icon: "🚚", color: "#00b894" },
-    { title: "Upskilling & Outsourcing", image: techn, description: "Tech Manthana - Innovation hub", icon: "💡", color: "#e17055" },
-    { title: "Content Management", image: contentImg, description: "Strategic content and PR solutions", icon: "📝", color: "#fd79a8" },
-    { title: "Research & Development", image: researchImg, description: "Cutting-edge technology research", icon: "🔬", color: "#6c5ce7" }
-  ];
 
   const industries = [
     { title: "Information Technology", image: itImg, description: "Digital transformation and IT solutions", gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", stats: "+48%" },
@@ -119,16 +188,17 @@ const Home = () => {
       </motion.section>
 
       {/* WHAT WE DO */}
-      <motion.section 
-        id="whatwedo"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px" }}
-        variants={containerVariants}
-        className="section-enhanced"
-      >
-        <WhatWeDo />
-      </motion.section>
+     <motion.section 
+  id="whatwedo"
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true, margin: "-50px" }}
+  variants={containerVariants}
+  className="section-enhanced whatwedo-bg"
+>
+  <WhatWeDo />
+</motion.section>
+
 
 
       {/* SERVICES SECTION */}
@@ -170,7 +240,10 @@ const Home = () => {
                       <div className="service-image-overlay"></div>
                     </motion.div>
 
-                    <motion.div className="service-icon-magical">{service.icon}</motion.div>
+                    <motion.div className="service-icon-magical">
+  <service.icon size={32} color={service.color} strokeWidth={1.8} />
+</motion.div>
+
 
                     <div className="service-content-magical">
                       <h3>{service.title}</h3>
@@ -273,7 +346,12 @@ const Home = () => {
         <ContactUs />
       </motion.section>
 
+<motion.section id="" className="contact-section-magical">
+        <Footer />
+      </motion.section>
     </motion.div>
+    
+
   );
 };
 

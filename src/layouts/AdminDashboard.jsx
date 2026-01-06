@@ -39,7 +39,7 @@ const NavItem = ({ label, Icon, active, onClick, collapsed }) => (
         : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
     }`}
   >
-    {active && !collapsed && (
+    {active && !collapsed && (  
       <motion.div
         layoutId="activeTab"
         className="absolute left-0 w-1 h-8 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-r-full"
@@ -253,10 +253,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-              </div>
+             
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold">
                   A

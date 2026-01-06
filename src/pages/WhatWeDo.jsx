@@ -120,7 +120,7 @@ export default function WhatWeDo() {
     <section
       className="what-we-do-section"
       style={{
-        background: "linear-gradient(135deg, #0a121aff 0%, #040508ff 0%, #021933ff 100%)",
+      
         paddingTop: "120px",
         paddingBottom: "120px",
         position: "relative",

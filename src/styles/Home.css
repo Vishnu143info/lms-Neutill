@@ -2,6 +2,11 @@
 .main-container {
   overflow-x: hidden;
 }
+.whatwedo-bg {
+  background: linear-gradient(180deg, #10182A 0%, #0E1627 100%);
+  padding: 80px 0;
+}
+
 
 .section-enhanced {
   position: relative;
@@ -18,7 +23,7 @@
   align-items: center;
   text-align: center;
   color: white;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  background: linear-gradient(180deg, #10182A 0%, #0E1627 100%);
   overflow: hidden;
   margin-top: 50px;
 }

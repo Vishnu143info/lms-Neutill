@@ -540,7 +540,7 @@ export default function ResumeUpload() {
                   </p>
                 </div>
               ) : (
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-1 gap-4">
                   {uploadedFiles.map(f => (
                     <FileUploadCard 
                       key={f.id} 
@@ -662,19 +662,7 @@ export default function ResumeUpload() {
             )}
 
             {/* Quick Stats */}
-            <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-5 border border-gray-200">
-              <h4 className="font-bold text-gray-800 mb-4">Quick Stats</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-blue-50 rounded-xl">
-                  <p className="text-2xl font-bold text-blue-700">{uploadedFiles.length}</p>
-                  <p className="text-xs text-blue-600">Files</p>
-                </div>
-                <div className="text-center p-3 bg-green-50 rounded-xl">
-                  <p className="text-2xl font-bold text-green-700">{status === "approved" ? "Yes" : "No"}</p>
-                  <p className="text-xs text-green-600">Approved</p>
-                </div>
-              </div>
-            </div>
+           
           </div>
         </div>
 

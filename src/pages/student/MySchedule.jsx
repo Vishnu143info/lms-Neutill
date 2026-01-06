@@ -5,38 +5,192 @@ import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 
 import { 
   Calendar, Clock, Users, Video, MapPin, 
-  PlayCircle, CheckCircle, AlertCircle, Loader2, ExternalLink 
+  PlayCircle, CheckCircle, AlertCircle, Loader2, ExternalLink, X, Info
 } from "lucide-react";
+
+/**
+ * Popup Modal Component
+ */
+const PopupModal = ({ isOpen, onClose, title, children, type = "info" }) => {
+  if (!isOpen) return null;
+
+  const getTypeStyles = () => {
+    switch(type) {
+      case "warning": return "border-yellow-200 bg-yellow-50";
+      case "error": return "border-red-200 bg-red-50";
+      case "success": return "border-green-200 bg-green-50";
+      default: return "border-blue-200 bg-blue-50";
+    }
+  };
+
+  const getTypeIcon = () => {
+    switch(type) {
+      case "warning": return <AlertCircle className="w-5 h-5 text-yellow-600" />;
+      case "error": return <AlertCircle className="w-5 h-5 text-red-600" />;
+      case "success": return <CheckCircle className="w-5 h-5 text-green-600" />;
+      default: return <Info className="w-5 h-5 text-blue-600" />;
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
+      <div className="relative w-full max-w-md">
+        <div className={`rounded-2xl shadow-2xl overflow-hidden ${getTypeStyles()} border`}>
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-6 border-b">
+            <div className="flex items-center gap-3">
+              {getTypeIcon()}
+              <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white hover:bg-opacity-30 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
+          
+          {/* Modal Content */}
+          <div className="p-6">
+            {children}
+          </div>
+          
+          {/* Modal Footer */}
+          <div className="flex justify-end gap-3 p-6 border-t">
+            <button
+              onClick={onClose}
+              className="px-6 py-2.5 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Class Details Popup Component
+ */
+const ClassDetailsPopup = ({ isOpen, onClose, classItem }) => {
+  if (!isOpen) return null;
+
+  const formatDate = (dateStr) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    } catch { return dateStr; }
+  };
+
+  return (
+    <PopupModal 
+      isOpen={isOpen} 
+      onClose={onClose}
+      title="Class Details"
+      type="info"
+    >
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <h4 className="font-bold text-gray-800 text-lg">{classItem?.className}</h4>
+          <div className="flex items-center gap-2 text-gray-600">
+            <Clock className="w-4 h-4" />
+            <span>{formatDate(classItem?.date)} • {classItem?.time}</span>
+          </div>
+          {classItem?.duration && (
+            <div className="flex items-center gap-2 text-gray-600">
+              <Video className="w-4 h-4" />
+              <span>Duration: {classItem.duration}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <div className="bg-white p-4 rounded-lg border">
+            <h5 className="font-bold text-gray-700 mb-2 flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Instructor
+            </h5>
+            <p className="text-gray-800">{classItem?.tutor}</p>
+          </div>
+
+          {classItem?.room && (
+            <div className="bg-white p-4 rounded-lg border">
+              <h5 className="font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                Location
+              </h5>
+              <p className="text-gray-800">{classItem.room}</p>
+            </div>
+          )}
+
+          <div className="bg-white p-4 rounded-lg border">
+            <h5 className="font-bold text-gray-700 mb-2">Class Status</h5>
+            <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(classItem?.status)}`}>
+              {getStatusIcon(classItem?.status)}
+              {classItem?.status}
+            </span>
+          </div>
+
+          {classItem?.students && (
+            <div className="bg-white p-4 rounded-lg border">
+              <h5 className="font-bold text-gray-700 mb-2">Enrollment</h5>
+              <p className="text-gray-800">{classItem.students} students enrolled</p>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <h5 className="font-bold text-blue-700 mb-2">📝 Preparation Tips</h5>
+          <ul className="text-sm text-blue-600 space-y-1 list-disc pl-4">
+            <li>Join 5 minutes before the scheduled time</li>
+            <li>Check your internet connection</li>
+            <li>Have your materials ready</li>
+            <li>Test your audio and video</li>
+          </ul>
+        </div>
+      </div>
+    </PopupModal>
+  );
+};
+
+// Helper functions for status (defined before ScheduleCard)
+const getStatusColor = (status) => {
+  switch(status?.toLowerCase()) {
+    case 'upcoming': return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'live': return 'bg-green-100 text-green-800 border-green-200 animate-pulse';
+    case 'completed': return 'bg-gray-100 text-gray-800 border-gray-200';
+    default: return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+  }
+};
+
+const getStatusIcon = (status) => {
+  switch(status?.toLowerCase()) {
+    case 'upcoming': return <Clock className="w-4 h-4" />;
+    case 'live': return <PlayCircle className="w-4 h-4" />;
+    case 'completed': return <CheckCircle className="w-4 h-4" />;
+    default: return <AlertCircle className="w-4 h-4" />;
+  }
+};
 
 /**
  * ScheduleCard Component
  * Handles the display of individual class sessions and the Join logic
  */
 const ScheduleCard = ({ className, date, time, tutor, duration, students, status, room, meetingUrl }) => {
-  
+  const [showJoinWarning, setShowJoinWarning] = useState(false);
+  const [showClassDetails, setShowClassDetails] = useState(false);
+
   const handleJoinClass = () => {
     if (meetingUrl && meetingUrl.startsWith('http')) {
       window.open(meetingUrl, "_blank", "noopener,noreferrer");
     } else {
-      alert("The meeting link is not available yet or is invalid. Please contact your instructor.");
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch(status?.toLowerCase()) {
-      case 'upcoming': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'live': return 'bg-green-100 text-green-800 border-green-200 animate-pulse';
-      case 'completed': return 'bg-gray-100 text-gray-800 border-gray-200';
-      default: return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch(status?.toLowerCase()) {
-      case 'upcoming': return <Clock className="w-4 h-4" />;
-      case 'live': return <PlayCircle className="w-4 h-4" />;
-      case 'completed': return <CheckCircle className="w-4 h-4" />;
-      default: return <AlertCircle className="w-4 h-4" />;
+      setShowJoinWarning(true);
     }
   };
 
@@ -47,81 +201,144 @@ const ScheduleCard = ({ className, date, time, tutor, duration, students, status
     } catch { return dateStr; }
   };
 
+  const classItem = { className, date, time, tutor, duration, students, status, room };
+
   return (
-    <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]">
-      {/* Header: Title and Status */}
-      <div className="flex justify-between items-start mb-6">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-blue-50 rounded-xl group-hover:bg-blue-600 transition-colors">
-            <Calendar className="w-6 h-6 text-blue-600 group-hover:text-white" />
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-800 text-xl mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
-              {className}
-            </h3>
-            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span>{formatDate(date)} • {time}</span>
-              </div>
-              {room && (
+    <>
+      <div className="group bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]">
+        {/* Header: Title and Status */}
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-blue-50 rounded-xl group-hover:bg-blue-600 transition-colors">
+              <Calendar className="w-6 h-6 text-blue-600 group-hover:text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-800 text-xl mb-1 group-hover:text-blue-600 transition-colors line-clamp-1">
+                {className}
+              </h3>
+              <div className="flex flex-wrap gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span>{room}</span>
+                  <Clock className="w-4 h-4" />
+                  <span>{formatDate(date)} • {time}</span>
                 </div>
-              )}
+                {room && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>{room}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+          <span className={`px-4 py-2 rounded-full text-[10px] font-bold flex items-center gap-2 uppercase tracking-widest border ${getStatusColor(status)}`}>
+            {getStatusIcon(status)}
+            {status}
+          </span>
         </div>
-        <span className={`px-4 py-2 rounded-full text-[10px] font-bold flex items-center gap-2 uppercase tracking-widest border ${getStatusColor(status)}`}>
-          {getStatusIcon(status)}
-          {status}
-        </span>
+
+        {/* Instructor & Enrollment Info */}
+        <div className="flex items-center justify-between mb-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
+              {tutor?.split(' ').map(n => n[0]).join('')}
+            </div>
+            <div>
+              <p className="font-semibold text-gray-800 text-sm">{tutor}</p>
+              <p className="text-xs text-gray-500 italic">{duration}</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="font-bold text-gray-800">{students}</p>
+            <p className="text-[10px] text-gray-500 uppercase font-medium">Students</p>
+          </div>
+        </div>
+
+        {/* Action Button: Logic changes based on Status */}
+        <div className="flex gap-3">
+          {status?.toLowerCase() === 'live' ? (
+            <button 
+              onClick={handleJoinClass}
+              className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-all transform active:scale-95 shadow-green-100"
+            >
+              <Video className="w-5 h-5" /> 
+              Join Live Class Now
+              <ExternalLink className="w-4 h-4 opacity-70" />
+            </button>
+          ) : status?.toLowerCase() === 'upcoming' ? (
+            <button 
+              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+              onClick={() => setShowClassDetails(true)}
+            >
+              Class Details
+            </button>
+          ) : (
+            <button className="flex-1 px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors">
+              View Recording
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Instructor & Enrollment Info */}
-      <div className="flex items-center justify-between mb-6 bg-gray-50 p-4 rounded-xl border border-gray-100">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-            {tutor?.split(' ').map(n => n[0]).join('')}
+      {/* Join Warning Popup */}
+      <PopupModal
+        isOpen={showJoinWarning}
+        onClose={() => setShowJoinWarning(false)}
+        title="Meeting Link Unavailable"
+        type="warning"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            The meeting link for this class is not available yet or is invalid.
+          </p>
+          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+            <h5 className="font-bold text-yellow-700 mb-2">Next Steps:</h5>
+            <ul className="text-sm text-yellow-600 space-y-1 list-disc pl-4">
+              <li>Check your email for updated meeting links</li>
+              <li>Contact your instructor directly</li>
+              <li>Visit the course dashboard for updates</li>
+              <li>The link may be shared closer to class time</li>
+            </ul>
           </div>
-          <div>
-            <p className="font-semibold text-gray-800 text-sm">{tutor}</p>
-            <p className="text-xs text-gray-500 italic">{duration}</p>
+          <div className="flex gap-3 pt-4">
+            <button
+              onClick={() => window.location.href = 'mailto:support@example.com'}
+              className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg font-medium hover:bg-yellow-700 transition-colors"
+            >
+              Contact Support
+            </button>
+            <button
+              onClick={() => setShowClassDetails(true)}
+              className="flex-1 px-4 py-2 border border-yellow-600 text-yellow-600 rounded-lg font-medium hover:bg-yellow-50 transition-colors"
+            >
+              View Class Details
+            </button>
           </div>
         </div>
-        <div className="text-right">
-          <p className="font-bold text-gray-800">{students}</p>
-          <p className="text-[10px] text-gray-500 uppercase font-medium">Students</p>
-        </div>
-      </div>
+      </PopupModal>
 
-      {/* Action Button: Logic changes based on Status */}
-      <div className="flex gap-3">
-        {status?.toLowerCase() === 'live' ? (
-          <button 
-            onClick={handleJoinClass}
-            className="flex-1 px-6 py-3 bg-green-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-green-700 transition-all transform active:scale-95 shadow-green-100"
-          >
-            <Video className="w-5 h-5" /> 
-            Join Live Class Now
-            <ExternalLink className="w-4 h-4 opacity-70" />
-          </button>
-        ) : status?.toLowerCase() === 'upcoming' ? (
-          <button 
-            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
-            onClick={() => alert("This class hasn't started yet. Please come back at the scheduled time.")}
-          >
-            Class Details
-          </button>
-        ) : (
-          <button className="flex-1 px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-colors">
-            View Recording
-          </button>
-        )}
-      </div>
-    </div>
+      {/* Class Details Popup */}
+      <ClassDetailsPopup
+        isOpen={showClassDetails}
+        onClose={() => setShowClassDetails(false)}
+        classItem={classItem}
+      />
+    </>
   );
+};
+
+const getClassStatus = (date, time) => {
+  try {
+    const classDateTime = new Date(`${date}T${time}`);
+    const now = new Date();
+
+    const diffMinutes = (classDateTime - now) / (1000 * 60);
+
+    if (diffMinutes > 5) return "Upcoming";
+    if (diffMinutes >= -60 && diffMinutes <= 5) return "Live";
+    return "Completed";
+  } catch {
+    return "Upcoming";
+  }
 };
 
 export default function MySchedule() {
@@ -134,17 +351,19 @@ export default function MySchedule() {
     const q = query(collection(db, "schedules"), orderBy("date", "asc"));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const scheduleData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const scheduleData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          status: getClassStatus(data.date, data.time),
+        };
+      });
+
       setSchedule(scheduleData);
       setLoading(false);
-    }, (error) => {
-      console.error("Firebase Error:", error);
-      setLoading(false);
     });
-
+    
     return () => unsubscribe();
   }, []);
 

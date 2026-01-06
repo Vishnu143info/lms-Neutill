@@ -200,10 +200,7 @@ export default function TutorDashboard() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <Bell className="w-6 h-6 text-gray-600 cursor-pointer hover:text-orange-600 transition-colors" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-              </div>
+            
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold">
                   T

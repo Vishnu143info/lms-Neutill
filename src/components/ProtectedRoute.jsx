@@ -1,21 +1,21 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
+const ProtectedRoute = ({ allowedRoles, children }) => {
   const { user, role, loading } = useAuth();
 
-  // ⛔ WAIT for Firebase auth to load
+  // ⏳ Wait for Firebase
   if (loading) {
-    return null; // or spinner
+    return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
-  // ❌ Not logged in
+  // 🔐 Not logged in
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // ❌ Role not allowed
-  if (allowedRoles && !allowedRoles.includes(role)) {
+  // 🚫 Role not allowed
+  if (!allowedRoles.includes(role)) {
     return (
       <div style={{ padding: 40, textAlign: "center" }}>
         <h2>Access Denied</h2>
@@ -24,7 +24,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     );
   }
 
-  // ✅ Access allowed
+  // ✅ Access granted
   return children;
 };
 

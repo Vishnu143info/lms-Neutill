@@ -2,30 +2,24 @@ import React, { useState, useEffect } from "react";
 import {
   Search,
   Filter,
-  MoreVertical,
   User,
-  Mail,
-  Phone,
   Calendar,
   Shield,
   ShieldCheck,
-  ShieldAlert,
   CheckCircle,
   XCircle,
   Trash2,
-  Eye,
   Download,
   RefreshCw,
   ChevronDown,
   AlertCircle,
   UserCheck,
-  UserX,
-  Edit,
-  MessageSquare,
   Clock,
   Star,
-  Mail as MailIcon,
-  Send
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight
 } from "lucide-react";
 import {
   collection,
@@ -43,8 +37,12 @@ export default function Users() {
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [selectedUsers, setSelectedUsers] = useState(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
@@ -64,7 +62,9 @@ export default function Users() {
         };
       });
 
-      setUsers(allUsers);
+      // Sort users by createdAt (newest first)
+      const sortedUsers = allUsers.sort((a, b) => b.createdAt - a.createdAt);
+      setUsers(sortedUsers);
       setLoading(false);
     });
 
@@ -92,88 +92,6 @@ export default function Users() {
     }
   };
 
-  const toggleSelectUser = (id) => {
-    const newSelected = new Set(selectedUsers);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedUsers(newSelected);
-  };
-
-  const selectAllUsers = () => {
-    if (selectedUsers.size === filteredUsers.length) {
-      setSelectedUsers(new Set());
-    } else {
-      setSelectedUsers(new Set(filteredUsers.map(user => user.id)));
-    }
-  };
-
-  // Send email to a single user
-  const sendEmailToUser = (user) => {
-    const subject = `Message from Admin - ${user.name}`;
-    const body = `Dear ${user.name},\n\nWe hope this message finds you well.\n\n[Your message here]\n\nBest regards,\nAdmin Team\naskneutill@gmail.com`;
-    
-    const mailtoLink = `mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&cc=askneutill@gmail.com`;
-    
-    window.open(mailtoLink, '_blank');
-  };
-
-  // Send bulk email to selected users
-  const sendBulkEmail = () => {
-    if (selectedUsers.size === 0) {
-      alert("Please select users to send email");
-      return;
-    }
-
-    const selectedUserDetails = users.filter(user => selectedUsers.has(user.id));
-    
-    // Create list of recipients
-    const recipients = selectedUserDetails.map(user => user.email).join(',');
-    
-    // Create list of user names for the email body
-    const userNames = selectedUserDetails.map(user => user.name).join(', ');
-    
-    const subject = "Important Announcement from Admin";
-    const body = `Dear Users,\n\nThis message is for: ${userNames}\n\n[Your bulk message here]\n\nThis email has been sent to all selected users.\n\nBest regards,\nAdmin Team\naskneutill@gmail.com`;
-    
-    const mailtoLink = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&cc=askneutill@gmail.com`;
-    
-    window.open(mailtoLink, '_blank');
-  };
-
-  // Send quick message template
-  const sendQuickMessage = (user, template) => {
-    let subject = "";
-    let body = "";
-    
-    switch(template) {
-      case 'welcome':
-        subject = `Welcome to Our Platform, ${user.name}!`;
-        body = `Dear ${user.name},\n\nWelcome to our platform! We're excited to have you on board.\n\nIf you have any questions or need assistance, please don't hesitate to reach out to us at askneutill@gmail.com.\n\nBest regards,\nAdmin Team`;
-        break;
-        
-      case 'account_activated':
-        subject = `Your Account Has Been Activated - ${user.name}`;
-        body = `Dear ${user.name},\n\nYour account has been successfully activated! You can now access all features of our platform.\n\nIf you have any questions, feel free to contact us at askneutill@gmail.com.\n\nBest regards,\nAdmin Team`;
-        break;
-        
-      case 'account_deactivated':
-        subject = `Account Status Update - ${user.name}`;
-        body = `Dear ${user.name},\n\nYour account has been temporarily deactivated. If you believe this is a mistake or would like to reactivate your account, please contact us at askneutill@gmail.com.\n\nBest regards,\nAdmin Team`;
-        break;
-        
-      default:
-        subject = `Message from Admin`;
-        body = `Dear ${user.name},\n\nWe hope this message finds you well.\n\n[Your custom message here]\n\nBest regards,\nAdmin Team\naskneutill@gmail.com`;
-    }
-    
-    const mailtoLink = `mailto:${user.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&cc=askneutill@gmail.com`;
-    
-    window.open(mailtoLink, '_blank');
-  };
-
   const filteredUsers = users.filter(user => {
     const matchesSearch = searchTerm === "" || 
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -187,17 +105,37 @@ export default function Users() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  // Calculate pagination
+  useEffect(() => {
+    const total = Math.ceil(filteredUsers.length / itemsPerPage);
+    setTotalPages(total);
+    
+    // Reset to first page if current page exceeds total pages
+    if (currentPage > total && total > 0) {
+      setCurrentPage(1);
+    }
+  }, [filteredUsers.length, itemsPerPage, currentPage]);
+
+  // Get current page data
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredUsers.slice(startIndex, endIndex);
+  };
+
+  const currentPageUsers = getCurrentPageData();
+
   const exportData = () => {
     const csvContent = "data:text/csv;charset=utf-8," 
-      + "Name,Email,Role,Status,Joined\n" 
-      + users.map(user => 
-          `"${user.name}","${user.email}","${user.role}","${user.approved ? 'Active' : 'Inactive'}","${user.createdAt.toLocaleDateString()}"`
+      + "Name,Email,Role,Status,Joined,Last Login,Rating\n" 
+      + filteredUsers.map(user => 
+          `"${user.name}","${user.email}","${user.role}","${user.approved ? 'Active' : 'Inactive'}","${user.createdAt.toLocaleDateString()}","${user.lastLogin ? user.lastLogin.toLocaleDateString() : 'Never'}","${user.rating}"`
         ).join("\n");
     
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "users_export.csv");
+    link.setAttribute("download", `users_export_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -243,6 +181,42 @@ export default function Users() {
     );
   };
 
+  // Pagination controls
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = startPage + maxVisiblePages - 1;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => goToPage(i)}
+          className={`px-3 py-1.5 rounded-lg transition-colors text-sm font-medium ${
+            currentPage === i
+              ? "bg-blue-600 text-white"
+              : "border border-gray-300 text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
@@ -283,71 +257,6 @@ export default function Users() {
           </div>
         </div>
 
-        {/* Bulk Actions Bar */}
-        {selectedUsers.size > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 mb-6 shadow-lg"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold">{selectedUsers.size}</span>
-                </div>
-                <p className="text-white font-medium">
-                  {selectedUsers.size} user{selectedUsers.size !== 1 ? 's' : ''} selected
-                </p>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={sendBulkEmail}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
-                >
-                  <MailIcon className="w-4 h-4" />
-                  <span>Send Email to All</span>
-                </button>
-                
-                {/* Quick Templates for Bulk */}
-                <div className="relative group">
-                  <button className="flex items-center space-x-2 px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors font-medium">
-                    <span>Quick Templates</span>
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 hidden group-hover:block">
-                    <button
-                      onClick={() => {
-                        const selectedUserDetails = users.filter(user => selectedUsers.has(user.id));
-                        selectedUserDetails.forEach(user => sendQuickMessage(user, 'welcome'));
-                      }}
-                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      Send Welcome Email
-                    </button>
-                    <button
-                      onClick={() => {
-                        const selectedUserDetails = users.filter(user => selectedUsers.has(user.id));
-                        selectedUserDetails.forEach(user => sendQuickMessage(user, 'account_activated'));
-                      }}
-                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      Send Activation Email
-                    </button>
-                  </div>
-                </div>
-                
-                <button
-                  onClick={() => setSelectedUsers(new Set())}
-                  className="px-4 py-2 text-white hover:bg-white/10 rounded-lg transition-colors"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
         {/* Search and Filters */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
           {/* Search Bar */}
@@ -358,7 +267,10 @@ export default function Users() {
                 type="text"
                 placeholder="Search users by name or email..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // Reset to first page on search
+                }}
                 className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               />
             </div>
@@ -368,6 +280,7 @@ export default function Users() {
                 setSearchTerm("");
                 setSelectedRole("all");
                 setSelectedStatus("all");
+                setCurrentPage(1);
               }}
               className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-medium flex items-center space-x-2"
             >
@@ -392,7 +305,10 @@ export default function Users() {
                       {["all", "student", "tutor", "admin", "consumer"].map((role) => (
                         <button
                           key={role}
-                          onClick={() => setSelectedRole(role)}
+                          onClick={() => {
+                            setSelectedRole(role);
+                            setCurrentPage(1);
+                          }}
                           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                             selectedRole === role
                               ? "bg-blue-600 text-white"
@@ -411,7 +327,10 @@ export default function Users() {
                       {["all", "active", "inactive"].map((status) => (
                         <button
                           key={status}
-                          onClick={() => setSelectedStatus(status)}
+                          onClick={() => {
+                            setSelectedStatus(status);
+                            setCurrentPage(1);
+                          }}
                           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                             selectedStatus === status
                               ? "bg-blue-600 text-white"
@@ -437,16 +356,8 @@ export default function Users() {
           <table className="w-full min-w-[1000px]">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="w-12 p-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedUsers.size === filteredUsers.length && filteredUsers.length > 0}
-                    onChange={selectAllUsers}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                </th>
                 <th className="p-4 text-left font-semibold text-gray-900">User</th>
-                <th className="p-4 text-left font-semibold text-gray-900">Contact</th>
+              
                 <th className="p-4 text-left font-semibold text-gray-900">Role</th>
                 <th className="p-4 text-left font-semibold text-gray-900">Status</th>
                 <th className="p-4 text-left font-semibold text-gray-900">Joined</th>
@@ -456,8 +367,8 @@ export default function Users() {
 
             <tbody className="divide-y divide-gray-200">
               <AnimatePresence>
-                {filteredUsers.length > 0 ? (
-                  filteredUsers.map((user) => (
+                {currentPageUsers.length > 0 ? (
+                  currentPageUsers.map((user) => (
                     <motion.tr
                       key={user.id}
                       initial={{ opacity: 0 }}
@@ -465,16 +376,6 @@ export default function Users() {
                       exit={{ opacity: 0 }}
                       className="hover:bg-gray-50 transition-colors"
                     >
-                      {/* Checkbox */}
-                      <td className="p-4">
-                        <input
-                          type="checkbox"
-                          checked={selectedUsers.has(user.id)}
-                          onChange={() => toggleSelectUser(user.id)}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </td>
-
                       {/* User Info */}
                       <td className="p-4">
                         <div className="flex items-center space-x-4">
@@ -491,7 +392,6 @@ export default function Users() {
                           <div>
                             <p className="font-bold text-gray-900">{user.name}</p>
                             <div className="flex items-center space-x-1 mt-1">
-                              <Mail className="w-3 h-3 text-gray-400" />
                               <p className="text-sm text-gray-600">{user.email}</p>
                             </div>
                           </div>
@@ -555,50 +455,6 @@ export default function Users() {
                           </button>
 
                           <button
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="View Details"
-                          >
-                            <Eye className="w-5 h-5" />
-                          </button>
-
-                          {/* Email Dropdown */}
-                          <div className="relative group">
-                            <button
-                              className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                              title="Send Message"
-                            >
-                              <MessageSquare className="w-5 h-5" />
-                            </button>
-                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 hidden group-hover:block">
-                              <button
-                                onClick={() => sendEmailToUser(user)}
-                                className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors flex items-center space-x-2"
-                              >
-                                <Send className="w-4 h-4" />
-                                <span>Custom Email</span>
-                              </button>
-                              <button
-                                onClick={() => sendQuickMessage(user, 'welcome')}
-                                className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                              >
-                                Send Welcome
-                              </button>
-                              <button
-                                onClick={() => sendQuickMessage(user, 'account_activated')}
-                                className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                              >
-                                Account Activated
-                              </button>
-                              <button
-                                onClick={() => sendQuickMessage(user, 'account_deactivated')}
-                                className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                              >
-                                Account Deactivated
-                              </button>
-                            </div>
-                          </div>
-
-                          <button
                             onClick={() => handleDelete(user.id, user.name)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete User"
@@ -611,7 +467,7 @@ export default function Users() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="p-12">
+                    <td colSpan="6" className="p-12">
                       <div className="text-center">
                         <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                           <AlertCircle className="w-10 h-10 text-gray-400" />
@@ -637,19 +493,42 @@ export default function Users() {
           </table>
         </div>
 
-        {/* Table Footer */}
+        {/* Table Footer with Dynamic Pagination */}
         {filteredUsers.length > 0 && (
           <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between">
-              <div className="mb-4 md:mb-0">
-                <p className="text-sm text-gray-600">
-                  Showing <span className="font-semibold text-gray-900">{filteredUsers.length}</span> of{" "}
-                  <span className="font-semibold text-gray-900">{users.length}</span> users
-                </p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between space-y-4 md:space-y-0">
+              {/* Left side - Results per page selector */}
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">Show:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1); // Reset to first page when changing items per page
+                    }}
+                    className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span className="text-sm text-gray-600">per page</span>
+                </div>
+                
+                <div className="text-sm text-gray-600">
+                  Showing <span className="font-semibold text-gray-900">
+                    {Math.min((currentPage - 1) * itemsPerPage + 1, filteredUsers.length)} - {Math.min(currentPage * itemsPerPage, filteredUsers.length)}
+                  </span> of <span className="font-semibold text-gray-900">{filteredUsers.length}</span> users
+                </div>
               </div>
-              
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-4">
+
+              {/* Right side - Pagination controls */}
+              <div className="flex items-center space-x-2">
+                {/* Status indicators */}
+                <div className="hidden md:flex items-center space-x-4 mr-4">
                   <div className="flex items-center space-x-2">
                     <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     <span className="text-sm text-gray-600">Active</span>
@@ -659,19 +538,46 @@ export default function Users() {
                     <span className="text-sm text-gray-600">Inactive</span>
                   </div>
                 </div>
-                
-                <div className="flex items-center space-x-2">
-                  <button className="px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 text-sm">
-                    Previous
+
+                {/* Pagination buttons */}
+                <div className="flex items-center space-x-1">
+                  {/* First page */}
+                  <button
+                    onClick={() => goToPage(1)}
+                    disabled={currentPage === 1}
+                    className="p-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronsLeft className="w-4 h-4 text-gray-600" />
                   </button>
-                  <button className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                    1
+
+                  {/* Previous page */}
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-gray-600" />
                   </button>
-                  <button className="px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 text-sm">
-                    2
+
+                  {/* Page numbers */}
+                  {renderPageNumbers()}
+
+                  {/* Next page */}
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="p-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronRight className="w-4 h-4 text-gray-600" />
                   </button>
-                  <button className="px-3 py-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 text-sm">
-                    Next
+
+                  {/* Last page */}
+                  <button
+                    onClick={() => goToPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="p-1.5 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronsRight className="w-4 h-4 text-gray-600" />
                   </button>
                 </div>
               </div>
