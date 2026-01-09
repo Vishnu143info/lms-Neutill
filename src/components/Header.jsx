@@ -5,7 +5,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { Link as ScrollLink } from "react-scroll";
-import logo from "../assets/logo1.png";
+import logo from "../assets/logo_.png";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -55,25 +55,30 @@ const Header = () => {
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
         isScrolled
           ? "bg-gradient-to-r from-blue-100 via-blue-900 to-purple-900 shadow-2xl py-2"
-          : "bg-gradient-to-r from-blue-100 via-blue-900 to-purple-900 py-4"
+          : "bg-gradient-to-r from-blue-100 via-blue-900 to-purple-900 shadow-2xl py-4"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-22 mb-0">
           
           {/* ✅ Logo with FIXED SIZE: h-30 is replaced with h-12 */}
-          <RouterLink 
-            to="/" 
-            onClick={handleClose}
-            className="flex-shrink-0 flex items-center space-x-3 group transition-shadow duration-300"
-          >
-            <img 
-              src={logo} 
-              alt="Logo" 
-              // Changed h-30 to h-12 to prevent it from dominating the space
-              className="h-30 w-auto transition-transform duration-300 group-hover:scale-110" 
-            />
-          </RouterLink>
+<RouterLink
+  to="/"
+  onClick={handleClose}
+  className="flex-shrink-0 flex items-center group"
+>
+  {/* Dark ribbon behind logo */}
+<div className="px-3 py-1.5 rounded-full bg-[#0b1220] shadow-lg border border-white/10 scale-110">
+
+    <img
+      src={logo}
+      alt="Logo"
+      className="h-18 w-auto transition-transform duration-300 group-hover:scale-110"
+    />
+  </div>
+</RouterLink>
+
+
 
           {/* ✅ Desktop Navigation Menu - Increased Spacing */}
           <div className="hidden lg:block">

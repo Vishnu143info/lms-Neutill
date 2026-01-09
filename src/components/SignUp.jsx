@@ -30,35 +30,48 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  e.preventDefault();
+  setError('');
+  setLoading(true);
 
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userCredential.user;
 
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        profile: {
-          name,
-          email,
-          role
-        },
-        password, // ⚠️ Remove this in production - never store passwords in Firestore
-        role,
-        approved: false,
-        createdAt: serverTimestamp(),
-        status: 'pending'
-      });
+    const isTutor = role === 'tutor';
 
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      profile: {
+        name,
+        email,
+        role
+      },
+      role,
+      approved: !isTutor, // ✅ auto-approved for consumer
+      status: isTutor ? 'pending' : 'active',
+      createdAt: serverTimestamp()
+    });
+
+    if (isTutor) {
+      // ⏳ Tutor waits for approval
       setWaitingApproval(true);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } else {
+      // ✅ Consumer goes directly to login
+      navigate('/login');
     }
-  };
+
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const passwordStrength = (pass) => {
     let strength = 0;

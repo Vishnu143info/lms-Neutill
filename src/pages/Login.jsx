@@ -22,20 +22,20 @@ const ADMIN_DOC_ID = "xGUSclC0q6S1IEI4iRb03pkiXIS2";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
+ const [role, setRole] = useState(""); 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
   setError("");
   setLoading(true);
 
   try {
-    // 1️⃣ Login with Firebase Auth
+    // 1️⃣ Firebase Auth login
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email.trim(),
@@ -45,42 +45,29 @@ const Login = () => {
     const user = userCredential.user;
     const uid = user.uid;
 
-    // 2️⃣ ADMIN CHECK (by UID)
-    const adminRef = doc(db, "admin", uid);
-    const adminSnap = await getDoc(adminRef);
-
+    // 2️⃣ ADMIN CHECK (UID-based)
+    const adminSnap = await getDoc(doc(db, "admin", uid));
     if (adminSnap.exists()) {
       localStorage.setItem("userRole", "admin");
       navigate("/dashboard/admin");
       return;
     }
 
-    // 3️⃣ NORMAL USER CHECK
-    const userRef = doc(db, "users", uid);
-    const userSnap = await getDoc(userRef);
+    // 3️⃣ USER PROFILE CHECK
+    const userSnap = await getDoc(doc(db, "users", uid));
 
-    // 4️⃣ AUTO-CREATE USER PROFILE IF NOT EXISTS
     if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email,
-        role: "consumer",   // default role
-        approved: true,
-        createdAt: new Date()
-      });
-
-      localStorage.setItem("userRole", "consumer");
-      navigate("/dashboard/consumer");
-      return;
+      throw new Error("User profile not found. Please contact support.");
     }
 
     const userData = userSnap.data();
 
-    // 5️⃣ CHECK APPROVAL
-    if (userData.approved === false) {
-      throw new Error("Your account is pending admin approval");
+    // 4️⃣ TUTOR APPROVAL CHECK
+    if (userData.role === "tutor" && userData.approved === false) {
+      throw new Error("Your tutor account is pending admin approval.");
     }
 
-    // 6️⃣ REDIRECT BY ROLE FROM FIRESTORE
+    // 5️⃣ REDIRECT BY ROLE
     localStorage.setItem("userRole", userData.role);
     navigate(`/dashboard/${userData.role}`);
 
@@ -288,7 +275,7 @@ const Login = () => {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Role Select */}
-                <motion.div
+                {/* <motion.div
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.1 }}
@@ -318,7 +305,7 @@ const Login = () => {
                       </svg>
                     </div>
                   </div>
-                </motion.div>
+                </motion.div> */}
 
                 {/* Email Input */}
                 <motion.div

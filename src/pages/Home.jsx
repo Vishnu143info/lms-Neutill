@@ -165,12 +165,12 @@ const allServices = [
 
 
   const industries = [
-    { title: "Information Technology", image: itImg, description: "Digital transformation and IT solutions", gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", stats: "+48%" },
-    { title: "Education", image: eduImg, description: "Modern learning platforms and tools", gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)", stats: "+52%" },
-    { title: "Finance & Banking", image: bankingImg, description: "Secure financial technology solutions", gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)", stats: "+45%" },
-    { title: "Health Care", image: healthcareImg, description: "Healthcare innovation and technology", gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)", stats: "+61%" },
-    { title: "Defence", image: defenceImg, description: "Secure defence technology systems", gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)", stats: "+38%" },
-    { title: "Agriculture", image: agricultureImg, description: "Smart farming and agricultural tech", gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)", stats: "+55%" }
+    { title: "Information Technology", image: itImg, description: "Digital transformation and IT solutions", gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
+    { title: "Education", image: eduImg, description: "Modern learning platforms and tools", gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"},
+    { title: "Finance & Banking", image: bankingImg, description: "Secure financial technology solutions", gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" },
+    { title: "Health Care", image: healthcareImg, description: "Healthcare innovation and technology", gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" },
+    { title: "Defence", image: defenceImg, description: "Secure defence technology systems", gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)" },
+    { title: "Agriculture", image: agricultureImg, description: "Smart farming and agricultural tech", gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)" }
   ];
 
   const servicesRef = useRef(null);
@@ -240,9 +240,9 @@ const allServices = [
                       <div className="service-image-overlay"></div>
                     </motion.div>
 
-                    <motion.div className="service-icon-magical">
+                    {/* <motion.div className="service-icon-magical">
   <service.icon size={32} color={service.color} strokeWidth={1.8} />
-</motion.div>
+</motion.div> */}
 
 
                     <div className="service-content-magical">
@@ -302,10 +302,7 @@ const allServices = [
                       <div className="industry-overlay-magical" style={{ background: industry.gradient }}></div>
                     </motion.div>
 
-                    <motion.div className="industry-stats-magical">
-                      <span>{industry.stats}</span>
-                      <small>Growth</small>
-                    </motion.div>
+                    {/* */}
 
                     <div className="industry-content-magical">
                       <h3>{industry.title}</h3>
@@ -328,7 +325,11 @@ const allServices = [
       {/* ALFA PLATFORM */}
       <motion.section id="alfa" className="platform-section">
         <motion.h2 className="section-title-platform">ALFA Platform</motion.h2>
+      
+
+
         <motion.div className="platform-container-magical">
+ 
           <ALFASection />
         </motion.div>
       </motion.section>

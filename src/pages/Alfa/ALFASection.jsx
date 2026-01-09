@@ -67,9 +67,14 @@ const ALFASection = ({ onCardClick }) => {
   // Mobile carousel view
   if (isMobile) {
     return (
+      
       <section className="w-full min-h-screen bg-gradient-to-br from-[#081420] to-[#0a1929] flex justify-center items-center p-4">
+        
         <div className="w-full max-w-md bg-[#0d1b2a] rounded-2xl shadow-2xl overflow-hidden border border-[#1e2f47]">
-          
+          <span className="ml-3 px-3 py-1 text-xs font-semibold rounded-full bg-yellow-400 text-black uppercase tracking-wide">
+  Commissioning Soon
+</span>
+
           {/* Top Navigation */}
           <div className="h-14 bg-gradient-to-r from-[#132235] to-[#1a2d42] rounded-t-2xl flex items-center justify-between px-6">
             <button onClick={prevMode} className="text-white/70 hover:text-white transition-colors">
@@ -142,12 +147,21 @@ const ALFASection = ({ onCardClick }) => {
 
   // Desktop view
   return (
+    
     <section className="w-full min-h-screen bg-gradient-to-br from-[#081420] to-[#0a1929] flex justify-center items-center p-4 md:p-8">
+      
       <div className="w-full max-w-[1600px] h-[85vh] bg-[#0d1b2a] rounded-2xl shadow-2xl overflow-hidden border border-[#1e2f47]">
-        
+      
+
+        <span className="ml-[903px] p-10 py-1  text-xs font-semibold rounded-full bg-yellow-400 text-black uppercase tracking-wide">
+  Commissioning Soon
+</span>
+    
         {/* Enhanced Top Bar */}
         <div className="h-14 bg-gradient-to-r from-[#132235] to-[#1a2d42] rounded-t-2xl flex items-center justify-between px-6">
+          
           <div className="flex items-center gap-4">
+            
             <div className="flex gap-2">
               <span onClick={() => setMode("red")} className={`w-3 h-3 bg-red-500 rounded-full cursor-pointer transition-transform hover:scale-110 ${mode === 'red' ? 'ring-2 ring-red-400' : ''}`} />
               <span onClick={() => setMode("yellow")} className={`w-3 h-3 bg-yellow-400 rounded-full cursor-pointer transition-transform hover:scale-110 ${mode === 'yellow' ? 'ring-2 ring-yellow-300' : ''}`} />

@@ -17,7 +17,7 @@ const industryData = {
           "Cybersecurity and data protection solutions",
           "IT consulting and strategic planning"
         ],
-        stats: { growth: "+48%", projects: "200+", clients: "50+" }
+     
       },
       {
         title: "Future-Ready IT Infrastructure",
@@ -45,7 +45,7 @@ const industryData = {
           "Medical imaging AI solutions",
           "Patient data analytics and insights"
         ],
-        stats: { growth: "+61%", efficiency: "+40%", accuracy: "+35%" }
+       
       },
       {
         title: "Medical Technology Advancements",
@@ -73,7 +73,7 @@ const industryData = {
           "Cybersecurity for defence networks",
           "Command and control systems"
         ],
-        stats: { security: "99.9%", reliability: "+45%", innovation: "+52%" }
+       
       },
       {
         title: "Mission-Critical Solutions",
@@ -101,7 +101,7 @@ const industryData = {
           "Blockchain and cryptocurrency solutions",
           "Investment and trading platforms"
         ],
-        stats: { transactions: "1M+/day", security: "99.99%", growth: "+45%" }
+       
       },
       {
         title: "Banking Digital Transformation",
@@ -129,7 +129,7 @@ const industryData = {
           "Adaptive learning platforms",
           "Educational data analytics"
         ],
-        stats: { engagement: "+52%", retention: "+38%", accessibility: "+65%" }
+       
       },
       {
         title: "Future of Learning",
@@ -157,7 +157,7 @@ const industryData = {
           "Supply chain optimization",
           "Sustainable farming practices"
         ],
-        stats: { yield: "+55%", efficiency: "+42%", sustainability: "+60%" }
+      
       },
       {
         title: "Smart Farming Solutions",
@@ -188,12 +188,21 @@ const IndustryDetail = () => {
     >
       {/* Header */}
       <div 
-        className="industry-detail-header"
-        style={{ background: industry.gradient }}
-      >
-        <h1>{industry.title}</h1>
-        <p>Driving innovation and transformation in the {industry.title.toLowerCase()} sector</p>
-      </div>
+  className="industry-detail-header"
+  style={{ background: industry.gradient }}
+>
+  <h1>{industry.title}</h1>
+
+  <p className="industry-subtitle">
+    Driving innovation and transformation in the {industry.title.toLowerCase()} sector
+  </p>
+
+  <p className="industry-intro">
+    We help organizations adopt modern technologies, optimize operations, 
+    and create sustainable impact through tailored digital solutions.
+  </p>
+</div>
+
 
       {/* Two-Page Content */}
       <div className="industry-pages-container">
@@ -207,7 +216,7 @@ const IndustryDetail = () => {
           >
             <div className="page-header">
               <h2>{page.title}</h2>
-              <div className="page-number">0{pageIndex + 1}</div>
+              
             </div>
 
             <div className="page-content">
@@ -245,12 +254,7 @@ const IndustryDetail = () => {
                 </div>
               )}
 
-              {page.caseStudy && (
-                <div className="case-study-section">
-                  <h3>Success Story</h3>
-                  <p>{page.caseStudy}</p>
-                </div>
-              )}
+            
             </div>
           </motion.div>
         ))}

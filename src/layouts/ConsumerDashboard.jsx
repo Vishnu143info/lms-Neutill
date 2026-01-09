@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { path } from "framer-motion/client";
 
 /* ================= PLAN ACCESS ================= */
 const NORMALIZE_PLAN = (rawPlan) => {
@@ -36,17 +37,19 @@ const NORMALIZE_PLAN = (rawPlan) => {
 const PLAN_ACCESS = {
   Starter: {
     page :false,
-    modules: true,
+    modules: false,
     schedule: false,
-    resume: false,
+    resume: true,
     askTutor: false,
+    path:true,
   },
   Premium: {
     page:true,
     modules: true,
     schedule: true,
     resume: true,
-    askTutor: false, // 🔴 STILL FALSE
+    askTutor: false, 
+    path:true,
   },
   "Pro Learner": {
     page :true,
@@ -54,13 +57,16 @@ const PLAN_ACCESS = {
     schedule: true,
     resume: true,
     askTutor: false,
+    path:true,
   },
   "Elite Scholar": {
     page : true,
     modules: true,
     schedule: true,
     resume: true,
-    askTutor: true, // ✅ ONLY HERE
+    askTutor: true, 
+    path:true,
+  
   },
 };
 
@@ -100,6 +106,7 @@ const PLAN_STYLES = {
 /* ================= NAV ITEMS ================= */
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/dashboard/consumer/page", icon: Home,requires: "page" },
+   { label: "Learning Path", path: "/dashboard/consumer/path", icon: Award, requires: "path" },
   { label: "My Modules", path: "/dashboard/consumer/modules", icon: BookOpen, requires: "modules" },
   { label: "My Schedule", path: "/dashboard/consumer/schedule", icon: Calendar, requires: "schedule" },
   { label: "Ask Tutor", path: "/dashboard/consumer/ask", icon: MessageSquare, requires: "askTutor" },
@@ -159,6 +166,43 @@ const NavItem = ({ item, active, locked, onClick, planStyle }) => {
     </motion.div>
   );
 };
+const calculatePlanProgress = (startDate, endDate) => {
+  if (!startDate || !endDate) {
+    return { remainingDays: 0, progressPercent: 0 };
+  }
+
+  const start =
+    startDate?.seconds
+      ? new Date(startDate.seconds * 1000)
+      : new Date(startDate);
+
+  const end =
+    endDate?.seconds
+      ? new Date(endDate.seconds * 1000)
+      : new Date(endDate);
+
+  const today = new Date();
+
+  const totalDays = Math.max(
+    1,
+    Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+  );
+
+  const remainingDays = Math.max(
+    0,
+    Math.ceil((end - today) / (1000 * 60 * 60 * 24))
+  );
+
+  const usedDays = totalDays - remainingDays;
+
+  const progressPercent = Math.min(
+    100,
+    Math.round((usedDays / totalDays) * 100)
+  );
+
+  return { remainingDays, progressPercent };
+};
+
 
 export default function ConsumerDashboard() {
   const { user, logout } = useAuth();
@@ -172,6 +216,11 @@ export default function ConsumerDashboard() {
   );
   const access = PLAN_ACCESS[planName];
   const planStyle = PLAN_STYLES[planName];
+  const { remainingDays, progressPercent } = calculatePlanProgress(
+  user?.subscription?.startDate,
+  user?.subscription?.endDate
+);
+
 
   /* ================= SIDEBAR ================= */
   const sidebar = (
@@ -215,48 +264,60 @@ export default function ConsumerDashboard() {
         </div>
         {/* Progress Bar */}
         <div className="mt-3">
-          <div className="flex justify-between text-xs text-gray-600 mb-1">
-            <span>Plan Progress</span>
-            <span>0%</span>
-          </div>
-          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: "0%" }}
-              className={`h-full ${planStyle.accent}`}
-            />
-          </div>
-        </div>
+  <div className="flex justify-between text-xs text-gray-600 mb-1">
+    <span>Plan Progress</span>
+    <span>
+      {remainingDays > 0
+        ? `${remainingDays} days left`
+        : "Expired"}
+    </span>
+  </div>
+
+  <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: `${progressPercent}%` }}
+      transition={{ duration: 0.6 }}
+      className={`h-full ${planStyle.accent}`}
+    />
+  </div>
+</div>
+
       </motion.div>
 
       {/* Navigation */}
-      <div className="flex-1 space-y-2">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 mb-2">
-          Navigation
-        </h3>
-        {NAV_ITEMS.map((item) => {
-          const locked = item.requires && !access[item.requires];
-          const active = pathname === item.path;
+      {/* Navigation */}
+<div className="flex-1 min-h-0 overflow-y-auto pr-1">
+  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 mb-2 sticky top-0 bg-gradient-to-b from-white to-gray-50 py-2 z-10">
+    Navigation
+  </h3>
 
-          return (
-            <NavItem
-              key={item.label}
-              item={item}
-              active={active}
-              locked={locked}
-              planStyle={planStyle}
-              onClick={() => {
-                if (locked) {
-                  navigate("/subscribe");
-                } else {
-                  navigate(item.path);
-                }
-                setIsMenuOpen(false);
-              }}
-            />
-          );
-        })}
-      </div>
+  <div className="space-y-2 pb-4">
+    {NAV_ITEMS.map((item) => {
+      const locked = item.requires && !access[item.requires];
+      const active = pathname === item.path;
+
+      return (
+        <NavItem
+          key={item.label}
+          item={item}
+          active={active}
+          locked={locked}
+          planStyle={planStyle}
+          onClick={() => {
+            if (locked) {
+              navigate("/subscribe");
+            } else {
+              navigate(item.path);
+            }
+            setIsMenuOpen(false);
+          }}
+        />
+      );
+    })}
+  </div>
+</div>
+
 
       {/* Logout */}
     {/* Logout Button in sidebar */}

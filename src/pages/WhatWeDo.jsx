@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaLightbulb, FaUsers, FaBrain, FaRocket, FaStar } from "react-icons/fa";
+import "../styles/Home.css"
 
 export default function WhatWeDo() {
   const containerVariants = {
@@ -121,8 +122,10 @@ export default function WhatWeDo() {
       className="what-we-do-section"
       style={{
       
-        paddingTop: "120px",
-        paddingBottom: "120px",
+        marginTop:"-20px",
+        marginBottom:"-50px",
+        paddingTop: "-10px",
+        paddingBottom: "0px",
         position: "relative",
         overflow: "hidden",
       }}
@@ -182,27 +185,16 @@ export default function WhatWeDo() {
         >
           <motion.div
             className="title-decoration"
-            animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.7, 1, 0.7],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            
             style={{
-              fontSize: "4rem",
+              fontSize: "3rem",
               marginBottom: "1rem",
-              background: "linear-gradient(45deg, #0066ff, #8f65ff, #ff6ec7)",
+             
               backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              fontWeight: "900",
-              textShadow: "0 10px 30px rgba(0, 102, 255, 0.3)",
+          
             }}
           >
-            What We Do
+           <h2 className="section-title-magical">What We Do</h2> 
           </motion.div>
           
           <motion.p

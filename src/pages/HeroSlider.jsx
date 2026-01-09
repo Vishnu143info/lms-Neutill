@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "../styles/HeroSlide.css"
-import img1 from "../assets/lo.png"
+import img1 from "../assets/hero.png"
 import img2 from "../assets/whatwedo.png"
-import img3 from "../assets/Ourservice.png"
+import img3 from "../assets/services animation.jpg"
 import img4 from "../assets/industries.png"
 import img5  from "../assets/alfa1.png"
 import img6 from "../assets/tm.png"
@@ -11,7 +11,7 @@ import img6 from "../assets/tm.png"
 const slides = [
      {
     title: "Neutill",
-    desc: "Next-generation AI platform revolutionizing business intelligence with predictive analytics and machine learning insights.",
+    desc: "At Neutill Services Private Limited, we innovate to accelerate progress towards the Sustainable Development Goals. Together, we are not just building solutions, we are shaping a sustainable future.",
     img: img1,
     link: "#neutill",
     gradient: "from-violet-500 to-purple-600"
@@ -25,7 +25,7 @@ const slides = [
   },
   {
     title: "Services",
-    desc: "Explore our advanced technology services designed for exponential growth and digital transformation.",
+    desc: "Explore our advanced technology services in Cloud technology, Generative AI and ML, Internet of things , content management and public relations, Logistics and marketing, upskilling and outsourcing designed for exponential growth and digital transformation.",
     img: img3,
     link: "#services",
     gradient: "from-purple-500 to-pink-500"
@@ -39,14 +39,14 @@ const slides = [
   },
   {
     title: "ALFA Platform",
-    desc: "Smart educational platform empowering institutions and learners with AI-driven personalized learning.",
+    desc: "ALFA provides the essential guardrails for meaningful innovation. By integrating elite data management with strict AI policy enforcement, we empower users to leverage generative AI technology as a strategic asset. With ALFA, AI is no longer a dependency—it is a sustainable partner in professional excellence.",
     img: img5,
     link: "#alfa",
     gradient: "from-amber-400 to-orange-500"
   },
   {
     title: "Tech Manthana",
-    desc: "Innovation hub bridging technology, ideas, and future talent through collaborative ecosystems.",
+    desc: "Through digital magazine We churn the raw potential of emerging technologies into intelligent applications and products that serve the greater good of society. we believe that collaboration is the cornerstone of progress. we actively partner with students, professionals, universities, startups, and multinational corporations—building a vibrant ecosystem of shared knowledge and mutual growth. ",
     img: img6,
     link: "#tech-manthana",
     gradient: "from-emerald-400 to-green-500"
@@ -113,7 +113,7 @@ const HeroSlider = () => {
   };
 
   return (
-    <div className="hero-slider-container">
+    <div className="hero-slider-container ">
       {/* Background Elements */}
       <div className="floating-shapes">
         <div className="shape shape-1"></div>

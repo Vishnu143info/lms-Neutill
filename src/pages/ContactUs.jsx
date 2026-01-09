@@ -35,22 +35,16 @@ const ContactUs = () => {
       style={{
         background: "linear-gradient(180deg, #10182A 0%, #0E1627 100%);",
     
-        padding: "100px 20px 60px",
+        paddingTop: "-10px",
+        paddingBottom: "30px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
       }}
     >
       {/* Title */}
-      <h2
-        style={{
-          fontSize: "2.5rem",
-          fontWeight: "700",
-          color: "#fff",
-          marginBottom: "50px",
-          textAlign: "center",
-          letterSpacing: "1px",
-        }}
+      <h2 className="section-title-magical"
+        
       >
         Get in Touch
       </h2>

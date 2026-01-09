@@ -213,7 +213,7 @@
 
 /* 💫 MAGICAL SERVICES SECTION */
 .services-section-magical {
-  padding: 100px 20px;
+  
   background: linear-gradient(180deg, #0f172a 0%, #1a2332 100%);
   position: relative;
   overflow: hidden;
@@ -547,9 +547,9 @@
 
 /* 🌟 PLATFORM SECTIONS */
 .platform-section {
-  padding: 100px 20px;
+  padding-bottom:  60px;
   position: relative;
-  background: linear-gradient(180deg, #0f172a 0%, #1a2332 100%);
+  background: linear-gradient(180deg, #0f172a 0%);
 }
 
 .section-title-platform {
@@ -577,7 +577,7 @@
 /* 🌈 CONTACT SECTION */
 .contact-section-magical {
   position: relative;
-  background: linear-gradient(180deg, #1a2332 0%, #0f172a 100%);
+ background: linear-gradient(180deg, #0f172a 0%)
 }
 
 /* ✨ ENHANCED ANIMATIONS */

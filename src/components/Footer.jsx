@@ -100,8 +100,8 @@ const quickLinks = [
     },
     {
       icon: Phone,
-      text: "+91 93531 11818",
-      href: "tel:+919353111818",
+      text: "+91 91871 14790",
+      href: "tel:+919187114790",
       desc: "Phone Support"
     },
     {
@@ -110,12 +110,7 @@ const quickLinks = [
       href: "#",
       desc: "Global Offices"
     },
-    {
-      icon: Clock,
-      text: "Mon – Fri : 9AM – 6PM",
-      href: "#",
-      desc: "Business Hours"
-    }
+    
   ];
 
   /* ---------- HELPERS ---------- */
@@ -137,33 +132,11 @@ const quickLinks = [
       <div className="container mx-auto px-4 lg:px-8">
 
         {/* MAIN GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 lg:gap-[9rem] mb-10">
 
-          {/* COMPANY */}
-          <div className="lg:col-span-3 space-y-5">
-          
-<div className="">
-  {/* Logo */}
- 
 
-  {/* Brand Content */}
-  <div className="items-center -mt-5">
-     <img
-    src={logo}
-    alt="Neutill Services Logo"
-    className="h-30 w-auto object-contain"
-  />
-   <p className="text-sm text-gray-400">
-  Technology • Innovation • Growth
-</p>
-<p className="text-xs text-gray-500 mt-1 max-w-xs leading-relaxed">
-  Building modern digital experiences and technology platforms that
-  transform ideas into impactful, scalable products for tomorrow’s
-  businesses.
-</p>
+          <div className="lg:col-span-0 space-y-5">
 
-  </div>
-</div>
 
             
           </div>
@@ -252,12 +225,13 @@ const quickLinks = [
 
         {/* BOTTOM */}
         <div className="border-t border-gray-800 pt-6 flex flex-col lg:flex-row justify-between items-center gap-6">
-          <p className="text-sm text-gray-400">
-            © {currentYear}{" "}
-            <span className="text-white font-semibold">
-              Neutill Services
-            </span>. All Rights Reserved.
-          </p>
+         <p className="text-sm font-semibold text-gray-400">
+  
+  
+     All rights reserved
+  © Neutill Services Private Limited
+</p>
+
 
           <div className="flex gap-4">
             {socialLinks.map((social, i) => {
@@ -280,8 +254,19 @@ const quickLinks = [
         
 
         <p className="text-xs text-gray-600 text-center mt-6 mb-10 flex items-center justify-center gap-1">
-          Made with <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" /> by Innomatrics Tech
-        </p>
+  Made with{" "}
+  <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" />{" "}
+  by{" "}
+  <a
+    href="https://www.innomatricstech.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-gray-400 hover:text-white no-underline underline-offset-2 transition-colors"
+  >
+    Innomatrics Tech
+  </a>
+</p>
+
       </div>
     </footer>
   );

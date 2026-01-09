@@ -127,42 +127,55 @@
 /* PLAN CARDS */
 .plans {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
 }
 
+/* BASE CARD */
 .plan-card {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 25px 15px;
-  border-radius: 15px;
+  background: #1b1b2b;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
   text-align: center;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease, background 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.plan-card:hover {
-  transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.25);
-}
-
+/* TITLE */
 .plan-card h4 {
-  margin-bottom: 15px;
-  font-size: 1.2rem;
-  color: #ffd700;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #facc15;
+  font-weight: 600;
 }
 
+/* ICON */
 .plan-icon {
-  font-size: 2rem;
-  margin-bottom: 15px;
-  color: #fff;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #facc15;
 }
 
+/* TEXT */
 .plan-card p {
   font-size: 0.9rem;
-  margin: 0;
+  color: #cbd5f5;
+  line-height: 1.5;
 }
+
+/* SIMPLE COLOR VARIANTS */
+.plan-card.free .plan-icon {
+  color: #60a5fa;
+}
+
+.plan-card.premium .plan-icon {
+  color: #facc15;
+}
+
+.plan-card.platinum .plan-icon {
+  color: #c084fc;
+}
+
 
 /* EXPLORE BUTTON */
 .explore-btn {

@@ -4,6 +4,8 @@
     import PublicLayout from "./layouts/PublicLayout";
     import ProtectedRoute from "./components/ProtectedRoute";
     import BackToTop from "./components/BackToTop";
+import PosterDetailsPage from "./pages/PosterDetailsPage";
+import AllUpdates from "./pages/AllUpdates";
 
 
     
@@ -36,6 +38,8 @@
     import MySchedule from "./pages/student/MySchedule";
     import ResumeUpload from "./pages/student/ResumeUpload";
     import AskTutor from "./pages/student/AskTutor";
+    import LearningPath from "./pages/student/LearningPath";
+
 
     /* -------- ADMIN -------- */
     import Dashboard from "./pages/admin/Dashboard";
@@ -80,6 +84,23 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
     </PublicLayout>
   }
 />
+<Route
+  path="/tech-manthana/blog/:id"
+  element={
+    <PublicLayout>
+      <PosterDetailsPage />
+    </PublicLayout>
+  }
+/>
+<Route
+  path="/tech-manthana/updates"
+  element={
+    <PublicLayout>
+      <AllUpdates />
+    </PublicLayout>
+  }
+/>
+
 
 <Route
   path="/payment-success"
@@ -131,6 +152,7 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
               <Route path="schedule" element={<MySchedule />} />
               <Route path="resume" element={<ResumeUpload />} />
               <Route path="ask" element={<AskTutor />} />
+               <Route path="path" element={<LearningPath/>} />
             </Route>
 
             {/* ALFA */}

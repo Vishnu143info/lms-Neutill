@@ -4,18 +4,26 @@ import { Calendar, Clock, Users, Plus, Edit2, Trash2, Video, Bell, CheckCircle, 
 // 🔹 Your Firebase instance
 import { db } from "../../firebase";
 
-// 🔹 Firestore SDK helpers
+
+
+
 import {
     collection,
     deleteDoc,
     doc,
     setDoc,
-    query,
+    getDocs,
     onSnapshot,
     orderBy,
+    query,
+    where        // ✅ ADD THIS
 } from "firebase/firestore";
 
-// --- Toast Notification Component ---
+
+
+
+
+
 const Toast = ({ message, type = "success", onClose }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -241,6 +249,44 @@ export default function ScheduleManager() {
     });
 
     const classTypes = ["Live", "Recorded", "Workshop"];
+useEffect(() => {
+  const fetchTutors = async () => {
+    try {
+      const q = query(
+        collection(db, "users"),
+        where("role", "==", "tutor"),
+        where("approved", "==", true)
+      );
+
+      const snapshot = await getDocs(q);
+
+      console.log("Tutor count:", snapshot.size);
+
+      if (snapshot.empty) {
+        showToast("No approved tutors found", "warning");
+        setTutors([]);
+        return;
+      }
+
+      const tutorsList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().profile?.name || "Unnamed Tutor"
+      }));
+
+      setTutors(tutorsList);
+    } catch (error) {
+      console.error("Tutor fetch error:", error);
+      showToast("Failed to load tutors", "error");
+    }
+  };
+
+  fetchTutors();
+}, []);
+
+
+
+
+
 
     // Show toast notification
     const showToast = (message, type = "success") => {
@@ -442,19 +488,22 @@ export default function ScheduleManager() {
                             className="border border-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
 
-                       <select
-                            value={form.tutor}
-                            onChange={(e) => setForm({ ...form, tutor: e.target.value })}
-                            onKeyDown={handleKeyDown}
-                            className="border border-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="">Select Tutor *</option>
-                            {tutors.map((tutor) => (
-                                <option key={tutor.id} value={tutor.name}>
-                                    {tutor.name}
-                                </option>
-                            ))}
-                        </select>
+                      <select
+  value={form.tutor}
+  onChange={(e) => setForm({ ...form, tutor: e.target.value })}
+  className="border border-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
+  <option value="" disabled>
+    {tutors.length === 0 ? "No tutors available" : "Select Tutor *"}
+  </option>
+
+  {tutors.map((tutor) => (
+    <option key={tutor.id} value={tutor.name}>
+      {tutor.name}
+    </option>
+  ))}
+</select>
+
 
                         <select
                             value={form.type}

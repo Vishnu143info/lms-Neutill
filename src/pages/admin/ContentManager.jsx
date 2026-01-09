@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 // Using lucide-react icons
-import { Upload, FileText, Video, Package, Clock, Download, Eye, Trash2, Search } from "lucide-react";
+import { Upload, FileText, Video, Package, Clock, Download, Eye, Trash2, Search, CheckCircle2 } from "lucide-react";
 
 // Import Firebase services and methods
-// NOTE: setDoc is required for explicitly setting the ID
 import { 
     storage, 
     db, 
     collection, 
-    setDoc, // Confirmed: setDoc is used for pre-generated IDs
+    setDoc, 
     deleteDoc, 
     doc, 
     query, 
@@ -26,7 +25,7 @@ const FileUploadCard = ({ title, description, icon: Icon, color, onFileSelect, i
     const handleFileChange = (e) => {
         if (e.target.files[0]) {
             onFileSelect(e.target.files[0]);
-            e.target.value = null; // Reset input field to allow uploading same file again
+            e.target.value = null; 
         }
     };
 
@@ -38,7 +37,6 @@ const FileUploadCard = ({ title, description, icon: Icon, color, onFileSelect, i
                 </div>
                 <div>
                     <h3 className="font-bold text-lg text-gray-800">{title}</h3>
-                    {/* Reduced description font size slightly for better fit on small cards */}
                     <p className="text-gray-600 text-sm">{description}</p>
                 </div>
             </div>
@@ -83,72 +81,60 @@ const ContentItem = ({ item, type, onDelete }) => {
             default: return "bg-gray-100 text-gray-600";
         }
     };
+
+    const getPlanBadge = (plan) => {
+        switch(plan) {
+            case "Platinum": return "bg-amber-100 text-amber-700 border-amber-200";
+            case "Premium": return "bg-purple-100 text-purple-700 border-purple-200";
+            default: return "bg-slate-100 text-slate-700 border-slate-200";
+        }
+    };
     
     const formatDate = (isoString) => {
-        if (item.date === "Just now") return "Just now";
         try {
             return new Date(isoString).toLocaleDateString('en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'
             });
-        } catch {
-            return "Unknown Date";
-        }
+        } catch { return "Unknown Date"; }
     }
 
     return (
         <div className="bg-white rounded-xl p-4 shadow border border-gray-100 hover:shadow-md transition-shadow">
-            {/* Mobile-Friendly Layout: Use flex-col on small screens, then row on medium */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-start gap-3 flex-grow min-w-0"> {/* Use min-w-0 to allow truncation */}
+                <div className="flex items-start gap-3 flex-grow min-w-0">
                     <div className={`p-2 rounded-lg flex-shrink-0 ${getTypeColor()}`}>
                         {type === "PDF" && <FileText className="w-4 h-4" />}
                         {type === "Video" && <Video className="w-4 h-4" />}
                         {type === "Workshop" && <Package className="w-4 h-4" />}
                     </div>
                     <div className="min-w-0">
-                        {/* Truncate long file names */}
-                        <p className="font-medium text-gray-800 truncate" title={item.name}>{item.name}</p>
-                        {/* Detail bar stacks better on small screens */}
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500 mt-1">
-                            <span className="flex-shrink-0">{item.type}</span>
-                            <span className="flex-shrink-0 hidden sm:inline">•</span>
-                            <span className="flex-shrink-0 hidden sm:inline">{item.size}</span>
-                            <span className="flex-shrink-0 hidden sm:inline">•</span>
-                            <span className="flex items-center gap-1 flex-shrink-0">
+                        <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-gray-800 truncate" title={item.name}>{item.name}</p>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${getPlanBadge(item.plan)}`}>
+                                {item.plan || "Free"}
+                            </span>
+                        </div>
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-gray-500">
+                            <span>{item.type}</span>
+                            <span className="hidden sm:inline">•</span>
+                            <span>{item.size}</span>
+                            <span className="hidden sm:inline">•</span>
+                            <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 {formatDate(item.date)}
-                            </span>
-                            <span className="text-xs text-gray-400 truncate max-w-[80px] sm:max-w-none" title={`Firestore ID: ${item.id}`}>
-                                ID: {item.id} 
                             </span>
                         </div>
                     </div>
                 </div>
                 
-                {/* Action buttons on the right, always visible */}
                 <div className="flex items-center gap-2 flex-shrink-0 mt-2 sm:mt-0">
-                    <a 
-                        href={item.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="View File"
-                    >
+                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <Eye className="w-4 h-4 text-gray-600" />
                     </a>
-                    <a 
-                        href={item.url} 
-                        download={item.name} 
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Download File"
-                    >
+                    <a href={item.url} download={item.name} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                         <Download className="w-4 h-4 text-gray-600" />
                     </a>
-                    <button 
-                        onClick={() => onDelete(item.id, item.storagePath)} 
-                        className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Delete File"
-                    >
+                    <button onClick={() => onDelete(item.id, item.storagePath)} className="p-2 hover:bg-red-50 rounded-lg transition-colors">
                         <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
                 </div>
@@ -165,11 +151,18 @@ export default function ContentManager() {
     const [searchTerm, setSearchTerm] = useState("");
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    
+    // NEW: State to track selected plan before uploading
+    const [selectedPlan, setSelectedPlan] = useState("Free");
 
-    // 1. FETCH DATA (Real-time listener)
+    const planOptions = [
+        { id: "Free", color: "bg-slate-500" },
+        { id: "Premium", color: "bg-purple-600" },
+        { id: "Platinum", color: "bg-amber-500" }
+    ];
+
     useEffect(() => {
         const q = query(collection(db, "contents"), orderBy("date", "desc"));
-
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const fetchedContents = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -179,20 +172,17 @@ export default function ContentManager() {
         }, (error) => {
             console.error("Error fetching contents: ", error);
         });
-
         return () => unsubscribe(); 
     }, []);
 
-    // 2. UNIFIED UPLOAD FUNCTION (Storage and Firestore)
     const handleFileUpload = async (file, type) => {
         if (!file || isUploading) return;
 
         setIsUploading(true);
         setUploadProgress(0);
         
-        // Pre-generate Firestore ID
         const newDocRef = doc(collection(db, "contents"));
-        const docId = newDocRef.id; // Store the generated ID
+        const docId = newDocRef.id;
 
         const storagePath = `content_uploads/${type}/${Date.now()}_${file.name}`;
         const fileRef = storageRef(storage, storagePath); 
@@ -209,29 +199,25 @@ export default function ContentManager() {
                 console.error("Upload failed:", error);
                 alert(`File upload failed: ${error.message}`);
                 setIsUploading(false);
-                setUploadProgress(0);
             },
             async () => {
                 try {
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
 
-                    // Use setDoc and include the ID as a field
                     await setDoc(newDocRef, {
-                        documentId: docId, // The explicitly stored ID field
+                        documentId: docId,
                         name: file.name,
                         type: type,
+                        plan: selectedPlan, // SAVING THE SELECTED PLAN
                         size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
                         date: new Date().toISOString(), 
                         url: downloadURL, 
                         storagePath: storagePath 
                     });
                     
-                    console.log('File uploaded and metadata saved to Firestore!');
-                    alert("File uploaded successfully!");
-
+                    alert(`Uploaded successfully to ${selectedPlan} plan!`);
                 } catch (e) {
                     console.error("Error saving metadata: ", e);
-                    alert("Metadata saving failed. File might be in storage, but the link is missing.");
                 } finally {
                     setIsUploading(false);
                     setUploadProgress(0);
@@ -240,111 +226,118 @@ export default function ContentManager() {
         );
     };
 
-    const uploadPDF = (file) => handleFileUpload(file, "PDF");
-    const uploadVideo = (file) => handleFileUpload(file, "Video");
-    const uploadWorkshop = (file) => handleFileUpload(file, "Workshop");
-
-    // 3. DELETE FUNCTION (Firestore and Storage)
     const deleteItem = async (id, storagePath) => {
-        if (!window.confirm("Are you sure you want to delete this content? This action is irreversible.")) {
-            return;
-        }
-
+        if (!window.confirm("Are you sure you want to delete this content?")) return;
         try {
-            // 1. Delete the file from Firebase Storage
             const fileRef = storageRef(storage, storagePath);
             await deleteObject(fileRef);
-            console.log("File successfully deleted from Firebase Storage!");
-
-            // 2. Delete metadata from Firestore
             await deleteDoc(doc(db, "contents", id));
-            console.log("Document successfully deleted from Firestore!");
-            
         } catch (error) {
             if (error.code === 'storage/object-not-found') {
-                console.warn("Storage object not found. Deleting Firestore record only.");
                 await deleteDoc(doc(db, "contents", id)); 
             } else {
-                console.error("Error deleting content: ", error);
                 alert(`Deletion failed: ${error.message}`);
             }
         }
     };
 
-    // 4. SEARCH/FILTER LOGIC
-    // This is the core logic that makes the search functional
     const filteredContents = contents.filter(item =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.type.toLowerCase().includes(searchTerm.toLowerCase())
+        item.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.plan && item.plan.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
             <div className="mb-8">
-                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-900 bg-clip-text text-transparent">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
                     📚 Content Manager
                 </h1>
                 <p className="text-gray-600 mt-2 text-sm sm:text-base">Upload and manage your educational content</p>
             </div>
 
-            {/* Upload Cards: Stacks on mobile, 3 columns on medium screens and up */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-                <FileUploadCard
-                    title="Upload PDFs"
-                    description="Study materials, notes, and guides"
-                    icon={FileText}
-                    color="bg-blue-500"
-                    onFileSelect={uploadPDF}
-                    isUploading={isUploading}
-                />
-                <FileUploadCard
-                    title="Upload Videos"
-                    description="Tutorials, lectures, and demos"
-                    icon={Video}
-                    color="bg-red-500"
-                    onFileSelect={uploadVideo}
-                    isUploading={isUploading}
-                />
-                <FileUploadCard
-                    title="Upload Workshops"
-                    description="Projects, templates, and resources"
-                    icon={Package}
-                    color="bg-green-500"
-                    onFileSelect={uploadWorkshop}
-                    isUploading={isUploading}
-                />
+            {/* PLAN SELECTION SECTION */}
+            <div className="mb-8 p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
+                <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Step 1: Select Target Plan</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {planOptions.map((plan) => (
+                        <button
+                            key={plan.id}
+                            onClick={() => setSelectedPlan(plan.id)}
+                            className={`relative flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 ${
+                                selectedPlan === plan.id 
+                                ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200" 
+                                : "border-gray-100 bg-gray-50 hover:bg-gray-100"
+                            }`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className={`w-3 h-3 rounded-full ${plan.color}`}></div>
+                                <span className={`font-bold ${selectedPlan === plan.id ? "text-blue-700" : "text-gray-600"}`}>
+                                    {plan.id}
+                                </span>
+                            </div>
+                            {selectedPlan === plan.id && <CheckCircle2 className="w-5 h-5 text-blue-500" />}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="mb-4">
+                <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Step 2: Upload Files for {selectedPlan}</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                    <FileUploadCard
+                        title="Upload PDFs"
+                        description="Study materials and guides"
+                        icon={FileText}
+                        color="bg-blue-500"
+                        onFileSelect={(file) => handleFileUpload(file, "PDF")}
+                        isUploading={isUploading}
+                    />
+                    <FileUploadCard
+                        title="Upload Videos"
+                        description="Tutorials and lectures"
+                        icon={Video}
+                        color="bg-red-500"
+                        onFileSelect={(file) => handleFileUpload(file, "Video")}
+                        isUploading={isUploading}
+                    />
+                    <FileUploadCard
+                        title="Upload Workshops"
+                        description="Projects and templates"
+                        icon={Package}
+                        color="bg-green-500"
+                        onFileSelect={(file) => handleFileUpload(file, "Workshop")}
+                        isUploading={isUploading}
+                    />
+                </div>
             </div>
             
-            {/* Upload Progress Bar */}
             {isUploading && (
-                <div className="mb-4 bg-blue-100 rounded-full h-2.5 dark:bg-blue-900">
+                <div className="mb-8 bg-blue-100 rounded-full h-2.5 overflow-hidden">
                     <div 
-                        className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+                        className="bg-blue-600 h-full transition-all duration-300" 
                         style={{ width: `${uploadProgress}%` }}
                     ></div>
-                    <p className="text-xs text-blue-600 text-center mt-1 font-medium">
-                        Uploading: {uploadProgress.toFixed(0)}%
+                    <p className="text-xs text-blue-600 text-center mt-2 font-bold">
+                        Uploading to {selectedPlan}: {uploadProgress.toFixed(0)}%
                     </p>
                 </div>
             )}
 
-
-            {/* Content Library */}
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
                     <div>
                         <h2 className="text-xl font-bold text-gray-800">Content Library</h2>
-                        <p className="text-gray-600 text-sm">Manage all your uploaded files ({contents.length} total)</p>
+                        <p className="text-gray-600 text-sm">Total files: {contents.length}</p>
                     </div>
-                    {/* Search bar takes full width on mobile, then snaps back */}
                     <div className="relative w-full sm:w-64">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                             type="text"
-                            placeholder="Search content..."
+                            placeholder="Search by name, type, or plan..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full"
+                            className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 w-full outline-none"
                         />
                     </div>
                 </div>
@@ -360,27 +353,10 @@ export default function ContentManager() {
                             />
                         ))
                     ) : (
-                        <div className="text-center p-8 text-gray-500">
-                            <FileText className="w-10 h-10 mx-auto mb-3" />
-                            <p>No content found. Start by uploading a file or try a different search term.</p>
+                        <div className="text-center p-8 text-gray-400">
+                            <p>No results found for your search.</p>
                         </div>
                     )}
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-gray-100">
-                    <div className="text-center">
-                        <p className="text-xl sm:text-2xl font-bold text-gray-800">{contents.filter(c => c.type === "PDF").length}</p>
-                        <p className="text-gray-600 text-sm">PDFs</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-xl sm:text-2xl font-bold text-gray-800">{contents.filter(c => c.type === "Video").length}</p>
-                        <p className="text-gray-600 text-sm">Videos</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-xl sm:text-2xl font-bold text-gray-800">{contents.filter(c => c.type === "Workshop").length}</p>
-                        <p className="text-gray-600 text-sm">Workshops</p>
-                    </div>
                 </div>
             </div>
         </div>

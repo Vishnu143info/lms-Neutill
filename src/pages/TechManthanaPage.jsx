@@ -61,25 +61,27 @@ const TechManthanaPage = () => {
         </p>
 
         {/* PLAN CARDS */}
-        <div className="plans">
-          <div className="plan-card free">
-            <h4>Free Access</h4>
-            <FaFileAlt className="plan-icon" />
-            <p>PDF (Learning Path)</p>
-          </div>
+       <div className="plans">
+  <div className="plan-card free">
+    <h4>Free Access</h4>
+    <FaFileAlt className="plan-icon" />
+    <p>PDF Learning Path</p>
+  </div>
 
-          <div className="plan-card premium">
-            <h4>Premium Access</h4>
-            <FaVideo className="plan-icon" />
-            <p>PDF, Lecture Tutor (Video)</p>
-          </div>
+  <div className="plan-card premium featured">
+    <h4>Premium Access</h4>
+    <FaVideo className="plan-icon" />
+    <p>PDF + Video Tutor</p>
+    <span className="badge">Most Popular</span>
+  </div>
 
-          <div className="plan-card platinum">
-            <h4>Platinum Access</h4>
-            <FaFolderOpen className="plan-icon" />
-            <p>Premium + Hands-on Projects</p>
-          </div>
-        </div>
+  <div className="plan-card platinum">
+    <h4>Platinum Access</h4>
+    <FaFolderOpen className="plan-icon" />
+    <p>Premium + Hands-on Projects</p>
+  </div>
+</div>
+
 
         {/* ⭐ EXPLORE MORE BUTTON */}
         <button
