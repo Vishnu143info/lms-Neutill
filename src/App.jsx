@@ -5,6 +5,7 @@
     import ProtectedRoute from "./components/ProtectedRoute";
     import BackToTop from "./components/BackToTop";
 import PosterDetailsPage from "./pages/PosterDetailsPage";
+import SendMail from "./pages/admin/SendMail";
 import AllUpdates from "./pages/AllUpdates";
 
 
@@ -153,6 +154,7 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
               <Route path="resume" element={<ResumeUpload />} />
               <Route path="ask" element={<AskTutor />} />
                <Route path="path" element={<LearningPath/>} />
+              
             </Route>
 
             {/* ALFA */}
@@ -168,14 +170,19 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
             </Route>
 
             {/* ================= ADMIN ================= */}
-            <Route
-              path="/dashboard/admin"
-              element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            >
+          <Route
+  path="/dashboard/admin"
+  element={
+    <ProtectedRoute allowedRoles={["admin"]}>
+      <AdminDashboard />
+    </ProtectedRoute>
+  }
+>
+  <Route index element={<Dashboard />} />
+  <Route path="users" element={<Users />} />
+<Route path="send-mail" element={<SendMail />} />
+
+
               <Route index element={<Dashboard />} />
               <Route path="page" element={<Dashboard />} />
               <Route path="content" element={<ContentManager />} />

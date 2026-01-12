@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+
 import "../styles/HeroSlide.css"
 import img1 from "../assets/hero.png"
 import img2 from "../assets/whatwedo.png"
@@ -41,14 +43,14 @@ const slides = [
     title: "ALFA Platform",
     desc: "ALFA provides the essential guardrails for meaningful innovation. By integrating elite data management with strict AI policy enforcement, we empower users to leverage generative AI technology as a strategic asset. With ALFA, AI is no longer a dependency—it is a sustainable partner in professional excellence.",
     img: img5,
-    link: "#alfa",
+    link: "/services/alfa-platform",
     gradient: "from-amber-400 to-orange-500"
   },
   {
     title: "Tech Manthana",
     desc: "Through digital magazine We churn the raw potential of emerging technologies into intelligent applications and products that serve the greater good of society. we believe that collaboration is the cornerstone of progress. we actively partner with students, professionals, universities, startups, and multinational corporations—building a vibrant ecosystem of shared knowledge and mutual growth. ",
     img: img6,
-    link: "#tech-manthana",
+    link: "/tech-manthana/blog",
     gradient: "from-emerald-400 to-green-500"
   },
  
@@ -56,7 +58,23 @@ const slides = [
 
 const HeroSlider = () => {
   const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+const [direction, setDirection] = useState(0);
+const [isPaused, setIsPaused] = useState(false);
+
+  const navigate = useNavigate();
+const handleSlideClick = () => {
+  const link = slides[index].link;
+
+  // If it's an in-page section (#services, #alfa, etc.)
+  if (link.startsWith("#")) {
+    const id = link.replace("#", "");
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  } else {
+    navigate(link);
+  }
+};
+
+
 
   const nextSlide = () => {
     setDirection(1);
@@ -68,16 +86,24 @@ const HeroSlider = () => {
     setIndex((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  const goToSlide = (i) => {
-    setDirection(i > index ? 1 : -1);
-    setIndex(i);
-  };
+ const goToSlide = (i) => {
+  setDirection(i > index ? 1 : -1);
+  setIndex(i);
+  setIsPaused(true); // ⬅ HOLD the slide
+};
+
 
   // Auto-slide every 5 seconds
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
-    return () => clearInterval(timer);
-  }, [index]);
+ useEffect(() => {
+  if (isPaused) return;
+
+  const timer = setInterval(() => {
+    nextSlide();
+  }, 5000);
+
+  return () => clearInterval(timer);
+}, [index, isPaused]);
+
 
   const slideVariants = {
     enter: (direction) => ({
@@ -113,7 +139,11 @@ const HeroSlider = () => {
   };
 
   return (
-    <div className="hero-slider-container ">
+    <div
+  className="hero-slider-container cursor-pointer"
+  onClick={handleSlideClick}
+>
+
       {/* Background Elements */}
       <div className="floating-shapes">
         <div className="shape shape-1"></div>
@@ -147,57 +177,36 @@ const HeroSlider = () => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Slider Controls */}
-        <button 
-          className="slide-btn left" 
-          onClick={prevSlide}
-          aria-label="Previous slide"
-        >
-          <motion.span
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            ‹
-          </motion.span>
-        </button>
-        <button 
-          className="slide-btn right" 
-          onClick={nextSlide}
-          aria-label="Next slide"
-        >
-          <motion.span
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            ›
-          </motion.span>
-        </button>
-
-        {/* Progress Bar */}
-        <div className="progress-bar">
-         
-        </div>
+        
 
         {/* Dots */}
-        <div className="slider-dots">
-          {slides.map((_, i) => (
-            <motion.div
-              key={i}
-              className={`dot ${i === index ? "active" : ""}`}
-              onClick={() => goToSlide(i)}
-              whileHover={{ scale: 1.3 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              {i === index && (
-                <motion.div
-                  className="dot-pulse"
-                  layoutId="activeDot"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
-              )}
-            </motion.div>
-          ))}
-        </div>
+       {/* Number Navigation */}
+{/* Number Navigation */}
+<div className="slider-dots">
+  {slides.map((_, i) => (
+    <motion.div
+      key={i}
+      className={`dot-number ${i === index ? "active" : ""}`}
+      onClick={(e) => {
+        e.stopPropagation();   // ✅ STOP navigation
+        goToSlide(i);
+      }}
+      whileHover={{ scale: 1.2 }}
+      whileTap={{ scale: 0.9 }}
+    >
+      {String(i + 1).padStart(2, "0")}
+      {i === index && (
+        <motion.span
+          className="number-ring"
+          layoutId="activeNumber"
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        />
+      )}
+    </motion.div>
+  ))}
+</div>
+
+ 
       </div>
 
       {/* Right Section */}
@@ -263,10 +272,7 @@ const HeroSlider = () => {
           </AnimatePresence>
 
           {/* Slide Counter */}
-          <div className="slide-counter">
-            <span className="current-slide">0{index + 1}</span>
-            <span className="total-slides">/0{slides.length}</span>
-          </div>
+        
         </div>
       </div>
     </div>

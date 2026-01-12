@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { FaDatabase, FaRobot, FaThLarge, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
-const ALFASection = ({ onCardClick }) => {
+
+const ALFASection = () => {
+
+   const navigate = useNavigate();
   const [mode, setMode] = useState("yellow");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -16,6 +20,10 @@ const ALFASection = ({ onCardClick }) => {
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
+  const handleNavigate = () => {
+  navigate("/services/alfa-platform");
+};
+
 
   const modes = {
     red: {
@@ -104,12 +112,13 @@ const ALFASection = ({ onCardClick }) => {
           <div className="p-6">
             <AnimatePresence mode="wait">
               <motion.div
+              onClick={handleNavigate}
                 key={mode}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                onClick={onCardClick}
+               
                 className={`bg-gradient-to-br ${active.bgGradient} to-[#0e1c2c] rounded-2xl p-8 relative text-white border ${active.borderColor} cursor-pointer hover:shadow-lg transition-all duration-300`}
               >
                 <div className="flex items-center gap-4 mb-6">
@@ -183,7 +192,8 @@ const ALFASection = ({ onCardClick }) => {
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4 }}
-            onClick={onCardClick}
+            onClick={handleNavigate}
+
             className={`lg:flex-[1.7] bg-gradient-to-br ${active.bgGradient} to-[#0e1c2c] rounded-2xl p-8 md:p-10 relative text-white border ${active.borderColor} cursor-pointer hover:shadow-xl transition-all duration-300 group`}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
@@ -212,7 +222,8 @@ const ALFASection = ({ onCardClick }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: idx * 0.1 }}
-                onClick={onCardClick}
+               onClick={handleNavigate}
+ 
                 className={`bg-gradient-to-br ${item.bgGradient} to-[#0e1c2c] rounded-2xl p-6 md:p-8 text-center text-white border ${item.borderColor} flex-1 flex flex-col justify-center cursor-pointer hover:shadow-lg transition-all duration-300 group relative overflow-hidden`}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

@@ -84,7 +84,8 @@ export default function Subscriptions() {
         throw new Error("Plan name is required");
       }
       
-      if (!plan.price || Number(plan.price) <= 0) {
+      if (plan.price === "" || Number(plan.price) < 0) {
+
         throw new Error("Please enter a valid price");
       }
 

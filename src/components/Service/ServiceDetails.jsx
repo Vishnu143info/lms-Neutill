@@ -1,6 +1,8 @@
     import React from 'react';
-    import { useParams, Link } from 'react-router-dom';
+    import { useParams, Link, Navigate } from 'react-router-dom';
     import { motion } from 'framer-motion';
+    
+
     // NOTE: These imports must point to your actual component files
     import ALFASection from '../../pages/Alfa/ALFASection'; 
     import TechManthanaPage from '../../pages/TechManthanaPage';
@@ -385,7 +387,9 @@
     const ServiceDetail = () => {
         const { serviceId } = useParams();
         const service = serviceData[serviceId];
-
+if (serviceId === "upskilling-outsourcing") {
+  return <Navigate to="/tech-manthana/blog" replace />;
+}
     
 
         return (

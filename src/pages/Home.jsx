@@ -3,6 +3,8 @@ import { motion, useInView } from "framer-motion";
 import "../styles/Home.css";
 import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 import {
   Cloud,
   BrainCircuit,
@@ -33,7 +35,7 @@ import researchImg from "../assets/outsourcing2.jpeg";
 import alfaImg from "../assets/education1.jpeg";
 import contentImg from "../assets/cm1.png";
 import marketingImg from "../assets/logi1.png";
-import techn from "../assets/tech.png";
+import techn from "../assets/tm.png";
 
 import itImg from "../assets/it2.jpg";
 import eduImg from "../assets/education1.jpeg";
@@ -86,6 +88,29 @@ const staggerContainer = {
 
 
 const Home = () => {
+
+  const navigate = useNavigate();
+
+  const heroRef = useRef(null);
+const isHeroInView = useInView(heroRef, {
+  once: false, // IMPORTANT: allows animation every time you scroll to top
+});
+const heroVariants = {
+  hidden: {
+    opacity: 0,
+    y: 40,
+    scale: 0.98,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+    },
+  },
+};
 
     const location = useLocation();
 
@@ -176,23 +201,33 @@ const allServices = [
   const servicesRef = useRef(null);
   const industriesRef = useRef(null);
 
-  const isServicesInView = useInView(servicesRef, { once: true, margin: "-50px" });
-  const isIndustriesInView = useInView(industriesRef, { once: true, margin: "-50px" });
+  const isServicesInView = useInView(servicesRef, { once: true, });
+  const isIndustriesInView = useInView(industriesRef, { once: true, });
 
   return (
     <motion.div initial="hidden" animate="visible" variants={containerVariants} className="main-container">
 
       {/* ⭐ NEW HERO SLIDER HERE */}
-      <motion.section id="hero">
-        <HeroSlider />
-      </motion.section>
+    <motion.section
+  id="hero"
+  style={{
+    marginTop: 0,
+    paddingTop: 0,
+    minHeight: "100dvh",   
+    overflow: "hidden",    
+  }}
+>
+  <HeroSlider />
+</motion.section>
+
+
 
       {/* WHAT WE DO */}
      <motion.section 
   id="whatwedo"
   initial="hidden"
   whileInView="visible"
-  viewport={{ once: true, margin: "-50px" }}
+  viewport={{ once: true, }}
   variants={containerVariants}
   className="section-enhanced whatwedo-bg"
 >
@@ -226,24 +261,20 @@ const allServices = [
 
 
               return (
-                <motion.div
-                  key={index}
-                  className="service-card-magical"
-                  variants={cardVariants}
-                  whileHover="hover"
-                  style={{ '--service-color': service.color }}
-                >
+               <motion.div
+  className="service-card-magical cursor-pointer"
+  variants={cardVariants}
+  whileHover="hover"
+  onClick={() => navigate(`/services/${serviceId}`)}
+  style={{ '--service-color': service.color }}
+>
+
                   <div className="service-card-inner-magical">
 
                     <motion.div className="service-image-container" whileHover={{ scale: 1.05 }}>
                       <img src={service.image} alt={service.title} />
                       <div className="service-image-overlay"></div>
                     </motion.div>
-
-                    {/* <motion.div className="service-icon-magical">
-  <service.icon size={32} color={service.color} strokeWidth={1.8} />
-</motion.div> */}
-
 
                     <div className="service-content-magical">
                       <h3>{service.title}</h3>
@@ -282,19 +313,20 @@ const allServices = [
               const industryId = industry.title
   .toLowerCase()
   .replace(/&/g, "")
-  .replace(/[^a-z0-9]+/g, "")
+  .replace(/[^a-z0-9]+/g, "-")
   .replace(/(^-|-$)/g, "")
   .replace(/\s+/g, "");
 
 
               return (
-                <motion.div
-                  key={index}
-                  className="industry-card-magical"
-                  variants={cardVariants}
-                  whileHover="hover"
-                  style={{ '--industry-gradient': industry.gradient }}
-                >
+               <motion.div
+  className="industry-card-magical cursor-pointer"
+  variants={cardVariants}
+  whileHover="hover"
+  onClick={() => navigate(`/industries/${industryId}`)}
+  style={{ '--industry-gradient': industry.gradient }}
+>
+
                   <div className="industry-card-inner-magical">
 
                     <motion.div className="industry-image-container-magical" whileHover={{ scale: 1.05 }}>
@@ -347,7 +379,7 @@ const allServices = [
         <ContactUs />
       </motion.section>
 
-<motion.section id="" className="contact-section-magical">
+<motion.section className="contact-section-magical">
         <Footer />
       </motion.section>
     </motion.div>

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import './Industry.css';
 
 const industryData = {
-  "informationtechnology": {
+  "information-technology": {
     title: "Information Technology",
     gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     pages: [
@@ -32,7 +32,7 @@ const industryData = {
       }
     ]
   },
-  "healthcare": {
+  "health-care": {
     title: "Health Care",
     gradient: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
     pages: [
@@ -88,7 +88,7 @@ const industryData = {
       }
     ]
   },
-  "financebanking": {
+  "finance-banking": {
     title: "Finance & Banking",
     gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
     pages: [

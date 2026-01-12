@@ -215,7 +215,7 @@ export default function SubscribePage() {
       {showConfetti && <Confetti recycle={false} numberOfPieces={200} />}
       
       {/* Enhanced Header */}
-      <div className="pt-20 pb-16 px-6 text-center relative overflow-hidden">
+      <div className="-pt-3 pb-16 px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5"></div>
         <div className="max-w-4xl mx-auto relative mt-10">
           

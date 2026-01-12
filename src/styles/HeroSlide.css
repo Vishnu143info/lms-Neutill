@@ -9,7 +9,7 @@
   height: 100vh;
   
   padding: 100px; /* Note: Adjust this padding based on the image cutoff issue discussed earlier */
-  margin-top: 100px;
+  
   background: linear-gradient(180deg, #10182A 0%, #0E1627 100%);
   color: white;
   position: relative;
@@ -246,47 +246,45 @@
   right: -8px;
 }
 
-/* Navigation Dots */
+
+/* Number Navigation (01 02 03...) */
 .slider-dots {
   position: absolute;
-  bottom: -35px;   /* 👈 push dots DOWN */
+  bottom: -55px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 14px;
+  gap: 18px;
   z-index: 20;
-  
 }
 
-
-.dot {
-  width: 14px;
-  height: 14px;
-  
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3); /* Inactive dot color */
-  cursor: pointer;
+.dot-number {
   position: relative;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.dot.active {
-  background: transparent;
-  border: 2px solid #00eaff; /* Active dot border */
+.dot-number:hover {
+  color: #00eaff;
 }
 
-/* Pulsing effect for active dot */
-.dot-pulse {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #00eaff;
-  box-shadow: 0 0 10px #00eaff; /* Glow effect */
+.dot-number.active {
+  color: #00eaff;
 }
+
+/* Ring around active number */
+.number-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid #00eaff;
+  box-shadow: 0 0 12px rgba(0, 234, 255, 0.6);
+}
+
 
 /* ---------------------------------------------------- */
 /* 5. RESPONSIVE DESIGN */
@@ -297,8 +295,8 @@
   .hero-slider-container {
     flex-direction: column; /* Stack image and content vertically */
     height: auto; /* Allow height to adjust to content */
-    padding: 50px 20px; 
-    margin-top: 100px; 
+   
+     margin-top: -10px;
   }
   
   .slider-left,
@@ -335,7 +333,8 @@
 /* Standard Tablets (768px) */
 @media (max-width: 768px) {
   .hero-slider-container {
-    padding: 30px 15px; /* Reduced padding */
+    padding: 30px 15px; 
+     margin-top: -10px;/* Reduced padding */
   }
   
   .slider-left,
@@ -391,49 +390,35 @@
   }
 }
 
-/* Small Mobile Devices (480px) */
 @media (max-width: 480px) {
   .hero-slider-container {
-    padding: 20px 10px; /* Minimal padding */
-  }
-  
-  .slider-left,
-  .slider-right {
-    padding: 15px 10px;
+    padding: 20px 20px;
+    margin-top: -10px;
   }
 
   .image-container {
-    height: 40vh; /* Smallest height for mobile */
-    border-radius: 15px;
+    height: 40vh;
   }
 
-  .slider-title {
-    font-size: 2rem; /* Smallest title size */
-  }
-
-  .slider-desc {
-    font-size: 1rem; /* Smallest description size */
-  }
-
-  .slider-btn {
-    padding: 12px 25px;
-    font-size: 0.9rem;
-  }
-
-  .slide-btn {
-    font-size: 1.5rem;
-    padding: 8px 12px;
-  }
-
-  /* Hide controls to save space on very small screens */
-  .progress-bar,
+  /* ✅ SHOW numbers on mobile */
   .slider-dots {
-    display: none;
+    display: flex;
+    bottom: 12px;
+    gap: 12px;
   }
 
-  .slide-counter {
-    bottom: 5px;
-    right: 10px;
-    font-size: 0.9rem;
+  .dot-number {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .number-ring {
+    inset: -6px;
+    border-width: 1.5px;
+  }
+
+  /* Hide only progress bar (not numbers) */
+  .progress-bar {
+    display: none;
   }
 }

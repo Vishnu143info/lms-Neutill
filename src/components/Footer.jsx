@@ -117,10 +117,14 @@ const quickLinks = [
 
   const toSlug = (text) =>
     text
-      .toLowerCase()
-      .replace(/&/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+       .toLowerCase()
+  .replace(/&/g, "")
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/(^-|-$)/g, "")
+  .replace(/\s+/g, "");
+   
+  
+
 
   const scrollToTop = () =>
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -183,10 +187,15 @@ const quickLinks = [
 
           {/* INDUSTRIES */}
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-400" />
-              Industries
-            </h3>
+           <Link
+  to="/"
+  state={{ scrollTo: "industries" }}
+  className="text-lg font-bold text-white mb-5 flex items-center gap-2 hover:text-blue-300 transition-colors"
+>
+  <Globe className="w-5 h-5 text-blue-400" />
+  Industries
+</Link>
+
             <div className="space-y-3">
               {industries.map((industry, i) => (
                 <Link

@@ -106,7 +106,7 @@ const PrivacyPolicy = () => {
   ];
 
   return (
-    <div className="min-h-screen mt-20 bg-gradient-to-br from-gray-50 via-white to-blue-50/30 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen mt-1 bg-gradient-to-br from-gray-50 via-white to-blue-50/30 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         
         {/* Hero Header */}

@@ -24,15 +24,15 @@ const Header = () => {
   }, []);
 
   /* ✅ Navigation items */
-  const navItems = [
-    { type: "scroll", to: "hero", label: "Home" },
-    { type: "scroll", to: "whatwedo", label: "What We Do" },
-    { type: "scroll", to: "services", label: "Services" },
-    { type: "scroll", to: "industries", label: "Industries" },
-    { type: "scroll", to: "alfa", label: "ALFA" },
-    { type: "path", to: "/tech-manthana/blog", label: "Tech Manthana" },
-    { type: "scroll", to: "contact", label: "Contact Us" },
-  ];
+ const navItems = [
+  { type: "scroll", to: "hero", label: "Home" },
+  { type: "scroll", to: "whatwedo", label: "What We Do" },
+  { type: "scroll", to: "services", label: "Services" },
+  { type: "scroll", to: "industries", label: "Industries" },
+    { type: "path", to: "/services/alfa-platform", label: "ALFA" },
+  { type: "path", to: "/tech-manthana/blog", label: "Tech Manthana" },
+  { type: "scroll", to: "contact", label: "Contact Us" },
+];
 
   /* ✅ Smooth scroll handler */
   const handleScrollToSection = (sectionId) => {
@@ -51,13 +51,11 @@ const Header = () => {
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        isScrolled
-          ? "bg-gradient-to-r from-blue-100 via-blue-900 to-purple-900 shadow-2xl py-2"
-          : "bg-gradient-to-r from-blue-100 via-blue-900 to-purple-900 shadow-2xl py-4"
-      }`}
-    >
+   <nav
+  className={` top-0 left-0 z-50 w-full transition-all duration-500
+  bg-[#0b1220] from-blue-100 via-blue-900 to-purple-900`}
+>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-22 mb-0">
           
@@ -73,7 +71,7 @@ const Header = () => {
     <img
       src={logo}
       alt="Logo"
-      className="h-18 w-auto transition-transform duration-300 group-hover:scale-110"
+      className="h-14 w-auto transition-transform duration-300 group-hover:scale-110"
     />
   </div>
 </RouterLink>
@@ -86,32 +84,23 @@ const Header = () => {
             <div className="ml-10 flex items-baseline space-x-4"> 
               {navItems.map((item, i) => (
                 <div key={i} className="relative group">
-                  {item.type === "scroll" ? (
-                    <ScrollLink
-                      to={item.to}
-                      smooth={true}
-                      duration={700}
-                      offset={-80}
-                      spy={true}
-                      // Use handleScrollToSection to manage navigation/scrolling and menu close
-                      onClick={() => handleScrollToSection(item.to)} 
-                      className="text-gray-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-white/10 cursor-pointer relative overflow-hidden"
-                    >
-                      {item.label}
-                      {/* ✨ ENHANCED UNDERLINE: Gradient glow that expands from the center */}
-                      <span className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent transition-all duration-500 transform scale-x-0 group-hover:scale-x-100 group-hover:h-0.5"></span>
-                    </ScrollLink>
-                  ) : (
-                   <RouterLink
-  to={item.to}
-  onClick={handleClose}
-  className="text-gray-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-white/10"
->
-  {item.label}
-</RouterLink>
+               {item.type === "scroll" ? (
+  <span
+    onClick={() => handleScrollToSection(item.to)}
+    className="text-gray-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-white/10 cursor-pointer"
+  >
+    {item.label}
+  </span>
+) : (
+  <RouterLink
+    to={item.to}
+    onClick={handleClose}
+    className="text-gray-200 hover:text-white px-3 py-2 rounded-lg text-sm font-medium"
+  >
+    {item.label}
+  </RouterLink>
+)}
 
-                    
-                  )}
                 </div>
               ))}
             </div>

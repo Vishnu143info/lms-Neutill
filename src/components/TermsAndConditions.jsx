@@ -115,7 +115,7 @@ const location = useLocation();
   ];
 
   return (
-    <div className="min-h-screen mt-20 bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen mt-1 bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         
         {/* Header Section */}
@@ -234,10 +234,7 @@ const location = useLocation();
             </div>
           </div>
           
-          {/* Decorative elements */}
-          <div className="absolute top-4 right-4 opacity-10">
-            <Shield className="w-24 h-24" />
-          </div>
+        
         </div>
 
         {/* Footer Note */}

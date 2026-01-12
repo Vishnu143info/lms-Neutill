@@ -16,10 +16,21 @@ import {
 } from "react-icons/fa";
 
 const TechManthanaPage = () => {
+ 
   const navigate = useNavigate();
 
+const handleNavigate = () => {
+  navigate("/tech-manthana/blog");
+};
+
+
   return (
-    <div className="techmanthana-container">
+    <div
+  className="techmanthana-container"
+  onClick={handleNavigate}
+  style={{ cursor: "pointer" }}
+>
+
 
       {/* LEFT SECTION */}
       <div className="left-section">
@@ -50,37 +61,50 @@ const TechManthanaPage = () => {
         <h1 className="right-heading">Build, Train, Deploy</h1>
 
         <div className="right-grid">
-          <div className="right-item"><FaUsers className="icon yellow" /> Dedicated teams & managed services</div>
-          <div className="right-item"><FaInfinity className="icon purple" /> Flexible engagement models</div>
-          <div className="right-item"><FaCogs className="icon blue" /> Domain-specific expertise (AI, Cloud, IoT)</div>
-          <div className="right-item"><FaChartLine className="icon yellow" /> Continuous learning & performance tracking</div>
-        </div>
+  <div className="right-item" onClick={handleNavigate}>
+    <FaUsers className="icon yellow" /> Dedicated teams & managed services
+  </div>
+
+  <div className="right-item" onClick={handleNavigate}>
+    <FaInfinity className="icon purple" /> Flexible engagement models
+  </div>
+
+  <div className="right-item" onClick={handleNavigate}>
+    <FaCogs className="icon blue" /> Domain-specific expertise (AI, Cloud, IoT)
+  </div>
+
+  <div className="right-item" onClick={handleNavigate}>
+    <FaChartLine className="icon yellow" /> Continuous learning & performance tracking
+  </div>
+</div>
+
 
         <p className="highlight-text">
           Tech Manthana is where talent meets transformation.
         </p>
 
         {/* PLAN CARDS */}
-       <div className="plans">
-  <div className="plan-card free">
+<div className="plans">
+  <div className="plan-card free" onClick={handleNavigate}>
     <h4>Free Access</h4>
     <FaFileAlt className="plan-icon" />
     <p>PDF Learning Path</p>
   </div>
 
-  <div className="plan-card premium featured">
+  <div className="plan-card premium featured" onClick={handleNavigate}>
     <h4>Premium Access</h4>
     <FaVideo className="plan-icon" />
     <p>PDF + Video Tutor</p>
     <span className="badge">Most Popular</span>
   </div>
 
-  <div className="plan-card platinum">
+  <div className="plan-card platinum" onClick={handleNavigate}>
     <h4>Platinum Access</h4>
     <FaFolderOpen className="plan-icon" />
     <p>Premium + Hands-on Projects</p>
   </div>
 </div>
+
 
 
         {/* ⭐ EXPLORE MORE BUTTON */}

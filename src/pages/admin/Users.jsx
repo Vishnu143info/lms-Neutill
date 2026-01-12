@@ -19,8 +19,11 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  Mail
 } from "lucide-react";
+import { Link } from "react-router-dom";
+
 import {
   collection,
   onSnapshot,
@@ -30,19 +33,37 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom"; // Added
+
+// Remove the emailjs import and sendMail function since we'll redirect instead
 
 export default function Users() {
+  const navigate = useNavigate(); // Added
   const [users, setUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+
+  const toggleUserSelection = (user) => {
+  setSelectedUsers((prev) => {
+    const exists = prev.find((u) => u.id === user.id);
+    if (exists) {
+      return prev.filter((u) => u.id !== user.id);
+    }
+    return [...prev, user];
+  });
+};
+
+const isUserSelected = (id) =>
+  selectedUsers.some((u) => u.id === id);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
@@ -90,6 +111,25 @@ export default function Users() {
         console.error("Error deleting user:", error);
       }
     }
+  };
+
+  // Function to handle sending mail - redirects to mail page
+  const handleSendMail = (user) => {
+    navigate("/send-mail", { 
+      state: { 
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          phone: user.phone,
+          rating: user.rating,
+          approved: user.approved,
+          createdAt: user.createdAt,
+          lastLogin: user.lastLogin
+        }
+      }
+    });
   };
 
   const filteredUsers = users.filter(user => {
@@ -348,126 +388,181 @@ export default function Users() {
           </AnimatePresence>
         </div>
       </div>
+      {/* Bulk Actions Bar */}
+{selectedUsers.length > 0 && (
+  <div className="mb-4 flex items-center justify-between bg-blue-50 border border-blue-200 rounded-xl p-4">
+    <div className="text-sm font-medium text-blue-700">
+      {selectedUsers.length} user{selectedUsers.length > 1 ? "s" : ""} selected
+    </div>
+
+    <button
+      onClick={() =>
+      navigate("/dashboard/admin/send-mail", {
+  state: { users: selectedUsers }
+})
+      }
+      className="flex items-center space-x-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+    >
+      <Mail className="w-4 h-4" />
+      <span>Send Mail</span>
+    </button>
+  </div>
+)}
+
 
       {/* Table Container */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1000px]">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="p-4 text-left font-semibold text-gray-900">User</th>
-              
-                <th className="p-4 text-left font-semibold text-gray-900">Role</th>
-                <th className="p-4 text-left font-semibold text-gray-900">Status</th>
-                <th className="p-4 text-left font-semibold text-gray-900">Joined</th>
-                <th className="p-4 text-left font-semibold text-gray-900">Actions</th>
-              </tr>
-            </thead>
+          <thead className="bg-gray-50 border-b border-gray-200">
+  <tr>
+    
+    {/* Select All Checkbox */}
+    <th className="p-4">
+      <input
+        type="checkbox"
+        checked={
+          selectedUsers.length === currentPageUsers.length &&
+          currentPageUsers.length > 0
+        }
+        onChange={(e) => {
+          if (e.target.checked) {
+            setSelectedUsers(currentPageUsers);
+          } else {
+            setSelectedUsers([]);
+          }
+        }}
+        className="w-4 h-4"
+      />
+    </th>
+
+    <th className="p-4 text-left font-semibold text-gray-900">User</th>
+    <th className="p-4 text-left font-semibold text-gray-900">
+      Contact & Rating
+    </th>
+    <th className="p-4 text-left font-semibold text-gray-900">Role</th>
+    <th className="p-4 text-left font-semibold text-gray-900">Status</th>
+    <th className="p-4 text-left font-semibold text-gray-900">Joined</th>
+    <th className="p-4 text-left font-semibold text-gray-900">Actions</th>
+  </tr>
+</thead>
+
 
             <tbody className="divide-y divide-gray-200">
               <AnimatePresence>
                 {currentPageUsers.length > 0 ? (
                   currentPageUsers.map((user) => (
-                    <motion.tr
-                      key={user.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      {/* User Info */}
-                      <td className="p-4">
-                        <div className="flex items-center space-x-4">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                            user.approved 
-                              ? "bg-gradient-to-br from-green-100 to-emerald-100" 
-                              : "bg-gradient-to-br from-gray-100 to-gray-200"
-                          }`}>
-                            <User className={`w-6 h-6 ${
-                              user.approved ? "text-green-600" : "text-gray-400"
-                            }`} />
-                          </div>
-                          
-                          <div>
-                            <p className="font-bold text-gray-900">{user.name}</p>
-                            <div className="flex items-center space-x-1 mt-1">
-                              <p className="text-sm text-gray-600">{user.email}</p>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
+                <motion.tr
+  key={user.id}
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  exit={{ opacity: 0 }}
+  className="hover:bg-gray-50 transition-colors"
+>
+  {/* Checkbox */}
+  <td className="p-4">
+    <input
+      type="checkbox"
+      checked={isUserSelected(user.id)}
+      onChange={() => toggleUserSelection(user)}
+      onClick={(e) => e.stopPropagation()}
+      className="w-4 h-4"
+    />
+  </td>
 
-                      {/* Contact Info */}
-                      <td className="p-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2">
-                            <Star className="w-3 h-3 text-amber-400 fill-current" />
-                            <span className="text-xs text-gray-600">{user.rating?.toFixed(1) || 'N/A'}</span>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            Last login: {user.lastLogin ? user.lastLogin.toLocaleDateString() : 'Never'}
-                          </div>
-                        </div>
-                      </td>
+  {/* User Info */}
+  <td className="p-4">
+    <div className="flex items-center space-x-4">
+      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+        user.approved
+          ? "bg-gradient-to-br from-green-100 to-emerald-100"
+          : "bg-gradient-to-br from-gray-100 to-gray-200"
+      }`}>
+        <User className={`w-6 h-6 ${
+          user.approved ? "text-green-600" : "text-gray-400"
+        }`} />
+      </div>
 
-                      {/* Role */}
-                      <td className="p-4">
-                        <RoleBadge role={user.role} />
-                      </td>
+      <div>
+        <p className="font-bold text-gray-900">{user.name}</p>
+        <p className="text-sm text-gray-600">{user.email}</p>
+      </div>
+    </div>
+  </td>
 
-                      {/* Status */}
-                      <td className="p-4">
-                        <StatusBadge approved={user.approved} />
-                      </td>
+  {/* Contact */}
+  <td className="p-4">
+    <div className="space-y-1">
+      <div className="flex items-center space-x-2">
+        <Star className="w-3 h-3 text-amber-400 fill-current" />
+        <span className="text-xs text-gray-600">
+          {user.rating?.toFixed(1) || "N/A"}
+        </span>
+      </div>
+      <div className="text-xs text-gray-500">
+        Last login: {user.lastLogin ? user.lastLogin.toLocaleDateString() : "Never"}
+      </div>
+    </div>
+  </td>
 
-                      {/* Joined Date */}
-                      <td className="p-4">
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-700">
-                            {user.createdAt.toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric'
-                            })}
-                          </span>
-                        </div>
-                      </td>
+  {/* Role */}
+  <td className="p-4">
+    <RoleBadge role={user.role} />
+  </td>
 
-                      {/* Actions */}
-                      <td className="p-4">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleToggleApproval(user.id, user.approved)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              user.approved
-                                ? "text-red-600 hover:bg-red-50"
-                                : "text-green-600 hover:bg-green-50"
-                            }`}
-                            title={user.approved ? "Deactivate" : "Activate"}
-                          >
-                            {user.approved ? (
-                              <XCircle className="w-5 h-5" />
-                            ) : (
-                              <CheckCircle className="w-5 h-5" />
-                            )}
-                          </button>
+  {/* Status */}
+  <td className="p-4">
+    <StatusBadge approved={user.approved} />
+  </td>
 
-                          <button
-                            onClick={() => handleDelete(user.id, user.name)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete User"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </motion.tr>
+  {/* Joined */}
+  <td className="p-4">
+    <div className="flex items-center space-x-2">
+      <Calendar className="w-4 h-4 text-gray-400" />
+      <span className="text-sm text-gray-700">
+        {user.createdAt.toLocaleDateString()}
+      </span>
+    </div>
+  </td>
+
+  {/* Actions */}
+  <td className="p-4">
+    <div className="flex items-center space-x-2">
+      <Link
+  to="/dashboard/admin/send-mail"
+  state={{ user }}
+>
+
+        <Mail className="w-5 h-5" />
+      </Link>
+
+      <button
+        onClick={() => handleToggleApproval(user.id, user.approved)}
+        className={`p-2 rounded-lg ${
+          user.approved
+            ? "text-red-600 hover:bg-red-50"
+            : "text-green-600 hover:bg-green-50"
+        }`}
+      >
+        {user.approved ? <XCircle /> : <CheckCircle />}
+      </button>
+
+      <button
+        onClick={() => handleDelete(user.id, user.name)}
+        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+      >
+        <Trash2 />
+      </button>
+    </div>
+  </td>
+</motion.tr>
+
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="p-12">
+                    <td colSpan="7" className="p-12">
+
                       <div className="text-center">
                         <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                           <AlertCircle className="w-10 h-10 text-gray-400" />
