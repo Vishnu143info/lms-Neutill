@@ -92,14 +92,14 @@ const handleNavigate = () => {
   </div>
 
   <div className="plan-card premium featured" onClick={handleNavigate}>
-    <h4>Premium Access</h4>
+    <h4>Basic Access</h4>
     <FaVideo className="plan-icon" />
     <p>PDF + Video Tutor</p>
     <span className="badge">Most Popular</span>
   </div>
 
   <div className="plan-card platinum" onClick={handleNavigate}>
-    <h4>Platinum Access</h4>
+    <h4>Premium Access</h4>
     <FaFolderOpen className="plan-icon" />
     <p>Premium + Hands-on Projects</p>
   </div>

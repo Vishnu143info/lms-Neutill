@@ -2,8 +2,10 @@ import React, { useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import "../styles/Home.css";
 import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 
 import {
   Cloud,
@@ -114,14 +116,40 @@ const heroVariants = {
 
     const location = useLocation();
 
-  useEffect(() => {
-    if (location.state?.scrollTo) {
-      const section = document.getElementById(location.state.scrollTo);
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  }, [location]);
+
+useEffect(() => {
+  if (!location.state?.scrollTo) return;
+
+  const id = location.state.scrollTo;
+
+  const scroll = () => {
+    const el = document.getElementById(id);
+    if (!el) return false;
+
+    el.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+
+    return true;
+  };
+
+  // try immediately
+  if (scroll()) return;
+
+  // otherwise wait for render
+  const interval = setInterval(() => {
+    if (scroll()) clearInterval(interval);
+  }, 100);
+
+  return () => clearInterval(interval);
+}, [location]);
+
+
+
+
+
+
 const allServices = [
   {
     title: "Cloud Consulting",
@@ -154,7 +182,7 @@ const allServices = [
   {
     title: "ALFA Platform",
     image: alfaImg,
-    description: "Comprehensive educational ecosystem",
+    description: "State of the art Responsible AI platform",
     icon: GraduationCap,
     color: "#ffd93d",
   },
@@ -166,7 +194,7 @@ const allServices = [
     color: "#00b894",
   },
   {
-    title: "Upskilling & Outsourcing",
+    title: "Daily Technology Upskilling Hub",
     image: techn,
     description: "Tech Manthana - Innovation hub",
     icon: Lightbulb,
@@ -201,8 +229,8 @@ const allServices = [
   const servicesRef = useRef(null);
   const industriesRef = useRef(null);
 
-  const isServicesInView = useInView(servicesRef, { once: true, });
-  const isIndustriesInView = useInView(industriesRef, { once: true, });
+ const isServicesInView = useInView(servicesRef, { once: false });
+const isIndustriesInView = useInView(industriesRef, { once: false });
 
   return (
     <motion.div initial="hidden" animate="visible" variants={containerVariants} className="main-container">
@@ -221,20 +249,18 @@ const allServices = [
 </motion.section>
 
 
-
-      {/* WHAT WE DO */}
-     <motion.section 
-  id="whatwedo"
-  initial="hidden"
-  whileInView="visible"
-  viewport={{ once: true, }}
-  variants={containerVariants}
-  className="section-enhanced whatwedo-bg"
->
-  <WhatWeDo />
+<motion.section id="whatwedo">
+   <WhatWeDo />
 </motion.section>
 
 
+ {/* TECH MANTHANA */}
+      <motion.section id="tech-manthana" className="platform-section">
+        <motion.h2 className="section-title-platform">Tech Manthana</motion.h2>
+        <motion.div className="platform-container-magical">
+          <TechManthanaPage />
+        </motion.div>
+      </motion.section>
 
       {/* SERVICES SECTION */}
       <motion.section
@@ -366,20 +392,14 @@ const allServices = [
         </motion.div>
       </motion.section>
 
-      {/* TECH MANTHANA */}
-      <motion.section id="tech-manthana" className="platform-section">
-        <motion.h2 className="section-title-platform">Tech Manthana</motion.h2>
-        <motion.div className="platform-container-magical">
-          <TechManthanaPage />
-        </motion.div>
-      </motion.section>
+     
 
       {/* CONTACT */}
-      <motion.section id="contact" className="contact-section-magical">
+    <motion.section id="contact" className="contact-section-magical">
         <ContactUs />
       </motion.section>
 
-<motion.section className="contact-section-magical">
+<motion.section className="">
         <Footer />
       </motion.section>
     </motion.div>

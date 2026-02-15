@@ -92,6 +92,12 @@ const quickLinks = [
   ];
 
   const contactInfo = [
+      {
+    icon: Mail,
+    text: "support@neutill.com",
+    href: "mailto:support@neutill.com",
+    desc: "Corporate Support"
+  },
     {
       icon: Mail,
       text: "askneutill@gmail.com",
@@ -132,7 +138,7 @@ const quickLinks = [
   /* ---------- UI ---------- */
 
   return (
-    <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-gray-300 pt-12 pb-8 border-t border-gray-800">
+    <footer className="text-gray-300 pt-12 pb-8 border-t border-gray-800">
       <div className="container mx-auto px-4 lg:px-8">
 
         {/* MAIN GRID */}
@@ -233,7 +239,7 @@ const quickLinks = [
         </div>
 
         {/* BOTTOM */}
-        <div className="border-t border-gray-800 pt-6 flex flex-col lg:flex-row justify-between items-center gap-6">
+        <div className="border-t border-gray-800 pt-3 flex flex-col lg:flex-row justify-evenly items-center gap-2">
          <p className="text-sm font-semibold text-gray-400">
   
   
@@ -261,8 +267,7 @@ const quickLinks = [
          
         </div>
         
-
-        <p className="text-xs text-gray-600 text-center mt-6 mb-10 flex items-center justify-center gap-1">
+        {/* <p className="text-xs text-gray-600 text-center mt-6 mb-10 flex items-center justify-center gap-1">
   Made with{" "}
   <Heart className="w-3 h-3 text-red-500 fill-red-500 animate-pulse" />{" "}
   by{" "}
@@ -274,7 +279,7 @@ const quickLinks = [
   >
     Innomatrics Tech
   </a>
-</p>
+</p> */}
 
       </div>
     </footer>

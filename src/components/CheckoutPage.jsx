@@ -476,9 +476,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Guarantee */}
-                <div className="text-center text-sm text-gray-500 p-3 bg-blue-50/50 rounded-lg">
-                  <p>✅ 30-day money-back guarantee • Cancel anytime</p>
-                </div>
+                
               </div>
             </div>
           </div>

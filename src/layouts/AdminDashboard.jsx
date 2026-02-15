@@ -26,6 +26,8 @@ const NAV_ITEMS = [
   { label: "Automation", icon: Zap, path: "/dashboard/admin/posters" },
   { label: "Users", icon: Users, path: "/dashboard/admin/users" },
   { label: "Resumes", icon: FileText, path: "/dashboard/admin/resume" },
+  { label: "Enquiry Form", icon: FileText, path: "/dashboard/admin/form" },
+
 ];
 
 const NavItem = ({ label, Icon, active, onClick, collapsed }) => (
@@ -144,7 +146,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Logout Button */}
-      <div className="p-4">
+      <div className="p-4  pb-18">
         <motion.button
           whileHover={{ scale: collapsed ? 1.05 : 1.02 }}
           whileTap={{ scale: 0.98 }}

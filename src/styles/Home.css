@@ -1,10 +1,19 @@
+html {
+  scroll-behavior: smooth;
+}
+
+
 /* 🌟 ENHANCED GLOBAL STYLES */
 .main-container {
   overflow-x: hidden;
+    background-color: #0f172a;
 }
+
+
+
 .whatwedo-bg {
-  background: linear-gradient(180deg, #10182A 0%, #0E1627 100%);
-  padding: 80px 0;
+  /* background: linear-gradient(180deg, #10182A 0%, #0E1627 100%); */
+ 
 }
 
 
@@ -23,7 +32,7 @@
   align-items: center;
   text-align: center;
   color: white;
-  background: linear-gradient(180deg, #10182A 0%, #0E1627 100%);
+   background: transparent;
   overflow: hidden;
   margin-top: 50px;
 }
@@ -214,7 +223,7 @@
 /* 💫 MAGICAL SERVICES SECTION */
 .services-section-magical {
   
-  background: linear-gradient(180deg, #0f172a 0%, #1a2332 100%);
+  /* background: linear-gradient(180deg, #0f172a 0%, #1a2332 100%); */
   position: relative;
   overflow: hidden;
   padding-bottom: 110px;
@@ -225,6 +234,7 @@
   margin: 0 auto;
   position: relative;
   z-index: 2;
+    padding: 0 clamp(16px, 4vw, 40px);
 }
 
 .services-header-magical {
@@ -267,6 +277,7 @@
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  padding: 10px;
   
 }
 
@@ -275,6 +286,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  
 }
 
 .service-image-container {
@@ -334,7 +346,7 @@ object-fit: fill;
 .service-content-magical p {
   color: #94a3b8;
   line-height: 1.6;
-  margin-bottom: 1.5rem;
+ 
   font-size: 0.95rem;
   flex-grow: 1;
   
@@ -353,7 +365,8 @@ object-fit: fill;
   justify-content: center;
   gap: 0.5rem;
   transition: all 0.3s ease;
-  margin-top: auto;
+  margin-top: 20px;
+  
 }
 
 .service-cta-magical:hover {
@@ -365,15 +378,16 @@ object-fit: fill;
 
 /* 🚀 MAGICAL INDUSTRIES SECTION */
 .industries-section-magical {
-  padding: 100px 20px;
-  margin-top: -40px;
-  background: linear-gradient(180deg, #1a2332 0%, #0f172a 100%);
+
+  
+  /* background: linear-gradient(180deg, #1a2332 0%, #0f172a 100%); */
   position: relative;
 }
 
 .industries-container-magical {
   max-width: 1400px;
   margin: 0 auto;
+  margin-bottom: 40px
 }
 
 .industries-header-magical {
@@ -381,27 +395,7 @@ object-fit: fill;
   margin-bottom: 4rem;
 }
 
-.industries-header-magical .section-title-magical {
-  font-size: 3.5rem;
-  font-weight: 800;
-  background: linear-gradient(45deg, #00eaff, #8f65ff, #ff6b6b);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 1.5rem;
-  margin-top: -100px;
-  animation: gradientShift 6s ease infinite;
-  text-align: center;
-}
 
-.industries-header-magical .section-subtitle-magical {
-  font-size: 1.2rem;
-  color: #94a3b8;
-  max-width: 700px;
-  margin: 0 auto;
-  line-height: 1.6;
-  text-align: center;
-}
 
 .industries-grid-magical {
   display: grid;
@@ -485,6 +479,7 @@ object-fit: fill;
 }
 
 .industry-content-magical h3 {
+
   font-size: 1.5rem;
   font-weight: 700;
   color: #f8fafc;
@@ -522,6 +517,7 @@ object-fit: fill;
   letter-spacing: 1px;
   position: relative;
   overflow: hidden;
+ 
 }
 
 .industry-cta-magical::before {
@@ -557,7 +553,7 @@ object-fit: fill;
 .platform-section {
   padding-bottom:  60px;
   position: relative;
-  background: linear-gradient(180deg, #0f172a 0%);
+  /* background: linear-gradient(180deg, #0f172a 0%); */
 }
 
 .section-title-platform {
@@ -582,11 +578,21 @@ object-fit: fill;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 🌈 CONTACT SECTION */
-.contact-section-magical {
-  position: relative;
- background: linear-gradient(180deg, #0f172a 0%)
+.contact-title-magical {
+  font-size: 3rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, #00eaff, #8f65ff, #ff6b6b);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+  margin-top: -80px;
+  animation: gradientShift 6s ease infinite;
 }
+.contact-section-magical {
+  padding: 80px clamp(16px, 4vw, 40px) 40px;
+}
+
 
 /* ✨ ENHANCED ANIMATIONS */
 @keyframes gradientShift {
@@ -715,3 +721,4 @@ object-fit: fill;
     transition-duration: 0.01ms !important;
   }
 }
+

@@ -84,8 +84,9 @@ const ContentItem = ({ item, type, onDelete }) => {
 
     const getPlanBadge = (plan) => {
         switch(plan) {
-            case "Platinum": return "bg-amber-100 text-amber-700 border-amber-200";
-            case "Premium": return "bg-purple-100 text-purple-700 border-purple-200";
+           case "Basic": return "bg-blue-100 text-blue-700 border-blue-200";
+case "Premium": return "bg-purple-100 text-purple-700 border-purple-200";
+
             default: return "bg-slate-100 text-slate-700 border-slate-200";
         }
     };
@@ -155,11 +156,12 @@ export default function ContentManager() {
     // NEW: State to track selected plan before uploading
     const [selectedPlan, setSelectedPlan] = useState("Free");
 
-    const planOptions = [
-        { id: "Free", color: "bg-slate-500" },
-        { id: "Premium", color: "bg-purple-600" },
-        { id: "Platinum", color: "bg-amber-500" }
-    ];
+  const planOptions = [
+    { id: "Free", color: "bg-slate-500" },
+    { id: "Basic", color: "bg-blue-600" },
+    { id: "Premium", color: "bg-purple-600" }
+];
+
 
     useEffect(() => {
         const q = query(collection(db, "contents"), orderBy("date", "desc"));
@@ -215,7 +217,7 @@ export default function ContentManager() {
                         storagePath: storagePath 
                     });
                     
-                    alert(`Uploaded successfully to ${selectedPlan} plan!`);
+                  
                 } catch (e) {
                     console.error("Error saving metadata: ", e);
                 } finally {

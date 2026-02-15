@@ -1,428 +1,190 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { FaLightbulb, FaUsers, FaBrain, FaRocket, FaStar } from "react-icons/fa";
 import "../styles/Home.css"
 
-export default function WhatWeDo() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.3
-      }
-    }
-  };
+import { useInView } from "framer-motion";
+import { useRef } from "react";
 
-  const cardVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 60,
-      scale: 0.9,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { 
-        duration: 0.8, 
-        type: "spring",
-        stiffness: 80,
-        damping: 15
-      }
-    }
-  };
 
-  const hoverVariants = {
-    hover: {
-      y: -15,
-      scale: 1.03,
-      boxShadow: "0 25px 50px rgba(0, 123, 255, 0.3), 0 0 80px rgba(143, 101, 255, 0.2)",
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 25
-      }
-    }
-  };
 
-  const iconVariants = {
-    hover: {
-      scale: 1.2,
-      rotate: [0, -10, 10, 0],
-      transition: {
-        duration: 0.6
-      }
-    }
-  };
 
-  const items = [
-    {
-      icon: <FaLightbulb size={50} />,
-      title: "Innovation Into Impact",
-      text: "Neutill Services Private Limited is committed to turning emerging technologies into intelligent, impactful real-world applications.",
-      gradient: "linear-gradient(135deg, #0066ff, #00ccff)",
-      glow: "rgba(0, 102, 255, 0.4)",
-      stars: 3
-    },
-    {
-      icon: <FaUsers size={50} />,
-      title: "Collaboration for Progress",
-      text: "We partner with students, professionals, universities, startups, and corporations to build a vibrant ecosystem of shared innovation.",
-      gradient: "linear-gradient(135deg, #8f65ff, #d164ff)",
-      glow: "rgba(143, 101, 255, 0.4)",
-      stars: 4
-    },
-    {
-      icon: <FaBrain size={50} />,
-      title: "Research-Driven Culture",
-      text: "Our research culture drives continuous learning, enabling transformative outcomes for individuals and institutions.",
-      gradient: "linear-gradient(135deg, #00c2ff, #00ffcc)",
-      glow: "rgba(0, 194, 255, 0.4)",
-      stars: 5
-    },
-    {
-      icon: <FaRocket size={50} />,
-      title: "Empowering the AI Future",
-      text: "We ensure both talent and technology are equipped to power the next era of responsible, intelligent AI innovation.",
-      gradient: "linear-gradient(135deg, #ff6ec7, #ff8a00)",
-      glow: "rgba(255, 110, 199, 0.4)",
-      stars: 4
-    },
-  ];
+const CARDS = [
+  {
+    Icon: FaLightbulb,
+    title: "Innovation Into Impact",
+    description:
+      "Neutill Services Private Limited transforms emerging technologies into intelligent, real‑world solutions that create measurable impact.",
+    gradient: "from-blue-600 to-cyan-400",
+    glow: "rgba(37,99,235,0.35)",
+    stars: 3,
+  },
+  {
+    Icon: FaUsers,
+    title: "Collaboration for Progress",
+    description:
+      "We collaborate with students, professionals, universities, startups, and enterprises to build a strong innovation ecosystem.",
+    gradient: "from-violet-500 to-fuchsia-400",
+    glow: "rgba(139,92,246,0.35)",
+    stars: 4,
+  },
+  {
+    Icon: FaBrain,
+    title: "Research‑Driven Culture",
+    description:
+      "Our research‑focused approach promotes continuous learning and drives transformative outcomes for individuals and organizations.",
+    gradient: "from-sky-400 to-emerald-300",
+    glow: "rgba(56,189,248,0.35)",
+    stars: 5,
+  },
+  {
+    Icon: FaRocket,
+    title: "Empowering the AI Future",
+    description:
+      "We equip talent and technology to lead the next generation of responsible, intelligent AI innovation.",
+    gradient: "from-pink-500 to-orange-400",
+    glow: "rgba(236,72,153,0.35)",
+    stars: 4,
+  },
+];
 
-  const renderStars = (count) => {
-    return [...Array(count)].map((_, i) => (
-      <motion.div
-        key={i}
-        className="floating-star"
-        animate={{
-          y: [0, -10, 0],
-          opacity: [0.5, 1, 0.5],
-          scale: [0.8, 1.2, 0.8],
-        }}
-        transition={{
-          duration: 2 + Math.random() * 2,
-          repeat: Infinity,
-          delay: Math.random() * 2,
-        }}
-        style={{
-          position: "absolute",
-          fontSize: "8px",
-          color: "gold",
-        }}
-      >
-        <FaStar />
-      </motion.div>
-    ));
-  };
+/* ---------------- Animations ---------------- */
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.6, type: "spring", stiffness: 90 },
+  },
+};
+
+const hoverAnimation = {
+  y: -12,
+  scale: 1.02,
+  transition: { type: "spring", stiffness: 300, damping: 18 },
+};
+
+/* ---------------- Subcomponents ---------------- */
+
+function FloatingStars({ count }) {
+  return (
+    <div className="absolute inset-0 pointer-events-none">
+      {Array.from({ length: count }).map((_, i) => (
+        <motion.span
+          key={i}
+          aria-hidden
+          animate={{ y: [0, -8, 0], opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 2 + i * 0.4, repeat: Infinity }}
+          className="absolute text-amber-400 text-[10px]"
+          style={{
+            top: `${20 + i * 12}%`,
+            left: `${10 + i * 15}%`,
+          }}
+        >
+          <FaStar />
+        </motion.span>
+      ))}
+    </div>
+  );
+}
+
+function Card({ item, reduceMotion }) {
+  const { Icon, title, description, gradient, glow, stars } = item;
 
   return (
-    <section
-      className="what-we-do-section"
-      style={{
-      
-        marginTop:"-20px",
-        marginBottom:"-50px",
-        paddingTop: "-10px",
-        paddingBottom: "0px",
-        position: "relative",
-        overflow: "hidden",
-      }}
+    <motion.article
+      variants={cardVariants}
+      whileHover={reduceMotion ? {} : hoverAnimation}
+      className="relative rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all"
+      style={{ boxShadow: `0 10px 25px ${glow}` }}
     >
-      {/* Animated Background Elements */}
-      <div className="background-elements">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
+      <FloatingStars count={stars} />
+
+      <div
+        className={`mb-6 inline-flex rounded-2xl bg-gradient-to-br ${gradient} p-5 text-white shadow-lg`}
+      >
+        <Icon size={28} />
+      </div>
+
+      <h3 className={`text-xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>
+        {title}
+      </h3>
+
+      <p className="mt-4 text-slate-600 leading-relaxed">{description}</p>
+    </motion.article>
+  );
+}
+
+/* ---------------- Main Component ---------------- */
+
+export default function WhatWeDo() {
+  const reduceMotion = useReducedMotion();
+  const ref = useRef(null);
+const isInView = useInView(ref, { amount: 0.3 });
+
+  return (
+   <section className="relative overflow-hidden pt-1 pb-12 px-6">
+
+
+      {/* Background floating dots */}
+      <div className="absolute inset-0 -z-10 opacity-30">
+        {Array.from({ length: 18 }).map((_, i) => (
+          <motion.span
             key={i}
-            className="floating-shape"
-            animate={{
-              y: [0, -30, 0],
-              x: [0, Math.random() * 20 - 10, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 8 + Math.random() * 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            style={{
-              position: "absolute",
-              width: "8px",
-              height: "8px",
-              background: "linear-gradient(45deg, #0066ff, #8f65ff)",
-              borderRadius: "50%",
-              opacity: 0.3,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
+            animate={
+              reduceMotion
+                ? {}
+                : { y: [0, -25, 0], x: [0, 10, 0], rotate: [0, 180, 360] }
+            }
+            transition={{ duration: 10 + i, repeat: Infinity }}
+            className="absolute h-2 w-2 rounded-full bg-gradient-to-r from-blue-500 to-violet-500"
+            style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` }}
           />
         ))}
       </div>
 
-      {/* Main Container */}
-      <motion.div
-        className="container"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        variants={containerVariants}
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "0 20px",
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
-        {/* Enhanced Header */}
-        <motion.div
-          className="section-header"
-          initial={{ opacity: 0, y: -30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, type: "spring" }}
-          style={{ textAlign: "center", marginBottom: "80px" }}
-        >
-          <motion.div
-            className="title-decoration"
-            
-            style={{
-              fontSize: "3rem",
-              marginBottom: "1rem",
-             
-              backgroundClip: "text",
-          
-            }}
-          >
-           <h2 className="section-title-magical">What We Do</h2> 
-          </motion.div>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            style={{
-              fontSize: "1.3rem",
-              color: "#64748b",
-              maxWidth: "600px",
-              margin: "0 auto",
-              lineHeight: "1.7",
-              fontWeight: "500",
-            }}
-          >
-            Transforming ideas into impactful solutions through innovation, collaboration, and cutting-edge technology
-          </motion.p>
-        </motion.div>
+  <motion.div
+  ref={ref}
+  variants={containerVariants}
+  initial="hidden"
+  animate={isInView ? "visible" : "hidden"}
+  className="mx-auto max-w-6xl"
+>
 
-        {/* Enhanced Grid */}
-        <div
-          className="wwd-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "40px",
-          }}
-        >
-          {items.map((item, index) => (
-            <motion.div
-              key={index}
-              variants={cardVariants}
-              whileHover="hover"
-              className="wwd-card"
-              style={{
-                padding: "45px 35px",
-                borderRadius: "25px",
-                background: "linear-gradient(145deg, #ffffff, #f8faff)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255, 255, 255, 0.8)",
-                boxShadow: `
-                  0 10px 30px rgba(0, 0, 0, 0.08),
-                  0 1px 0 rgba(255, 255, 255, 0.9) inset,
-                  0 -1px 0 rgba(0, 0, 0, 0.05) inset
-                `,
-                position: "relative",
-                overflow: "hidden",
-                transformStyle: "preserve-3d",
-              }}
-              custom={index}
-            >
-              {/* Animated Border */}
-              <div
-                className="card-border"
-                style={{
-                  position: "absolute",
-                  inset: "0",
-                  borderRadius: "25px",
-                  padding: "2px",
-                  background: item.gradient,
-                  WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                  WebkitMaskComposite: "xor",
-                  maskComposite: "exclude",
-                  opacity: 0,
-                  transition: "opacity 0.4s ease",
-                }}
-              />
-              
-              {/* Floating Stars */}
-              <div className="stars-container">
-                {renderStars(item.stars)}
-              </div>
+        {/* Header */}
+        <header className="mb-3 text-center">
+          <h2 className="section-title-platform">What We Do</h2>
+          <p className="mx-auto -mt-8 max-w-2xl text-lg text-slate-600">
+            Transforming ideas into impactful solutions through innovation,
+            collaboration, and advanced technology.
+          </p>
+        </header>
 
-              {/* Icon Container */}
-              <motion.div
-                variants={iconVariants}
-                className="icon-container"
-                style={{
-                  marginBottom: "25px",
-                  display: "inline-flex",
-                  padding: "20px",
-                  borderRadius: "20px",
-                  background: `linear-gradient(135deg, ${item.gradient})`,
-                  boxShadow: `0 10px 30px ${item.glow}`,
-                  position: "relative",
-                  zIndex: 2,
-                }}
-              >
-                <div style={{ color: "white" }}>
-                  {item.icon}
-                </div>
-                
-                {/* Icon Glow Effect */}
-                <motion.div
-                  animate={{
-                    scale: [1, 1.3, 1],
-                    opacity: [0.5, 0.8, 0.5],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  style={{
-                    position: "absolute",
-                    inset: "0",
-                    borderRadius: "20px",
-                    background: item.gradient,
-                    filter: "blur(15px)",
-                    opacity: 0.6,
-                    zIndex: -1,
-                  }}
-                />
-              </motion.div>
-
-              {/* Content */}
-              <motion.h3
-                style={{
-                  fontWeight: "800",
-                  marginBottom: "15px",
-                  background: item.gradient,
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  fontSize: "1.5rem",
-                  lineHeight: "1.3",
-                }}
-              >
-                {item.title}
-              </motion.h3>
-
-              <motion.p 
-                style={{ 
-                  color: "#4a5568", 
-                  lineHeight: "1.7", 
-                  fontSize: "1.05rem",
-                  fontWeight: "500",
-                }}
-              >
-                {item.text}
-              </motion.p>
-
-              {/* Hover Glow Effect */}
-              <motion.div
-                className="hover-glow"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                style={{
-                  position: "absolute",
-                  inset: "0",
-                  borderRadius: "25px",
-                  background: item.gradient,
-                  filter: "blur(30px)",
-                  opacity: 0,
-                  zIndex: -1,
-                  transition: "opacity 0.4s ease",
-                }}
-              />
-            </motion.div>
+        {/* Grid */}
+        <div className="grid gap-8 md:grid-cols-2">
+          {CARDS.map((item, i) => (
+            <Card key={i} item={item} reduceMotion={reduceMotion} />
           ))}
         </div>
 
-        {/* Bottom Decoration */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1, duration: 0.8 }}
-          style={{
-            textAlign: "center",
-            marginTop: "60px",
-          }}
-        >
+        {/* Footer Icon */}
+        <div className="mt-12 flex justify-center">
           <motion.div
-            animate={{
-              rotate: [0, 360],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{
-              display: "inline-block",
-              fontSize: "2rem",
-              background: "linear-gradient(45deg, #0066ff, #8f65ff, #ff6ec7)",
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
+            animate={reduceMotion ? {} : { rotate: 360 }}
+            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            className="bg-gradient-to-r from-blue-600 via-violet-500 to-pink-500 bg-clip-text text-3xl text-transparent"
           >
             <FaStar />
           </motion.div>
-        </motion.div>
+        </div>
       </motion.div>
-
-      {/* Responsive Styles */}
-      <style jsx>{`
-        .wwd-card:hover .card-border {
-          opacity: 1 !important;
-        }
-        
-        @media (max-width: 968px) {
-          .wwd-grid {
-            grid-template-columns: 1fr !important;
-            gap: 30px !important;
-          }
-          
-          .wwd-card {
-            padding: 35px 25px !important;
-          }
-        }
-        
-        @media (max-width: 480px) {
-          .title-decoration {
-            font-size: 3rem !important;
-          }
-          
-          .wwd-card {
-            padding: 25px 20px !important;
-          }
-        }
-        
-        .floating-star:nth-child(1) { top: 10%; left: 10%; }
-        .floating-star:nth-child(2) { top: 20%; right: 15%; }
-        .floating-star:nth-child(3) { bottom: 30%; left: 20%; }
-        .floating-star:nth-child(4) { bottom: 15%; right: 25%; }
-        .floating-star:nth-child(5) { top: 40%; left: 30%; }
-      `}</style>
     </section>
   );
 }

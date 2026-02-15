@@ -1,6 +1,8 @@
     import React from 'react';
     import { useParams, Link, Navigate } from 'react-router-dom';
     import { motion } from 'framer-motion';
+    import { useNavigate } from "react-router-dom";
+
     
 
     // NOTE: These imports must point to your actual component files
@@ -387,6 +389,9 @@
     const ServiceDetail = () => {
         const { serviceId } = useParams();
         const service = serviceData[serviceId];
+
+        const navigate = useNavigate();
+
 if (serviceId === "upskilling-outsourcing") {
   return <Navigate to="/tech-manthana/blog" replace />;
 }
@@ -503,9 +508,18 @@ if (serviceId === "upskilling-outsourcing") {
                 {/* Navigation - FIXED BACK BUTTON */}
                 <div className="service-navigation">
                     {/* This links back to your /services route handled by ServicesSection */}
-                        <Link to="/" state={{ scrollTo: "services" }} className="back-button">
-    ← Back to Services
-    </Link>
+<button
+  type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(-1);
+  }}
+  className="back-button"
+>
+  ← Back to Services
+</button>
+
                     <Link to="/" state={{ scrollTo: "contact" }} className="contact-button" style={{ backgroundColor: service.color }}>
                         Contact Us About {service.title}
                     </Link>

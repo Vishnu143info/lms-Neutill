@@ -7,7 +7,9 @@
 import PosterDetailsPage from "./pages/PosterDetailsPage";
 import SendMail from "./pages/admin/SendMail";
 import AllUpdates from "./pages/AllUpdates";
+import MagazineReader from "./pages/MagazineReader";
 
+import RightUpdatesStripe from "./pages/RightUpdatesStripe";
 
     
 
@@ -50,6 +52,8 @@ import AllUpdates from "./pages/AllUpdates";
     import Subscriptions from "./pages/admin/Subscriptions";
     import ResumeManager from "./pages/admin/ResumeManager";
     import Users from "./pages/admin/Users";
+    import FormMessages from "./pages/admin/FormMessage";
+
 
     /* -------- TUTOR -------- */
     import TutorDashboardPage from "../src/pages/tutor/DashboardTutor"
@@ -85,6 +89,9 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
     </PublicLayout>
   }
 />
+
+<Route path="/read/:id" element={<MagazineReader />} />
+
 <Route
   path="/tech-manthana/blog/:id"
   element={
@@ -191,6 +198,8 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
               <Route path="subscriptions" element={<Subscriptions />} />
               <Route path="resume" element={<ResumeManager />} />
               <Route path="users" element={<Users />} />
+              <Route path="form" element={<FormMessages />} />
+
             </Route>
 
             {/* ================= TUTOR ================= */}

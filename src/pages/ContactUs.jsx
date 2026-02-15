@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
 import {
   FaMapMarkerAlt,
   FaFacebook,
@@ -16,14 +20,39 @@ const ContactUs = () => {
     message: "",
   });
 
+  const [showPopup, setShowPopup] = useState(false);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("✅ Thank you! Your message has been sent.");
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+   await addDoc(collection(db, "contacts"), {
+  name: formData.name,
+  email: formData.email,
+  phone: formData.phone,
+  message: formData.message,
+  receivedBy: "askneutill@gmail.com", // ← added
+  createdAt: serverTimestamp(),
+});
+
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      message: "",
+    });
+
+    setShowPopup(true); // ⭐ show popup
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
 
   return (
     <motion.section
@@ -35,15 +64,15 @@ const ContactUs = () => {
       style={{
         background: "linear-gradient(180deg, #10182A 0%, #0E1627 100%);",
     
-        paddingTop: "-10px",
-        paddingBottom: "30px",
+       
+    
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
       }}
     >
       {/* Title */}
-      <h2 className="section-title-magical"
+      <h2 className="contact-title-magical"
         
       >
         Get in Touch
@@ -58,6 +87,8 @@ const ContactUs = () => {
           gap: "40px",
           maxWidth: "1200px",
           width: "100%",
+          
+
         }}
       >
         {/* LEFT SIDE — Map + Office Info */}
@@ -98,15 +129,15 @@ const ContactUs = () => {
               boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
             }}
           >
-            <iframe
-              title="Office Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3890.3892721381533!2d77.53017397482366!3d12.997573387324754!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae3e64ad21ef59%3A0x8c31bdb00fa6c5ee!2sSunkadakatte%2C%20Bengaluru%2C%20Karnataka%20560091!5e0!3m2!1sen!2sin!4v1709654320000!5m2!1sen!2sin"
-              width="100%"
-              height="300"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-            ></iframe>
+          <iframe
+  title="Office Location"
+  src="https://www.google.com/maps?q=12.990944,77.506500&z=15&output=embed"
+  width="100%"
+  height="300"
+  style={{ border: 0 }}
+  loading="lazy"
+></iframe>
+
           </div>
         </motion.div>
 
@@ -234,7 +265,62 @@ const ContactUs = () => {
         </motion.div>
       </div>
 
-    
+    {showPopup && (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      background: "rgba(0,0,0,0.5)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 999,
+    }}
+  >
+    <motion.div
+      initial={{ scale: 0.7, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      style={{
+        background: "#fff",
+        padding: "40px",
+        borderRadius: "16px",
+        textAlign: "center",
+        width: "90%",
+        maxWidth: "400px",
+        boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+      }}
+    >
+      <h2 style={{ color: "#001f3f" }}>✅ Message Sent!</h2>
+      <p style={{ color: "#555", marginTop: "10px" }}>
+        Thank you for contacting us. We’ll get back to you soon.
+      </p>
+
+      <button
+        onClick={() => setShowPopup(false)}
+        style={{
+          marginTop: "20px",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#e63946",
+          color: "#fff",
+          cursor: "pointer",
+          fontWeight: "600",
+        }}
+      >
+        Close
+      </button>
+    </motion.div>
+  </motion.div>
+)}
+
 
       
     </motion.section>

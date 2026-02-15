@@ -2,6 +2,8 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import './Industry.css';
+import { useNavigate } from "react-router-dom";
+
 
 const industryData = {
   "information-technology": {
@@ -178,6 +180,8 @@ const IndustryDetail = () => {
   const { industryId } = useParams();
   const industry = industryData[industryId];
 
+  const navigate = useNavigate();
+
 
   return (
     <motion.div
@@ -263,9 +267,17 @@ const IndustryDetail = () => {
       {/* Navigation */}
      <div className="service-navigation">
                      {/* This links back to your /services route handled by ServicesSection */}
-                            <Link to="/" state={{ scrollTo: "industries" }} className="back-button">
-       ← Back to Industries
-     </Link>
+ <button
+  type="button"
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(-1);
+  }}
+  className="back-button"
+>
+  ← Back to Services
+</button>
                      <Link to="/" state={{ scrollTo: "contact" }} className="inquiry-button " style={{ backgroundColor: industry.color }}>
                          Contact Us About {industry.title}
                      </Link>

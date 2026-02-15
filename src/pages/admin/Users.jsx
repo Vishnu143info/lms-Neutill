@@ -69,18 +69,25 @@ const isUserSelected = (id) =>
     const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
       const allUsers = snapshot.docs.map((docSnap) => {
         const data = docSnap.data();
-        return {
-          id: docSnap.id,
-          role: data.role || "student",
-          approved: data.approved || false,
-          name: data.profile?.name || data.name || "Unnamed User",
-          email: data.profile?.email || data.email || "No email",
-          phone: data.profile?.phone || data.phone || "N/A",
-          createdAt: data.createdAt?.toDate() || new Date(),
-          lastLogin: data.lastLogin?.toDate() || null,
-          status: data.status || "active",
-          rating: data.rating || 4.5
-        };
+  return {
+  id: docSnap.id,
+  role: data.role || "student",
+  approved: data.approved || false,
+  name: data.profile?.name || data.name || "Unnamed User",
+  email: data.profile?.email || data.email || "No email",
+  phone: data.profile?.phone || data.phone || "N/A",
+  createdAt: data.createdAt?.toDate() || new Date(),
+  lastLogin: data.lastLogin?.toDate() || null,
+  rating: data.rating || 4.5,
+
+ planName: data.planName ?? data.subscription?.planName ?? "Free",
+price: data.price ?? data.subscription?.price ?? 0,
+paymentMethod: data.paymentMethod ?? data.subscription?.paymentMethod ?? "-",
+planStatus: data.status ?? data.subscription?.status ?? "inactive",
+
+};
+
+
       });
 
       // Sort users by createdAt (newest first)
@@ -419,7 +426,7 @@ const isUserSelected = (id) =>
   <tr>
     
     {/* Select All Checkbox */}
-    <th className="p-4">
+    <th className="">
       <input
         type="checkbox"
         checked={
@@ -438,9 +445,10 @@ const isUserSelected = (id) =>
     </th>
 
     <th className="p-4 text-left font-semibold text-gray-900">User</th>
-    <th className="p-4 text-left font-semibold text-gray-900">
-      Contact & Rating
-    </th>
+   <th className="p-4 text-left font-semibold text-gray-900">
+  Plan
+</th>
+
     <th className="p-4 text-left font-semibold text-gray-900">Role</th>
     <th className="p-4 text-left font-semibold text-gray-900">Status</th>
     <th className="p-4 text-left font-semibold text-gray-900">Joined</th>
@@ -491,20 +499,33 @@ const isUserSelected = (id) =>
     </div>
   </td>
 
-  {/* Contact */}
-  <td className="p-4">
-    <div className="space-y-1">
-      <div className="flex items-center space-x-2">
-        <Star className="w-3 h-3 text-amber-400 fill-current" />
-        <span className="text-xs text-gray-600">
-          {user.rating?.toFixed(1) || "N/A"}
-        </span>
-      </div>
-      <div className="text-xs text-gray-500">
-        Last login: {user.lastLogin ? user.lastLogin.toLocaleDateString() : "Never"}
-      </div>
-    </div>
-  </td>
+
+  {/* Plan */}
+{/* Plan Column */}
+<td className="p-4">
+  <div className="space-y-2">
+    <p className="font-semibold  text-gray-800">
+      {user.planName || "Free"}
+    </p>
+
+    <p className="text-xs text-gray-500">
+      ₹{user.price ?? 0} • {user.paymentMethod || "-"}
+    </p>
+
+    <span
+      className={`text-xs px-2 py-1 rounded-full font-semibold ${
+        user.planStatus === "active"
+          ? "bg-green-100 text-green-700"
+          : "bg-gray-100 text-gray-600"
+      }`}
+    >
+      {user.planStatus || "inactive"}
+    </span>
+  </div>
+</td>
+
+
+
 
   {/* Role */}
   <td className="p-4">

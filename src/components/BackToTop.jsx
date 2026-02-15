@@ -31,7 +31,7 @@ const BackToTop = () => {
     visible && (
       <button
         onClick={scrollToTop}
-        className="group fixed bottom-8 right-8 z-50 flex flex-col items-center transition-all duration-300 hover:scale-110"
+        className="group fixed bottom-30 right-2 z-50 flex flex-col items-center transition-all duration-300 hover:scale-110"
         aria-label="Back to top"
       >
         {/* Animated background circle with gradient */}

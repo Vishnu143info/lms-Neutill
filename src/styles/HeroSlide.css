@@ -10,7 +10,7 @@
   
   padding: 100px; /* Note: Adjust this padding based on the image cutoff issue discussed earlier */
   
-  background: linear-gradient(180deg, #10182A 0%, #0E1627 100%);
+  /* background: linear-gradient(180deg, #10182A 0%, #0E1627 100%); */
   color: white;
   position: relative;
   overflow: hidden;

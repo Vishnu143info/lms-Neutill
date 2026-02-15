@@ -399,15 +399,7 @@ export default function SubscribePage() {
                       )}
                     </button>
 
-                    {/* Guarantee Badge */}
-                    {plan.price > 0 && (
-                      <div className="text-center mt-6 pt-6 border-t border-gray-100">
-                        <div className="inline-flex items-center gap-2 text-xs text-gray-500">
-                          <Shield className="w-3 h-3 text-green-500" />
-                          <span>30-Day Money-Back Guarantee</span>
-                        </div>
-                      </div>
-                    )}
+                    
                   </div>
                 </div>
               );

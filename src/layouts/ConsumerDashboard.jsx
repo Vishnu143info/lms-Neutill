@@ -22,86 +22,73 @@ import { path } from "framer-motion/client";
 
 /* ================= PLAN ACCESS ================= */
 const NORMALIZE_PLAN = (rawPlan) => {
-  if (!rawPlan) return "Starter";
+  if (!rawPlan) return "Free";
 
   const name = rawPlan.toLowerCase();
 
-  if (name.includes("starter")) return "Starter";
+  if (name.includes("basic")) return "Basic";
   if (name.includes("premium")) return "Premium";
-  if (name.includes("pro")) return "Pro Learner";
-  if (name.includes("platinum") || name.includes("elite")) return "Elite Scholar";
 
-  return "Starter";
+  return "Free";
 };
 
 const PLAN_ACCESS = {
-  Starter: {
-    page :false,
+  Free: {
+    page: false,
     modules: false,
     schedule: false,
     resume: true,
     askTutor: false,
-    path:true,
+    path: false,
   },
-  Premium: {
-    page:true,
-    modules: true,
-    schedule: true,
-    resume: true,
-    askTutor: false, 
-    path:true,
-  },
-  "Pro Learner": {
-    page :true,
+
+  Basic: {
+    page: true,
     modules: true,
     schedule: true,
     resume: true,
     askTutor: false,
-    path:true,
+    path: true,
   },
-  "Elite Scholar": {
-    page : true,
+
+  Premium: {
+    page: true,
     modules: true,
     schedule: true,
     resume: true,
-    askTutor: true, 
-    path:true,
-  
+    askTutor: true,
+    path: true,
   },
 };
 
 
 /* ================= PLAN COLORS & STYLES ================= */
 const PLAN_STYLES = {
-  Starter: {
+  Free: {
     color: "text-gray-600",
     bg: "bg-gradient-to-r from-gray-50 to-gray-100",
     border: "border-gray-200",
     accent: "bg-gray-500",
     icon: null,
   },
-  Premium: {
+
+  Basic: {
     color: "text-blue-600",
     bg: "bg-gradient-to-r from-blue-50 to-indigo-50",
     border: "border-blue-200",
     accent: "bg-gradient-to-r from-blue-500 to-indigo-500",
     icon: <Sparkles className="w-3 h-3" />,
   },
-  "Pro Learner": {
+
+  Premium: {
     color: "text-purple-600",
     bg: "bg-gradient-to-r from-purple-50 to-pink-50",
     border: "border-purple-200",
     accent: "bg-gradient-to-r from-purple-500 to-pink-500",
     icon: <Crown className="w-3 h-3" />,
   },
-  "Elite Scholar": {
-    color: "text-amber-600",
-    bg: "bg-gradient-to-r from-amber-50 to-orange-50",
-    border: "border-amber-200",
-    accent: "bg-gradient-to-r from-amber-500 to-orange-500",
-    icon: <Crown className="w-3 h-3" />,
-  },
 };
+
 
 /* ================= NAV ITEMS ================= */
 const NAV_ITEMS = [
@@ -211,9 +198,10 @@ export default function ConsumerDashboard() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   /* ================= PLAN DETECTION (SAFE) ================= */
-  const planName = NORMALIZE_PLAN(
-    user?.subscription?.planName || user?.planName
-  );
+ const planName = NORMALIZE_PLAN(
+  user?.subscription?.planName || user?.planName || "Free"
+);
+
   const access = PLAN_ACCESS[planName];
   const planStyle = PLAN_STYLES[planName];
   const { remainingDays, progressPercent } = calculatePlanProgress(

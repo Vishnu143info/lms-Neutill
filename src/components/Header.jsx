@@ -4,7 +4,6 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
-import { Link as ScrollLink } from "react-scroll";
 import logo from "../assets/logo_.png";
 
 const Header = () => {
@@ -34,21 +33,31 @@ const Header = () => {
   { type: "scroll", to: "contact", label: "Contact Us" },
 ];
 
-  /* ✅ Smooth scroll handler */
-  const handleScrollToSection = (sectionId) => {
-    handleClose(); // Close mobile menu on click
-    if (location.pathname !== "/") {
-      navigate("/");
-      // Use window.onload or a more robust check if needed, but setTimeout is a common workaround
-      setTimeout(() => {
-        const element = document.getElementById(sectionId);
-        if (element) element.scrollIntoView({ behavior: "smooth" });
-      }, 300);
-    } else {
-      const element = document.getElementById(sectionId);
-      if (element) element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+
+const handleScrollToSection = (id) => {
+  handleClose();
+
+  // Always go home first if not already there
+  if (location.pathname !== "/") {
+    navigate("/", { state: { scrollTo: id } });
+    return;
+  }
+
+  // If already on home → scroll immediately
+  const el = document.getElementById(id);
+
+  if (el) {
+    requestAnimationFrame(() => {
+      el.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+};
+
+
+
 
   return (
    <nav
@@ -139,30 +148,25 @@ const Header = () => {
         }`}>
           <div className="px-2 pt-2 pb-3 space-y-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10">
             {navItems.map((item, i) => (
-              <div key={i} className="block">
-                {item.type === "scroll" ? (
-                  <ScrollLink
-                    to={item.to}
-                    smooth={true}
-                    duration={700}
-                    offset={-80}
-                    spy={true}
-                    onClick={() => handleScrollToSection(item.to)} // Updated to use the unified handler
-                    className="text-white hover:text-cyan-300 block px-4 py-2 rounded-lg text-[15px] font-semibold transition-all duration-300 hover:bg-white/10 cursor-pointer" // Added block class and hover:bg
-                  >
-                    {item.label}
-                  </ScrollLink>
-                ) : (
-                 <RouterLink
-  to={item.to}
-  onClick={handleClose}
-  className="text-gray-200 hover:text-white block px-4 py-2 rounded-lg text-base font-medium transition-all duration-300 hover:bg-white/10"
->
-  {item.label}
-</RouterLink>
+          <div key={i} className="block">
+  {item.type === "scroll" ? (
+    <span
+      onClick={() => handleScrollToSection(item.to)}
+      className="text-white hover:text-cyan-300 block px-4 py-2 rounded-lg text-[15px] font-semibold transition-all duration-300 hover:bg-white/10 cursor-pointer"
+    >
+      {item.label}
+    </span>
+  ) : (
+    <RouterLink
+      to={item.to}
+      onClick={handleClose}
+      className="text-gray-200 hover:text-white block px-4 py-2 rounded-lg text-base font-medium transition-all duration-300 hover:bg-white/10"
+    >
+      {item.label}
+    </RouterLink>
+  )}
+</div>
 
-                )}
-              </div>
             ))}
             
             {/* ✅ Mobile Buttons */}
