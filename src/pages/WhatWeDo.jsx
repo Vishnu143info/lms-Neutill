@@ -55,6 +55,7 @@ const containerVariants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
 };
 
+
 const cardVariants = {
   hidden: { opacity: 0, y: 40, scale: 0.96 },
   visible: {

@@ -6,8 +6,7 @@
 
 .hero-slider-container {
   display: flex;
- min-height: 100dvh;
-
+  height: 100vh;
   
   padding: 100px; /* Note: Adjust this padding based on the image cutoff issue discussed earlier */
   
@@ -421,10 +420,5 @@
   /* Hide only progress bar (not numbers) */
   .progress-bar {
     display: none;
-  }
-}
-@media (max-width: 768px) {
-  .hero-slider-container {
-    padding: 60px 20px;
   }
 }
