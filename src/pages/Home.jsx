@@ -252,13 +252,13 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
 </motion.section>
 
 
-<motion.section id="whatwedo">
+<motion.section id="whatwedo"      className="scroll-mt-24">
    <WhatWeDo />
 </motion.section>
 
 
  {/* TECH MANTHANA */}
-      <motion.section id="tech-manthana" className="platform-section">
+      <motion.section id="tech-manthana" className="platform-section scroll-mt-24">
         <motion.h2 className="section-title-platform">Tech Manthana</motion.h2>
         <motion.div className="platform-container-magical">
           <TechManthanaPage />
@@ -269,7 +269,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
       <motion.section
         ref={servicesRef}
         id="services"
-        className="services-section-magical"
+        className="services-section-magical scroll-mt-24"
         initial="hidden"
         animate={isServicesInView ? "visible" : "hidden"}
         variants={containerVariants}
@@ -326,7 +326,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
       <motion.section
         ref={industriesRef}
         id="industries"
-        className="industries-section-magical"
+        className="industries-section-magical scroll-mt-24"
         initial="hidden"
         animate={isIndustriesInView ? "visible" : "hidden"}
         variants={containerVariants}
@@ -398,7 +398,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
      
 
       {/* CONTACT */}
-    <motion.section id="contact" className="contact-section-magical">
+    <motion.section id="contact" className="contact-section-magical scroll-mt-24">
         <ContactUs />
       </motion.section>
 
