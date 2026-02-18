@@ -33,7 +33,6 @@ const Header = () => {
   { type: "scroll", to: "contact", label: "Contact Us" },
 ];
 
-
 const handleScrollToSection = (id) => {
   handleClose();
 
@@ -42,25 +41,22 @@ const handleScrollToSection = (id) => {
     return;
   }
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const el = document.getElementById(id);
-      if (!el) return;
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
 
-      const headerOffset = 90;
+    const headerOffset =
+      document.querySelector("nav")?.offsetHeight || 0;
 
-      const elementPosition =
-        el.getBoundingClientRect().top + window.pageYOffset;
+    const y =
+      el.getBoundingClientRect().top +
+      window.pageYOffset -
+      headerOffset;
 
-      const offsetPosition = elementPosition - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-    });
-  });
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }, 300); // ⭐ mobile needs delay
 };
+
 
 
 

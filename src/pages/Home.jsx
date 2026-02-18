@@ -116,7 +116,6 @@ const heroVariants = {
 
     const location = useLocation();
 
-
 useEffect(() => {
   if (!location.state?.scrollTo) return;
 
@@ -126,7 +125,8 @@ useEffect(() => {
     const el = document.getElementById(id);
     if (!el) return;
 
-    const headerOffset = 90;
+    const headerOffset =
+      document.querySelector("nav")?.offsetHeight || 0;
 
     const y =
       el.getBoundingClientRect().top +
@@ -134,7 +134,7 @@ useEffect(() => {
       headerOffset;
 
     window.scrollTo({ top: y, behavior: "smooth" });
-  }, 200); // wait for layout
+  }, 500); // ⭐ bigger delay for real mobile
 
   return () => clearTimeout(timer);
 }, [location]);
@@ -235,7 +235,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
   style={{
     marginTop: 0,
     paddingTop: 0,
-    minHeight: "100dvh",   
+    minHeight: "100svh",   
     overflow: "hidden",    
   }}
 >
