@@ -242,7 +242,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
     <motion.section
   id="hero"   className="scroll-mt-24"
   style={{
-    marginTop: 0,
+    marginTop: 24,
     paddingTop: 0,
     minHeight: "100dvh",   
     overflow: "hidden",    
