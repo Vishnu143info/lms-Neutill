@@ -1,6 +1,12 @@
-html {
-  scroll-padding-top: 90px;
+#hero,
+#whatwedo,
+#services,
+#industries,
+#alfa,
+#contact {
+  scroll-margin-top: 110px;
 }
+
 
 
 /* 🌟 ENHANCED GLOBAL STYLES */
