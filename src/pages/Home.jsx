@@ -240,7 +240,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
 
       {/* ⭐ NEW HERO SLIDER HERE */}
     <motion.section
-  id="hero"
+  id="hero"   className="scroll-mt-24"
   style={{
     marginTop: 0,
     paddingTop: 0,
