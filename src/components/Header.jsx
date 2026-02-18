@@ -37,29 +37,33 @@ const Header = () => {
 const handleScrollToSection = (id) => {
   handleClose();
 
-  // Always go home first if not already there
   if (location.pathname !== "/") {
     navigate("/", { state: { scrollTo: id } });
     return;
   }
 
-  // If already on home → scroll immediately
-  const el = document.getElementById(id);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
 
-  if (el) {
-  const headerOffset = 90; // adjust to your navbar height
+      const headerOffset = 90;
 
-  const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+      const elementPosition =
+        el.getBoundingClientRect().top + window.pageYOffset;
 
-  const offsetPosition = elementPosition - headerOffset;
+      const offsetPosition = elementPosition - headerOffset;
 
-  window.scrollTo({
-    top: offsetPosition,
-    behavior: "smooth",
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    });
   });
-}
-
 };
+
+
+
 
 
 

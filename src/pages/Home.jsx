@@ -122,33 +122,21 @@ useEffect(() => {
 
   const id = location.state.scrollTo;
 
- const scroll = () => {
-  const el = document.getElementById(id);
-  if (!el) return false;
+  const timer = setTimeout(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
 
-  const headerOffset = 90;
-  const elementPosition =
-    el.getBoundingClientRect().top + window.pageYOffset;
+    const headerOffset = 90;
 
-  const offsetPosition = elementPosition - headerOffset;
+    const y =
+      el.getBoundingClientRect().top +
+      window.pageYOffset -
+      headerOffset;
 
-  window.scrollTo({
-    top: offsetPosition,
-    behavior: "smooth",
-  });
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }, 200); // wait for layout
 
-  return true;
-};
-
-  // try immediately
-  if (scroll()) return;
-
-  // otherwise wait for render
-  const interval = setInterval(() => {
-    if (scroll()) clearInterval(interval);
-  }, 100);
-
-  return () => clearInterval(interval);
+  return () => clearTimeout(timer);
 }, [location]);
 
 

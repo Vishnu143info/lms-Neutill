@@ -1,8 +1,5 @@
 html {
-  scroll-behavior: smooth;
-}
-section {
-  scroll-margin-top: 100px;
+  scroll-padding-top: 900px;
 }
 
 
