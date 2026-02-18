@@ -126,27 +126,24 @@ useEffect(() => {
     const el = document.getElementById(id);
     if (!el) return false;
 
-    const yOffset = -90; // 🔥 adjust based on your header height
-    const y =
-      el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
-    window.scrollTo({
-      top: y,
+    el.scrollIntoView({
       behavior: "smooth",
+      block: "start",
     });
 
     return true;
   };
 
+  // try immediately
   if (scroll()) return;
 
+  // otherwise wait for render
   const interval = setInterval(() => {
     if (scroll()) clearInterval(interval);
   }, 100);
 
   return () => clearInterval(interval);
 }, [location]);
-
 
 
 
@@ -240,9 +237,9 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
 
       {/* ⭐ NEW HERO SLIDER HERE */}
     <motion.section
-  id="hero"   className="scroll-mt-24"
+  id="hero"
   style={{
-    marginTop: 24,
+    marginTop: 0,
     paddingTop: 0,
     minHeight: "100dvh",   
     overflow: "hidden",    
@@ -252,13 +249,13 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
 </motion.section>
 
 
-<motion.section id="whatwedo"      className="scroll-mt-24">
+<motion.section id="whatwedo">
    <WhatWeDo />
 </motion.section>
 
 
  {/* TECH MANTHANA */}
-      <motion.section id="tech-manthana" className="platform-section scroll-mt-24">
+      <motion.section id="tech-manthana" className="platform-section">
         <motion.h2 className="section-title-platform">Tech Manthana</motion.h2>
         <motion.div className="platform-container-magical">
           <TechManthanaPage />
@@ -269,7 +266,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
       <motion.section
         ref={servicesRef}
         id="services"
-        className="services-section-magical scroll-mt-24"
+        className="services-section-magical"
         initial="hidden"
         animate={isServicesInView ? "visible" : "hidden"}
         variants={containerVariants}
@@ -326,7 +323,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
       <motion.section
         ref={industriesRef}
         id="industries"
-        className="industries-section-magical scroll-mt-24"
+        className="industries-section-magical"
         initial="hidden"
         animate={isIndustriesInView ? "visible" : "hidden"}
         variants={containerVariants}
@@ -398,7 +395,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
      
 
       {/* CONTACT */}
-    <motion.section id="contact" className="contact-section-magical scroll-mt-24">
+    <motion.section id="contact" className="contact-section-magical">
         <ContactUs />
       </motion.section>
 

@@ -37,22 +37,23 @@ const Header = () => {
 const handleScrollToSection = (id) => {
   handleClose();
 
+  // Always go home first if not already there
   if (location.pathname !== "/") {
     navigate("/", { state: { scrollTo: id } });
     return;
   }
 
-  // 🔥 wait for mobile menu close animation to finish
-  setTimeout(() => {
-    const el = document.getElementById(id);
+  // If already on home → scroll immediately
+  const el = document.getElementById(id);
 
-    if (el) {
+  if (el) {
+    requestAnimationFrame(() => {
       el.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
-    }
-  }, 350); // important for real mobile
+    });
+  }
 };
 
 
@@ -142,8 +143,7 @@ const handleScrollToSection = (id) => {
         </div>
 
         {/* ✅ Mobile Navigation Menu */}
-        <div className={`lg:hidden transition-all duration-500 ease-in-out overflow-hidden lg:overflow-visible
-${
+        <div className={`lg:hidden transition-all duration-500 ease-in-out overflow-hidden ${
           isOpen ? 'max-h-[500px] opacity-100 py-4' : 'max-h-0 opacity-0'
         }`}>
           <div className="px-2 pt-2 pb-3 space-y-2 bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10">

@@ -62,23 +62,17 @@ const [direction, setDirection] = useState(0);
 const [isPaused, setIsPaused] = useState(false);
 
   const navigate = useNavigate();
-
-  
 const handleSlideClick = () => {
   const link = slides[index].link;
 
+  // If it's an in-page section (#services, #alfa, etc.)
   if (link.startsWith("#")) {
     const id = link.replace("#", "");
-
-    navigate("/", {
-      state: { scrollTo: id },
-    });
-
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   } else {
     navigate(link);
   }
 };
-
 
 
 
