@@ -130,7 +130,8 @@ export default function WhatWeDo() {
 const isInView = useInView(ref, { amount: 0.3 });
 
   return (
-   <section className="relative overflow-hidden pt-1 pb-12 px-6">
+   <section className="relative overflow-hidden pt-5 pb-12 px-6">
+
 
 
       {/* Background floating dots */}
@@ -176,7 +177,7 @@ const isInView = useInView(ref, { amount: 0.3 });
         </div>
 
         {/* Footer Icon */}
-        <div className="mt-12 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <motion.div
             animate={reduceMotion ? {} : { rotate: 360 }}
             transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
