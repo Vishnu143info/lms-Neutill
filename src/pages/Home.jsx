@@ -126,24 +126,27 @@ useEffect(() => {
     const el = document.getElementById(id);
     if (!el) return false;
 
-    el.scrollIntoView({
+    const yOffset = -90; // 🔥 adjust based on your header height
+    const y =
+      el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+    window.scrollTo({
+      top: y,
       behavior: "smooth",
-      block: "start",
     });
 
     return true;
   };
 
-  // try immediately
   if (scroll()) return;
 
-  // otherwise wait for render
   const interval = setInterval(() => {
     if (scroll()) clearInterval(interval);
   }, 100);
 
   return () => clearInterval(interval);
 }, [location]);
+
 
 
 
