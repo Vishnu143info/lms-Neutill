@@ -222,11 +222,10 @@ html {
 
 /* 💫 MAGICAL SERVICES SECTION */
 .services-section-magical {
-  
   /* background: linear-gradient(180deg, #0f172a 0%, #1a2332 100%); */
   position: relative;
   overflow: hidden;
-  padding-top: 10px;
+  padding-top: 0px;
   padding-bottom: 110px;
 }
 
@@ -552,7 +551,7 @@ object-fit: fill;
 
 /* 🌟 PLATFORM SECTIONS */
 .platform-section {
-  padding-bottom:  90px;
+  padding-bottom:  120px;
   position: relative;
   /* background: linear-gradient(180deg, #0f172a 0%); */
 }
