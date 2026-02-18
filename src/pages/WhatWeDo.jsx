@@ -55,7 +55,6 @@ const containerVariants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
 };
 
-
 const cardVariants = {
   hidden: { opacity: 0, y: 40, scale: 0.96 },
   visible: {
@@ -162,7 +161,8 @@ const isInView = useInView(ref, { amount: 0.3 });
         {/* Header */}
         <header className="mb-3 text-center">
           <h2 className="section-title-platform">What We Do</h2>
-          <p className="mx-auto -mt-8 max-w-2xl text-lg text-slate-600">
+         <p className="mx-auto -mt-10 text-lg text-slate-600">
+ 
             Transforming ideas into impactful solutions through innovation,
             collaboration, and advanced technology.
           </p>

@@ -1,5 +1,5 @@
 html {
-  scroll-padding-top: 120px;
+  scroll-padding-top: 100px;
 }
 
 
@@ -9,12 +9,6 @@ html {
     background-color: #0f172a;
 }
 
-
-
-.whatwedo-bg {
-  /* background: linear-gradient(180deg, #10182A 0%, #0E1627 100%); */
- 
-}
 
 
 .section-enhanced {
@@ -219,6 +213,8 @@ html {
   0%, 100% { transform: rotate(45deg) translateY(0); }
   50% { transform: rotate(45deg) translateY(-8px); }
 }
+
+
 
 /* 💫 MAGICAL SERVICES SECTION */
 .services-section-magical {
@@ -564,6 +560,7 @@ object-fit: fill;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 3rem;
+ margin-top: -20px;
 }
 
 .platform-container-magical {
@@ -586,7 +583,7 @@ object-fit: fill;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 1.5rem;
-  margin-top: -80px;
+  margin-top: -160px;
   animation: gradientShift 6s ease infinite;
 }
 .contact-section-magical {

@@ -188,7 +188,7 @@ const allServices = [
     color: "#00b894",
   },
   {
-    title: "Daily Technology Upskilling Hub",
+    title: "Tech Manthana",
     image: techn,
     description: "Tech Manthana - Innovation hub",
     icon: Lightbulb,
