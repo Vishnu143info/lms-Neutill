@@ -130,7 +130,7 @@ export default function WhatWeDo() {
 const isInView = useInView(ref, { amount: 0.3 });
 
   return (
-   <section className="relative overflow-hidden pt-5 pb-12 px-6">
+   <section className="relative pt-5 pb-12 px-6">
 
 
 
