@@ -47,13 +47,18 @@ const handleScrollToSection = (id) => {
   const el = document.getElementById(id);
 
   if (el) {
-    requestAnimationFrame(() => {
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
-  }
+  const headerOffset = 90; // adjust to your navbar height
+
+  const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+
+  const offsetPosition = elementPosition - headerOffset;
+
+  window.scrollTo({
+    top: offsetPosition,
+    behavior: "smooth",
+  });
+}
+
 };
 
 

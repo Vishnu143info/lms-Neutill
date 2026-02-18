@@ -122,17 +122,23 @@ useEffect(() => {
 
   const id = location.state.scrollTo;
 
-  const scroll = () => {
-    const el = document.getElementById(id);
-    if (!el) return false;
+ const scroll = () => {
+  const el = document.getElementById(id);
+  if (!el) return false;
 
-    el.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+  const headerOffset = 90;
+  const elementPosition =
+    el.getBoundingClientRect().top + window.pageYOffset;
 
-    return true;
-  };
+  const offsetPosition = elementPosition - headerOffset;
+
+  window.scrollTo({
+    top: offsetPosition,
+    behavior: "smooth",
+  });
+
+  return true;
+};
 
   // try immediately
   if (scroll()) return;
