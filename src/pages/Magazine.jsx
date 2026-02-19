@@ -159,7 +159,11 @@ const [magazines, setMagazines] = useState([]);
 
 </div>
 
+
+
                   </div>
+
+                  
                 ) : (
                   <div className="h-[450px] flex items-center justify-center text-gray-400 bg-white/5 rounded-[30px] border-2 border-dashed border-white/20">
   
@@ -178,6 +182,16 @@ const [magazines, setMagazines] = useState([]);
                   
                 )}
 
+<div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4 text-left">
+  <h5 className="text-white font-semibold mb-3">How it works:</h5>
+
+  <ol className="space-y-2 text-sm text-gray-200 list-decimal list-inside">
+    <li>Sign up to get your personal portal for easy access.</li>
+    <li>Enjoy free access to available magazines.</li>
+    <li>View all free files directly from your portal.</li>
+    <li>Subscribe anytime to unlock premium content.</li>
+  </ol>
+</div>
 
                 {/* Action Buttons with Enhanced Design */}
                 {/* <div className="flex gap-4">
@@ -320,6 +334,8 @@ const [magazines, setMagazines] = useState([]);
                       </svg>
                     </button>
                   </div>
+
+                  
                 </div>
               </div>
             </div>
