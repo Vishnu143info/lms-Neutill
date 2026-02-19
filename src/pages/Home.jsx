@@ -269,7 +269,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
         <div className="services-container-magical">
           <motion.div className="services-header-magical" variants={itemVariants}>
             <motion.h2 className="section-title-magical">Our Core Services</motion.h2>
-            <motion.p className="section-subtitle-magical">Innovative solutions tailored to drive your business forward</motion.p>
+            <motion.p className=" text-lg text-slate-200 font-bold">Innovative solutions tailored to drive your business forward</motion.p>
           </motion.div>
 
           <motion.div className="services-grid-magical" variants={staggerContainer}>
@@ -331,7 +331,7 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
         <div className="industries-container-magical">
           <motion.div className="industries-header-magical" variants={itemVariants}>
             <motion.h2 className="section-title-magical">Industries We Transform</motion.h2>
-            <motion.p className="section-subtitle-magical">Driving digital transformation across diverse sectors</motion.p>
+            <motion.p className="text-lg text-slate-200 font-bold">Driving digital transformation across diverse sectors</motion.p>
           </motion.div>
 
           <motion.div className="industries-grid-magical" variants={staggerContainer}>

@@ -162,11 +162,11 @@ const isInView = useInView(ref, { amount: 0.3 });
         {/* Header */}
         <header className="mb-3 text-center">
           <h2 className="section-title-platform">What We Do</h2>
-         <p className="mx-auto -mt-10 text-lg text-slate-600">
- 
-            Transforming ideas into impactful solutions through innovation,
-            collaboration, and advanced technology.
-          </p>
+        <p className="mx-auto -mt-10 mb-4 text-md text-slate-200 font-bold">
+  Transforming ideas into impactful solutions through innovation,
+  collaboration, and advanced technology.
+</p>
+
         </header>
 
         {/* Grid */}
