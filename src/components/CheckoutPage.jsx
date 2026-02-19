@@ -26,6 +26,8 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showSignupPopup, setShowSignupPopup] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -87,11 +89,11 @@ export default function CheckoutPage() {
     if (!validateForm()) return;
 
     const user = auth.currentUser;
-    if (!user) {
-      alert("Please login to continue");
-      navigate("/login");
-      return;
-    }
+  if (!user) {
+  setShowSignupPopup(true);
+  return;
+}
+
 
     setLoading(true);
 
@@ -482,6 +484,38 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+      {showSignupPopup && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+      
+      <h2 className="text-2xl font-bold mb-3 text-gray-800">
+        Please sign up to continue
+      </h2>
+
+      <p className="text-gray-600 mb-6">
+        Create an account to complete your purchase and activate your plan.
+      </p>
+
+      <div className="flex gap-3">
+        <button
+          onClick={() => navigate("/signup")}
+          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold"
+        >
+          Sign Up
+        </button>
+
+        <button
+          onClick={() => setShowSignupPopup(false)}
+          className="flex-1 bg-gray-100 py-3 rounded-xl font-semibold"
+        >
+          Cancel
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

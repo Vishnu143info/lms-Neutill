@@ -23,7 +23,7 @@ const NAV_ITEMS = [
   { label: "Content", icon: BookOpen, path: "/dashboard/admin/content" },
   { label: "Schedule", icon: Calendar, path: "/dashboard/admin/schedule" },
   { label: "Subscriptions", icon: Wallet, path: "/dashboard/admin/subscriptions" },
-  { label: "Automation", icon: Zap, path: "/dashboard/admin/posters" },
+  { label: "Posters", icon: Zap, path: "/dashboard/admin/posters" },
   { label: "Users", icon: Users, path: "/dashboard/admin/users" },
   { label: "Resumes", icon: FileText, path: "/dashboard/admin/resume" },
   { label: "Enquiry Form", icon: FileText, path: "/dashboard/admin/form" },

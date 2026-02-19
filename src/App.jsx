@@ -7,9 +7,6 @@
 import PosterDetailsPage from "./pages/PosterDetailsPage";
 import SendMail from "./pages/admin/SendMail";
 import AllUpdates from "./pages/AllUpdates";
-import MagazineReader from "./pages/MagazineReader";
-
-import RightUpdatesStripe from "./pages/RightUpdatesStripe";
 
     
 
@@ -42,6 +39,7 @@ import RightUpdatesStripe from "./pages/RightUpdatesStripe";
     import ResumeUpload from "./pages/student/ResumeUpload";
     import AskTutor from "./pages/student/AskTutor";
     import LearningPath from "./pages/student/LearningPath";
+    import MagazinePage from "./pages/student/MagazinePage";
 
 
     /* -------- ADMIN -------- */
@@ -90,7 +88,7 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
   }
 />
 
-<Route path="/read/:id" element={<MagazineReader />} />
+
 
 <Route
   path="/tech-manthana/blog/:id"
@@ -154,13 +152,14 @@ import PrivacyPolicy from "./components/PrivacyPolicy";
                 </ProtectedRoute>
               }
             >
-              <Route index element={<ConsumerDashboardPage />} />
+              <Route index element={<MagazinePage/>} />
               <Route path="page" element={<ConsumerDashboardPage />} />
               <Route path="modules" element={<MyModules />} />
               <Route path="schedule" element={<MySchedule />} />
               <Route path="resume" element={<ResumeUpload />} />
               <Route path="ask" element={<AskTutor />} />
                <Route path="path" element={<LearningPath/>} />
+               <Route path="magazine" element={<MagazinePage/>} />
               
             </Route>
 

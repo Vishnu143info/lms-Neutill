@@ -15,6 +15,9 @@ import {
   FaEyeSlash
 } from "react-icons/fa";
 import { setDoc } from "firebase/firestore";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
+
 
 const ADMIN_DOC_ID = "xGUSclC0q6S1IEI4iRb03pkiXIS2";
 
@@ -26,6 +29,9 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [resetLoading, setResetLoading] = useState(false);
+const [resetMsg, setResetMsg] = useState("");
 
   const navigate = useNavigate();
 
@@ -85,6 +91,75 @@ const handleSubmit = async (e) => {
     }
   } finally {
     setLoading(false);
+  }
+};
+
+const handleForgotPassword = async () => {
+  setError("");
+  setResetMsg("");
+
+  if (!email) {
+    return setError("Enter your email to reset password");
+  }
+
+  try {
+    setResetLoading(true);
+
+    const emailValue = email.trim().toLowerCase();
+
+    // 🔍 search root email
+    const q1 = query(
+      collection(db, "users"),
+      where("email", "==", emailValue)
+    );
+
+    // 🔍 search nested profile.email
+    const q2 = query(
+      collection(db, "users"),
+      where("profile.email", "==", emailValue)
+    );
+
+    const [snap1, snap2] = await Promise.all([
+      getDocs(q1),
+      getDocs(q2),
+    ]);
+
+    if (snap1.empty && snap2.empty) {
+      setError(
+  <span>
+    No account found with this email.{" "}
+    <Link
+      to="/signup"
+      className="font-semibold text-indigo-600 underline"
+    >
+      Sign up
+    </Link>
+  </span>
+);
+
+      return;
+    }
+
+    // ✅ send reset email
+    await sendPasswordResetEmail(auth, emailValue);
+
+    setResetMsg(
+      <>
+        Password reset link sent to <b>{email}</b>.
+        <br />
+        Please check your inbox and spam folder.
+      </>
+    );
+  } catch (err) {
+    console.error(err);
+
+    if (err.code === "auth/invalid-email") {
+      setError("Invalid email address");
+    } else {
+      setError("Something went wrong. Try again.");
+    }
+  } finally {
+    setResetLoading(false);
   }
 };
 
@@ -247,6 +322,20 @@ const handleSubmit = async (e) => {
               </div>
             </motion.div>
 
+            <AnimatePresence>
+  {resetMsg && (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg"
+    >
+      <p className="text-sm text-green-700">{resetMsg}</p>
+    </motion.div>
+  )}
+</AnimatePresence>
+
+
             {/* Form Area */}
             <div className="p-8">
               <AnimatePresence>
@@ -359,6 +448,17 @@ const handleSubmit = async (e) => {
                     </button>
                   </div>
                 </motion.div>
+
+<div className="flex justify-end mt-2">
+  <button
+    type="button"
+    onClick={handleForgotPassword}
+    disabled={resetLoading}
+    className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+  >
+    {resetLoading ? "Sending..." : "Forgot password?"}
+  </button>
+</div>
 
                 {/* Submit Button */}
                 <motion.div

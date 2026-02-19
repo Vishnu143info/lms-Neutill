@@ -19,6 +19,7 @@ import {
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { path } from "framer-motion/client";
+import Magazine from "../pages/Magazine";
 
 /* ================= PLAN ACCESS ================= */
 const NORMALIZE_PLAN = (rawPlan) => {
@@ -39,7 +40,8 @@ const PLAN_ACCESS = {
     schedule: false,
     resume: true,
     askTutor: false,
-    path: false,
+    path: true,
+    magazine : true
   },
 
   Basic: {
@@ -49,6 +51,7 @@ const PLAN_ACCESS = {
     resume: true,
     askTutor: false,
     path: true,
+    magazine : true
   },
 
   Premium: {
@@ -58,6 +61,7 @@ const PLAN_ACCESS = {
     resume: true,
     askTutor: true,
     path: true,
+    magazine : true
   },
 };
 
@@ -93,6 +97,7 @@ const PLAN_STYLES = {
 /* ================= NAV ITEMS ================= */
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/dashboard/consumer/page", icon: Home,requires: "page" },
+  { label: "Digital Magazine", path: "/dashboard/consumer/magazine", icon: Award, requires: "magazine" },
    { label: "Learning Path", path: "/dashboard/consumer/path", icon: Award, requires: "path" },
   { label: "My Modules", path: "/dashboard/consumer/modules", icon: BookOpen, requires: "modules" },
   { label: "My Schedule", path: "/dashboard/consumer/schedule", icon: Calendar, requires: "schedule" },

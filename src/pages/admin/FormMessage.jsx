@@ -12,6 +12,7 @@ export default function FormMessages() {
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [viewMsg, setViewMsg] = useState(null);
 
   // pagination
   const [page, setPage] = useState(1);
@@ -145,7 +146,6 @@ export default function FormMessages() {
               <th className="p-4 text-left">User</th>
               <th className="p-4 text-left">Phone</th>
               <th className="p-4 text-left">Message</th>
-              <th className="p-4 text-left">Received Mail</th>
               <th className="p-4 text-left">Date</th>
               <th className="p-4 text-left">Action</th>
             </tr>
@@ -171,28 +171,28 @@ export default function FormMessages() {
                     </td>
 
                     <td className="p-4">
-                      <div>
-                        <p className="font-semibold">{msg.name}</p>
-                        <p className="text-sm text-gray-500">{msg.email}</p>
-                      </div>
+                      <p className="font-semibold">{msg.name}</p>
+                      <p className="text-sm text-gray-500">{msg.email}</p>
                     </td>
 
                     <td className="p-4">{msg.phone}</td>
 
-                   <td className="p-4 max-w-xs truncate">
-  {msg.message}
-</td>
+                    <td className="p-4 max-w-xs truncate">
+                      {msg.message}
+                    </td>
 
-<td className="p-4 font-medium text-indigo-600">
-  {msg.receivedBy || "askneutill@gmail.com"}
-</td>
+                    <td className="p-4 text-sm text-gray-600">
+                      {msg.createdAt?.toDate().toLocaleString() || "Now"}
+                    </td>
 
-<td className="p-4 text-sm text-gray-600">
-  {msg.createdAt?.toDate().toLocaleString() || "Now"}
-</td>
+                    <td className="p-4 flex gap-2">
+                      <button
+                        onClick={() => setViewMsg(msg)}
+                        className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
+                      >
+                        View
+                      </button>
 
-
-                    <td className="p-4">
                       <button
                         onClick={() => sendMail([msg])}
                         className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
@@ -233,6 +233,49 @@ export default function FormMessages() {
           </div>
         )}
       </div>
+
+      {/* VIEW MODAL */}
+      <AnimatePresence>
+        {viewMsg && (
+          <motion.div
+            className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+            >
+              <button
+                onClick={() => setViewMsg(null)}
+                className="absolute top-3 right-3 text-gray-500 hover:text-black"
+              >
+                ✕
+              </button>
+
+              <h2 className="text-xl font-bold mb-1">{viewMsg.name}</h2>
+              <p className="text-sm text-gray-500 mb-3">{viewMsg.email}</p>
+
+              <p className="mb-2"><b>Phone:</b> {viewMsg.phone}</p>
+
+              <p className="text-sm text-gray-500 mb-4">
+                {viewMsg.createdAt?.toDate().toLocaleString()}
+              </p>
+
+              <div>
+                <p className="font-semibold mb-1">Message:</p>
+                <p className="text-gray-700 whitespace-pre-line">
+                  {viewMsg.message}
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

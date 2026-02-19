@@ -87,7 +87,12 @@ const quickLinks = [
   const socialLinks = [
     { icon: Facebook, href: "#", label: "Facebook" },
    { icon: FaXTwitter, href: "#", label: "X" },
-    { icon: Instagram, href: "#", label: "Instagram" },
+{ 
+  icon: Instagram, 
+  href: "https://www.instagram.com/neutillservices?igsh=MWFrejNncGM1Mm4zZQ==", 
+  label: "Instagram" 
+},
+
     { icon: Linkedin, href: "#", label: "LinkedIn" }
   ];
 

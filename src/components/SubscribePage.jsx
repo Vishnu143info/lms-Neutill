@@ -232,7 +232,7 @@ export default function SubscribePage() {
           </p>
           
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <div className="text-2xl font-bold text-blue-600">99%</div>
               <div className="text-sm text-gray-600">Satisfaction Rate</div>
@@ -241,10 +241,7 @@ export default function SubscribePage() {
               <div className="text-2xl font-bold text-blue-600">24/7</div>
               <div className="text-sm text-gray-600">Support Available</div>
             </div>
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-              <div className="text-2xl font-bold text-blue-600">30-Day</div>
-              <div className="text-sm text-gray-600">Money Back Guarantee</div>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -407,7 +404,7 @@ export default function SubscribePage() {
           </div>
 
           {/* FAQ Section */}
-          <div className="mt-20 max-w-3xl mx-auto">
+          {/* <div className="mt-20 max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
               Frequently Asked Questions
             </h2>
@@ -436,7 +433,7 @@ export default function SubscribePage() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
