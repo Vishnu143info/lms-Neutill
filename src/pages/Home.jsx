@@ -37,7 +37,7 @@ import researchImg from "../assets/outsourcing2.jpeg";
 import alfaImg from "../assets/education1.jpeg";
 import contentImg from "../assets/cm1.png";
 import marketingImg from "../assets/logi1.png";
-import techn from "../assets/tm.png";
+import techn from "../assets/tm1.png";
 
 import itImg from "../assets/it2.jpg";
 import eduImg from "../assets/education1.jpeg";
@@ -193,6 +193,7 @@ const allServices = [
     description: "Tech Manthana - Innovation hub",
     icon: Lightbulb,
     color: "#e17055",
+    path: "/tech-manthana/blog",
   },
   {
     title: "Content Management",
@@ -285,7 +286,8 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
   className="service-card-magical cursor-pointer"
   variants={cardVariants}
   whileHover="hover"
-  onClick={() => navigate(`/services/${serviceId}`)}
+  onClick={() => navigate(service.path || `/services/${serviceId}`)}
+
   style={{ '--service-color': service.color }}
 >
 
@@ -300,7 +302,11 @@ const isIndustriesInView = useInView(industriesRef, { once: false });
                       <h3>{service.title}</h3>
                       <p>{service.description}</p>
 
-                      <Link to={`/services/${serviceId}`} className="service-link">
+                      <Link
+  to={service.path || `/services/${serviceId}`}
+  className="service-link"
+>
+
                         <motion.button className="service-cta-magical">Discover →</motion.button>
                       </Link>
                     </div>

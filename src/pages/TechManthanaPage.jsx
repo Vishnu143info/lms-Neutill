@@ -1,124 +1,63 @@
 import React from "react";
-import "../styles/TechManthana.css";
 import { useNavigate } from "react-router-dom";
+import "../styles/TechManthana.css";
+import Img1 from "../assets/Banner1.jpeg";
+import Img2 from "../assets/Banner2.jpeg";
 
-import {
-  FaGraduationCap,
-  FaProjectDiagram,
-  FaUserTie,
-  FaUsers,
-  FaInfinity,
-  FaCogs,
-  FaChartLine,
-  FaFileAlt,
-  FaVideo,
-  FaFolderOpen
-} from "react-icons/fa";
-
-const TechManthanaPage = () => {
- 
+const Techmanthana = () => {
   const navigate = useNavigate();
 
-const handleNavigate = () => {
-  navigate("/tech-manthana/blog");
-};
-
+  const handlePageClick = () => {
+    // Navigate to the tech-manthana/blog page
+    navigate("/tech-manthana/blog");
+  };
 
   return (
-    <div
-  className="techmanthana-container"
-  onClick={handleNavigate}
-  style={{ cursor: "pointer" }}
->
+    <div className="tech-container" onClick={handlePageClick}>
+      {/* Top Banner */}
+      <div className="text-center mb-12 md:mb-16 relative px-4">
+  <div className="inline-block relative">
+    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-4 relative z-10 mt-10">
+      <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-pink-300 to-purple-300">
+        Digital Magazine
+      </span>
+      <br />
+      <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-green-300">
+        Library
+      </span>
+    </h1>
 
-
-      {/* LEFT SECTION */}
-      <div className="left-section">
-        <h2 className="brand-title">TECH MANTHANA</h2>
-        <p className="brand-subtitle">Upskilling and Outsourcing</p>
-
-        <h1 className="main-heading">Talent That Evolves</h1>
-
-        <p className="description">
-          <strong>Tech Manthana</strong> is our initiative to upskill talent and offer strategic outsourcing:
-        </p>
-
-        <ul className="features-list">
-          <li><FaGraduationCap className="icon" /> Hands-on bootcamps & certifications</li>
-          <li><FaProjectDiagram className="icon" /> Project-based learning & mentorship</li>
-          <li><FaUserTie className="icon" /> Placement support & career mapping</li>
-        </ul>
-
-        <p className="extra-info">
-          We also provide skilled teams for outsourced development, support and innovation.
-        </p>
-
-        <h3 className="company-name">Neutill Services Private Limited</h3>
-      </div>
-
-      {/* RIGHT SECTION */}
-      <div className="right-section">
-        <h1 className="right-heading">Build, Train, Deploy</h1>
-
-        <div className="right-grid">
-  <div className="right-item" onClick={handleNavigate}>
-    <FaUsers className="icon yellow" /> Dedicated teams & managed services
+    <div className="absolute -inset-4 bg-white/5 blur-2xl rounded-[40px]"></div>
   </div>
 
-  <div className="right-item" onClick={handleNavigate}>
-    <FaInfinity className="icon purple" /> Flexible engagement models
-  </div>
+  <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mt-6 rounded-full"></div>
 
-  <div className="right-item" onClick={handleNavigate}>
-    <FaCogs className="icon blue" /> Domain-specific expertise (AI, Cloud, IoT)
-  </div>
-
-  <div className="right-item" onClick={handleNavigate}>
-    <FaChartLine className="icon yellow" /> Continuous learning & performance tracking
-  </div>
-</div>
-
-
-        <p className="highlight-text">
-          Tech Manthana is where talent meets transformation.
-        </p>
-
-        {/* PLAN CARDS */}
-<div className="plans">
-  <div className="plan-card free" onClick={handleNavigate}>
-    <h4>Free Access</h4>
-    <FaFileAlt className="plan-icon" />
-    <p>PDF Learning Path</p>
-  </div>
-
-  <div className="plan-card premium featured" onClick={handleNavigate}>
-    <h4>Basic Access</h4>
-    <FaVideo className="plan-icon" />
-    <p>PDF + Video Tutor</p>
-    <span className="badge">Most Popular</span>
-  </div>
-
-  <div className="plan-card platinum" onClick={handleNavigate}>
-    <h4>Premium Access</h4>
-    <FaFolderOpen className="plan-icon" />
-    <p>Premium + Hands-on Projects</p>
-  </div>
+  <p className="text-gray-300 text-base sm:text-lg md:text-xl mt-6 max-w-2xl mx-auto font-light">
+    Discover inspiring stories and insights from our curated collection
+  </p>
 </div>
 
 
 
-        {/* ⭐ EXPLORE MORE BUTTON */}
-        <button
-          className="explore-btn"
-          onClick={() => navigate("/tech-manthana/blog")}
-        >
-          Explore More
-        </button>
+      {/* Bottom Images Section */}
+      <div className="tech-content flex flex-col md:flex-row items-center">
 
+        <div className="tech-card">
+          <img
+            src={Img1}
+            alt="Daily Upskilling Dosage"
+          />
+        </div>
+
+        <div className="tech-card">
+          <img
+            src={Img2}
+            alt="Career Growth Roadmap"
+          />
+        </div>
       </div>
-
     </div>
   );
 };
 
-export default TechManthanaPage;
+export default Techmanthana;

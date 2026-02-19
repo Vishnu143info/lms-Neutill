@@ -8,7 +8,7 @@ import img2 from "../assets/whatwedo.png"
 import img3 from "../assets/image.png"
 import img4 from "../assets/industries.png"
 import img5  from "../assets/alfa1.png"
-import img6 from "../assets/tm.png"
+import img6 from "../assets/tm1.png"
 
 const slides = [
      {
