@@ -15,13 +15,18 @@ import {
   Gift,
 } from "lucide-react";
 import { getAuth } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+
 import { db } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+
 
 export default function CheckoutPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const auth = getAuth();
+  const [currentUser, setCurrentUser] = useState(null);
+
 
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("upi");
@@ -39,28 +44,51 @@ export default function CheckoutPage() {
 
   /* ================= LOAD PLAN ================= */
   useEffect(() => {
-    if (location.state?.plan) {
-      setSelectedPlan(location.state.plan);
-      localStorage.setItem(
-        "selectedPlan",
-        JSON.stringify(location.state.plan)
-      );
+  // ✅ LOAD PLAN FIRST
+  if (location.state?.plan) {
+    setSelectedPlan(location.state.plan);
+    localStorage.setItem(
+      "selectedPlan",
+      JSON.stringify(location.state.plan)
+    );
+  } else {
+    const savedPlan = localStorage.getItem("selectedPlan");
+    if (savedPlan) {
+      setSelectedPlan(JSON.parse(savedPlan));
     } else {
-      const savedPlan = localStorage.getItem("selectedPlan");
-      if (savedPlan) {
-        setSelectedPlan(JSON.parse(savedPlan));
-      } else {
-        navigate("/subscribe");
-      }
+      navigate("/subscribe");
+      return;
     }
+  }
 
-    const userData = JSON.parse(localStorage.getItem("user") || "{}");
-    setFormData({
-      name: userData.name || "",
-      email: userData.email || "",
-      phone: userData.phone || "",
-    });
-  }, [location, navigate]);
+  // ✅ LOAD USER FROM FIRESTORE
+const unsubscribe = onAuthStateChanged(auth, async (user) => {
+  setCurrentUser(user); // ✅ IMPORTANT
+
+  if (!user) return;
+
+  try {
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+
+    if (snap.exists()) {
+      const data = snap.data();
+
+      setFormData({
+        name: data.name || "",
+        email: data.email || user.email || "",
+        phone: data.phone || "",
+      });
+    }
+  } catch (err) {
+    console.error("Error fetching user:", err);
+  }
+});
+
+
+  return () => unsubscribe();
+}, [location, navigate]);
+
 
   /* ================= FORM ================= */
   const handleInputChange = (e) => {
@@ -85,94 +113,66 @@ export default function CheckoutPage() {
   };
 
   /* ================= PAYMENT ================= */
-  const handlePayment = async () => {
-    if (!validateForm()) return;
+const handlePayment = async () => {
+  if (!validateForm()) return;
 
-    const user = auth.currentUser;
-  if (!user) {
-  setShowSignupPopup(true);
-  return;
-}
+  if (!currentUser) {
+    setShowSignupPopup(true);
+    return;
+  }
 
+  setLoading(true);
 
-    setLoading(true);
+  try {
+    const now = new Date();
+    let expiresAt = null;
 
-    try {
-      // Calculate expiry
-      const now = new Date();
-      let expiresAt = null;
+    if (selectedPlan.billing === "monthly") {
+      expiresAt = new Date(now.setMonth(now.getMonth() + 1));
+    } else if (selectedPlan.billing === "yearly") {
+      expiresAt = new Date(now.setFullYear(now.getFullYear() + 1));
+    }
 
-      if (selectedPlan.billing === "monthly") {
-        expiresAt = new Date(now.setMonth(now.getMonth() + 1));
-      } else if (selectedPlan.billing === "yearly") {
-        expiresAt = new Date(now.setFullYear(now.getFullYear() + 1));
-      }
-
-      // 🔥 SAVE SUBSCRIPTION AND USER INFO TO FIRESTORE
-      await setDoc(
-        doc(db, "users", user.uid),
-        {
-          // User profile information
-          name: formData.name.trim(),  // ✅ Store name in Firestore
-          email: formData.email.trim(),
-          phone: formData.phone.trim(),
-          
-          // Subscription details
-          subscription: {
-            planId: selectedPlan.id,
-            planName: selectedPlan.name,
-            price: selectedPlan.price,
-            currency: selectedPlan.currency || "₹",
-            billing: selectedPlan.billing,
-            features: selectedPlan.features,
-            status: "active",
-            paymentMethod,
-            subscribedAt: serverTimestamp(),
-            expiresAt: expiresAt ? expiresAt.toISOString() : null,
-          },
-          
-          // User metadata
-          lastUpdated: serverTimestamp(),
-          profileCompleted: true,
-        },
-        { merge: true }
-      );
-
-      // Also update local storage
-      localStorage.setItem(
-        "userSubscription",
-        JSON.stringify({
-          planId: selectedPlan.id,
-          status: "active",
-          planName: selectedPlan.name,
-        })
-      );
-
-      // Update user info in local storage
-      const currentUserData = JSON.parse(localStorage.getItem("user") || "{}");
-      localStorage.setItem("user", JSON.stringify({
-        ...currentUserData,
+    await setDoc(
+      doc(db, "users", currentUser.uid), // ✅ FIXED
+      {
         name: formData.name.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
-      }));
 
-      // Simulate payment delay with visual feedback
-      await new Promise((r) => setTimeout(r, 1500));
+        subscription: {
+          planId: selectedPlan.id,
+          planName: selectedPlan.name,
+          price: selectedPlan.price,
+          currency: selectedPlan.currency || "₹",
+          billing: selectedPlan.billing,
+          features: selectedPlan.features,
+          status: "active",
+          paymentMethod,
+          subscribedAt: serverTimestamp(),
+          expiresAt: expiresAt ? expiresAt.toISOString() : null,
+        },
 
-      navigate("/payment-success", {
-  state: { 
-    plan: selectedPlan, 
-    planName: selectedPlan.name
-  },
-});
-    } catch (err) {
-      console.error("Payment error:", err);
-      alert("Payment failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+        lastUpdated: serverTimestamp(),
+        profileCompleted: true,
+      },
+      { merge: true }
+    );
+
+    navigate("/payment-success", {
+      state: {
+        plan: selectedPlan,
+        planName: selectedPlan.name,
+      },
+    });
+  } catch (err) {
+    console.error("Payment error:", err);
+    alert("Payment failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (!selectedPlan) {
     return (
