@@ -19,6 +19,9 @@ import { getAuth } from "firebase/auth";
 import { db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
+
+
 
 
 export default function CheckoutPage() {
@@ -26,6 +29,9 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const auth = getAuth();
   const [currentUser, setCurrentUser] = useState(null);
+
+  const localUser = JSON.parse(localStorage.getItem("user") || "{}");
+const localEmail = localUser?.email;
 
 
   const [loading, setLoading] = useState(false);
@@ -38,6 +44,24 @@ export default function CheckoutPage() {
     email: "",
     phone: "",
   });
+
+
+  const findUserByEmail = async (email) => {
+  if (!email) return null;
+
+  const q = query(
+    collection(db, "users"),
+    where("email", "==", email)
+  );
+
+  const snap = await getDocs(q);
+
+  if (!snap.empty) {
+    return snap.docs[0]; // first matched user
+  }
+
+  return null;
+};
 
   // Animated card effect
   const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });
@@ -116,14 +140,19 @@ const unsubscribe = onAuthStateChanged(auth, async (user) => {
 const handlePayment = async () => {
   if (!validateForm()) return;
 
-  if (!currentUser) {
-    setShowSignupPopup(true);
-    return;
-  }
-
   setLoading(true);
 
   try {
+    const userDoc = await findUserByEmail(formData.email);
+
+    if (!userDoc) {
+      setShowSignupPopup(true);
+      setLoading(false);
+      return;
+    }
+
+    const uid = userDoc.id;
+
     const now = new Date();
     let expiresAt = null;
 
@@ -134,7 +163,7 @@ const handlePayment = async () => {
     }
 
     await setDoc(
-      doc(db, "users", currentUser.uid), // ✅ FIXED
+      doc(db, "users", uid),
       {
         name: formData.name.trim(),
         email: formData.email.trim(),
@@ -150,7 +179,7 @@ const handlePayment = async () => {
           status: "active",
           paymentMethod,
           subscribedAt: serverTimestamp(),
-          expiresAt: expiresAt ? expiresAt.toISOString() : null,
+          expiresAt: expiresAt?.toISOString() || null,
         },
 
         lastUpdated: serverTimestamp(),
@@ -160,18 +189,17 @@ const handlePayment = async () => {
     );
 
     navigate("/payment-success", {
-      state: {
-        plan: selectedPlan,
-        planName: selectedPlan.name,
-      },
+      state: { plan: selectedPlan, planName: selectedPlan.name },
     });
+
   } catch (err) {
     console.error("Payment error:", err);
-    alert("Payment failed. Please try again.");
+    alert("Payment failed");
   } finally {
     setLoading(false);
   }
 };
+
 
 
   if (!selectedPlan) {
