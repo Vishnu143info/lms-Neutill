@@ -46,22 +46,21 @@ const localEmail = localUser?.email;
   });
 
 
-  const findUserByEmail = async (email) => {
-  if (!email) return null;
+ const findUserByEmail = async (email) => {
+  const normalizedEmail = email.trim().toLowerCase();
 
-  const q = query(
-    collection(db, "users"),
-    where("email", "==", email)
-  );
+  const [snap1, snap2] = await Promise.all([
+    getDocs(query(collection(db, "users"), where("email", "==", normalizedEmail))),
+    getDocs(query(collection(db, "users"), where("profile.email", "==", normalizedEmail)))
+  ]);
 
-  const snap = await getDocs(q);
-
-  if (!snap.empty) {
-    return snap.docs[0]; // first matched user
-  }
+  if (!snap1.empty) return snap1.docs[0];
+  if (!snap2.empty) return snap2.docs[0];
 
   return null;
 };
+
+
 
   // Animated card effect
   const [cardTilt, setCardTilt] = useState({ x: 0, y: 0 });

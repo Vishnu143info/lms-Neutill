@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+
+
 import { 
   FaUser, 
   FaEnvelope, 
@@ -385,13 +387,19 @@ const SignUp = () => {
                       />
                       <label className="text-sm text-gray-600">
                         I agree to the{' '}
-                        <a href="#" className="text-green-600 hover:text-green-800 font-medium">
-                          Terms of Service
-                        </a>{' '}
+                        <Link
+  to="/terms"
+  className="text-green-600 hover:text-green-800 font-medium"
+>
+  Terms of Service
+</Link>{' '}
                         and{' '}
-                        <a href="#" className="text-green-600 hover:text-green-800 font-medium">
-                          Privacy Policy
-                        </a>
+                        <Link
+  to="/privacy"
+  className="text-green-600 hover:text-green-800 font-medium"
+>
+  Privacy Policy
+</Link>
                       </label>
                     </motion.div>
 
