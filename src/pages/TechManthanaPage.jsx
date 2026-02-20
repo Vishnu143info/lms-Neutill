@@ -23,7 +23,8 @@ const Techmanthana = () => {
       </span>
       <br />
       <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-green-300">
-        Library
+        Tech Manthana
+
       </span>
     </h1>
 

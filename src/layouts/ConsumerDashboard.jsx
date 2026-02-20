@@ -280,7 +280,7 @@ export default function ConsumerDashboard() {
 
       {/* Navigation */}
       {/* Navigation */}
-<div className="flex-1 min-h-0 overflow-y-auto pr-1">
+<div className="flex-1 min-h-0 overflow-y-auto pr-1 no-scrollbar">
   <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-2 mb-2 sticky top-0 bg-gradient-to-b from-white to-gray-50 py-2 z-10">
     Navigation
   </h3>
@@ -379,7 +379,7 @@ export default function ConsumerDashboard() {
             <X className="w-5 h-5 text-gray-600" />
           </button>
         </div>
-        <div className="h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="h-[calc(100vh-80px)] overflow-y-auto no-scrollbar">
           {sidebar}
         </div>
       </motion.div>

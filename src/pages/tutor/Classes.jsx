@@ -16,7 +16,7 @@ const ClassCard = ({ classItem, onStart }) => {
     setIsStarting(true);
     setTimeout(() => {
       setIsStarting(false);
-      onStart(classItem.id);
+     onStart(classItem)
     }, 800);
   };
 
@@ -302,10 +302,13 @@ export default function Classes() {
     setFilteredClasses(filtered);
   }, [searchTerm, filter, classes]);
 
-  const handleStartClass = (id) => {
-    alert(`Starting class: ${id}`);
-    // In a real app, you would navigate to the class page
-  };
+ const handleStartClass = (classItem) => {
+  if (classItem.meetingUrl) {
+    window.open(classItem.meetingUrl, "_blank");
+  } else {
+    alert("Meeting link not available");
+  }
+};
 
   if (loading) return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex flex-col items-center justify-center">

@@ -129,7 +129,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Navigation Items */}
-      <div className="flex-1 px-2 space-y-1 overflow-y-auto">
+      <div className="flex-1 px-2 space-y-1 overflow-y-auto no-scrollbar">
         {NAV_ITEMS.map((item) => (
           <NavItem
             key={item.label}
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
         
         
         {/* Mobile Sidebar Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto no-scrollbar">
           {sidebar(false)}
         </div>
       </motion.div>

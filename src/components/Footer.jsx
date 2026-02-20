@@ -85,15 +85,13 @@ const quickLinks = [
   ];
 
   const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-   { icon: FaXTwitter, href: "#", label: "X" },
+
 { 
   icon: Instagram, 
   href: "https://www.instagram.com/neutillservices?igsh=MWFrejNncGM1Mm4zZQ==", 
   label: "Instagram" 
 },
 
-    { icon: Linkedin, href: "#", label: "LinkedIn" }
   ];
 
   const contactInfo = [
@@ -244,33 +242,32 @@ const quickLinks = [
         </div>
 
         {/* BOTTOM */}
-        <div className="border-t border-gray-800 pt-3 flex flex-col lg:flex-row justify-evenly items-center gap-2">
-         <p className="text-sm font-semibold text-gray-400">
-  
-  
-     All rights reserved
-  © Neutill Services Private Limited
-</p>
+      <div className="border-t border-gray-800 pt-4 flex flex-col items-center gap-3">
 
+  <p className="text-sm font-semibold text-gray-400 text-center">
+    © {currentYear} Neutill Services Private Limited — All rights reserved
+  </p>
 
-          <div className="flex gap-4">
-            {socialLinks.map((social, i) => {
-              const Icon = social.icon;
-              return (
-                <a
-                  key={i}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition"
-                >
-                  <Icon className="w-5 h-5 text-gray-400 hover:text-white" />
-                </a>
-              );
-            })}
-          </div>
+  <div>
+    {socialLinks.map((social, i) => {
+      const Icon = social.icon;
+      return (
+        <a
+          key={i}
+          href={social.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={social.label}
+          className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center
+           hover:bg-pink-600 transition"
+        >
+          <Icon className="w-5 h-5 text-white" />
+        </a>
+      );
+    })}
+  </div>
 
-         
-        </div>
+</div>
         
         {/* <p className="text-xs text-gray-600 text-center mt-6 mb-10 flex items-center justify-center gap-1">
   Made with{" "}

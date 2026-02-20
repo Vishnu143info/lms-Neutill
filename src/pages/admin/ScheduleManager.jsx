@@ -161,9 +161,9 @@ const ScheduleCard = ({ schedule, onEdit, onDelete }) => {
             </div>
 
             {/* Attendance & Join Button */}
-            <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-4">
+            {/* <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-4">
                 <div className="flex items-center gap-2">
-                    {/* Simplified attendee count display */}
+                 
                     <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 border-2 border-white flex items-center justify-center text-xs text-white">
                         {schedule.attendees || 0}+
                     </div>
@@ -187,7 +187,7 @@ const ScheduleCard = ({ schedule, onEdit, onDelete }) => {
                         "Join Class"
                     )}
                 </button>
-            </div>
+            </div> */}
         </div>
     );
 };
@@ -231,15 +231,16 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
 export default function ScheduleManager() {
     const [schedules, setSchedules] = useState([]); 
     const [form, setForm] = useState({
-        id: null,
-        className: "",
-        description: "",
-        date: "",
-        time: "",
-        tutor: "",
-        type: "Live",
-        duration: ""
-    });
+  id: null,
+  className: "",
+  description: "",
+  date: "",
+  time: "",
+  tutor: "",
+  type: "Live",
+  duration: "",
+  meetingUrl: ""   // ✅ ADD THIS
+});
     const [isEditing, setIsEditing] = useState(false);
     const [tutors, setTutors] = useState([]);
     const [toast, setToast] = useState(null);
@@ -376,17 +377,18 @@ useEffect(() => {
             finalDocId = docRef.id;
         }
 
-        const scheduleData = {
-            documentId: finalDocId, 
-            className: form.className,
-            description: form.description,
-            date: form.date,
-            time: form.time,
-            tutor: form.tutor,
-            type: form.type,
-            duration: form.duration,
-            attendees: form.attendees || Math.floor(Math.random() * 40) + 10 
-        };
+       const scheduleData = {
+  documentId: finalDocId,
+  className: form.className,
+  description: form.description,
+  date: form.date,
+  time: form.time,
+  tutor: form.tutor,
+  type: form.type,
+  duration: form.duration,
+  meetingUrl: form.meetingUrl,   // ✅ SAVE
+  attendees: form.attendees || Math.floor(Math.random() * 40) + 10
+};
 
         try {
             await setDoc(docRef, scheduleData);
@@ -438,7 +440,7 @@ useEffect(() => {
 
             <div className="mb-8">
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-900 bg-clip-text text-transparent">
-                    📅 Schedule Manager
+                     Schedule Manager
                 </h1>
                 <p className="text-gray-600 mt-2">Create and manage class schedules</p>
             </div>
@@ -524,7 +526,15 @@ useEffect(() => {
                             onKeyDown={handleKeyDown}
                             className="border border-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent lg:col-span-1"
                         />
+                        <input
+  type="url"
+  placeholder="Meeting Link (Zoom / GMeet)"
+  value={form.meetingUrl}
+  onChange={(e) => setForm({ ...form, meetingUrl: e.target.value })}
+  className="border border-gray-200 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
                     </div>
+
 
                     <div className="mt-6 flex items-center">
                         <button

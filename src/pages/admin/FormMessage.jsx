@@ -235,46 +235,70 @@ export default function FormMessages() {
       </div>
 
       {/* VIEW MODAL */}
-      <AnimatePresence>
-        {viewMsg && (
-          <motion.div
-            className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+     <AnimatePresence>
+  {viewMsg && (
+    <motion.div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full h-[80vh] flex flex-col relative"
+        initial={{ scale: 0.9, y: 40 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 40 }}
+        transition={{ duration: 0.25 }}
+      >
+
+        {/* HEADER */}
+        <div className="flex justify-between items-start border-b p-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              {viewMsg.name}
+            </h2>
+            <p className="text-sm text-gray-500">{viewMsg.email}</p>
+          </div>
+
+          <button
+            onClick={() => setViewMsg(null)}
+            className="text-gray-400 hover:text-black text-xl"
           >
-            <motion.div
-              className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-            >
-              <button
-                onClick={() => setViewMsg(null)}
-                className="absolute top-3 right-3 text-gray-500 hover:text-black"
-              >
-                ✕
-              </button>
+            ✕
+          </button>
+        </div>
 
-              <h2 className="text-xl font-bold mb-1">{viewMsg.name}</h2>
-              <p className="text-sm text-gray-500 mb-3">{viewMsg.email}</p>
+        {/* BODY */}
+        <div className="p-6 overflow-y-auto flex-1 space-y-4">
 
-              <p className="mb-2"><b>Phone:</b> {viewMsg.phone}</p>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <p>
+              <span className="font-semibold text-gray-700">Phone:</span><br/>
+              {viewMsg.phone}
+            </p>
 
-              <p className="text-sm text-gray-500 mb-4">
-                {viewMsg.createdAt?.toDate().toLocaleString()}
-              </p>
+            <p>
+              <span className="font-semibold text-gray-700">Date:</span><br/>
+              {viewMsg.createdAt?.toDate().toLocaleString()}
+            </p>
+          </div>
 
-              <div>
-                <p className="font-semibold mb-1">Message:</p>
-                <p className="text-gray-700 whitespace-pre-line">
-                  {viewMsg.message}
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          <div>
+            <p className="font-semibold text-gray-800 mb-2 text-lg">
+              Message
+            </p>
+
+            <div className="bg-gray-50 border rounded-xl p-4 text-gray-700 whitespace-pre-line break-words leading-relaxed">
+              {viewMsg.message}
+            </div>
+          </div>
+
+        </div>
+
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
     </div>
   );

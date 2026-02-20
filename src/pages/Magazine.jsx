@@ -89,14 +89,14 @@ const [magazines, setMagazines] = useState([]);
         <div className="text-center mb-16 relative">
           <div className="inline-block relative">
             <h1 className="text-7xl font-black text-white mb-4 relative z-10">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-pink-300 to-purple-300">
-                Digital Magazine
-              </span>
-              <br />
-              <span className="text-5xl bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-green-300">
-                Library
-              </span>
-            </h1>
+  <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-pink-300 to-purple-300">
+    Digital Magazine
+  </span>
+  <br />
+  <span className="text-5xl bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-green-300">
+    Tech Manthana
+  </span>
+</h1>
             <div className="absolute -inset-4 bg-white/5 blur-2xl rounded-[40px]"></div>
           </div>
           <div className="w-32 h-1 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mt-6 rounded-full"></div>
