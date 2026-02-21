@@ -296,14 +296,15 @@ const BlogPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-blue-50">
       
       {/* Hero Section */}
      
 
-      <div className="max-w-7xl mx-auto px-4 py-16">
+     
         
         {/* Magazine Section */}
+        <div className="w-full ">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -313,6 +314,9 @@ const BlogPage = () => {
           <Magazine />
         </motion.div>
 
+        </div>
+
+<div className="w-full 6 lg:px-12">
         {/* Controls Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
           
@@ -325,7 +329,7 @@ const BlogPage = () => {
           </div>
 
           {/* View Toggle */}
-          <div className="flex items-center gap-2 bg-white rounded-xl p-1 shadow-sm border">
+          <div className="flex items-center gap-2 bg-white rounded-xl p-2 shadow-sm border">
             <button
               onClick={() => setViewMode("grid")}
               className={`p-2 rounded-lg transition ${
