@@ -88,21 +88,19 @@ const [magazines, setMagazines] = useState([]);
         {/* Header with Unique Design */}
         <div className="text-center mb-16 relative">
           <div className="inline-block relative">
-            <h1 className="text-7xl font-black text-white mb-4 relative z-10">
+            <h1 className="text-6xl font-black  -mt-8 text-white mb-4 relative z-10">
   <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-pink-300 to-purple-300">
     Digital Magazine
   </span>
   <br />
-  <span className="text-5xl bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-green-300">
+  <span className="text-4xl bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-green-300">
     Tech Manthana
   </span>
 </h1>
             <div className="absolute -inset-4 bg-white/5 blur-2xl rounded-[40px]"></div>
           </div>
-          <div className="w-32 h-1 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mt-6 rounded-full"></div>
-          <p className="text-gray-300 text-xl mt-6 max-w-2xl mx-auto font-light">
-            Discover inspiring stories and insights from our curated collection
-          </p>
+       
+         
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -112,7 +110,7 @@ const [magazines, setMagazines] = useState([]);
             {selectedMagazine && (
               <div
   onClick={() => navigate("/subscribe")}
-  className="bg-white/10 backdrop-blur-xl rounded-[40px] p-8 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 cursor-pointer"
+  className="bg-white/10 backdrop-blur-xl rounded-[40px] p-8  -mt-8 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 cursor-pointer"
 >
 
                 {/* Magazine Title with Enhanced Styling */}
