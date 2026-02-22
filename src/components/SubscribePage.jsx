@@ -232,7 +232,7 @@ export default function SubscribePage() {
           </p>
           
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
               <div className="text-2xl font-bold text-blue-600">99%</div>
               <div className="text-sm text-gray-600">Satisfaction Rate</div>
@@ -242,7 +242,7 @@ export default function SubscribePage() {
               <div className="text-sm text-gray-600">Support Available</div>
             </div>
             
-          </div>
+          </div> */}
         </div>
       </div>
 

@@ -21,6 +21,7 @@ const [magazines, setMagazines] = useState([]);
 
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
+  const [showAccessPopup, setShowAccessPopup] = useState(false);
 
   /* 🔥 FETCH MAGAZINES */
   useEffect(() => {
@@ -109,7 +110,7 @@ const [magazines, setMagazines] = useState([]);
           <div className="lg:w-2/3">
             {selectedMagazine && (
               <div
-  onClick={() => navigate("/subscribe")}
+ onClick={() => setShowAccessPopup(true)}
   className="bg-white/10 backdrop-blur-xl rounded-[40px] p-8  -mt-8 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 cursor-pointer"
 >
 
@@ -323,7 +324,7 @@ const [magazines, setMagazines] = useState([]);
                       Subscribe now to unlock all magazines and get exclusive access to premium content
                     </p>
                     <button
-                      onClick={() => navigate("/subscribe")}
+                     onClick={() => setShowAccessPopup(true)}
                       className="w-full bg-white text-gray-900 px-4 py-3 rounded-2xl font-bold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl flex items-center justify-center gap-2 group"
                     >
                       View Subscription Plans
@@ -411,6 +412,87 @@ const [magazines, setMagazines] = useState([]);
             </div>
           </div>
         )}
+        {showAccessPopup && (
+  <div 
+    className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 backdrop-blur-md animate-in fade-in duration-300"
+    onClick={() => setShowAccessPopup(false)}
+  >
+    {/* Modal Content - Click propagation stopped to prevent closing when clicking inside */}
+    <div 
+      className="bg-gradient-to-br from-gray-900 via-purple-900/90 to-indigo-900/90 p-10 rounded-[40px] text-center max-w-md w-full mx-4 border border-white/30 shadow-2xl shadow-purple-500/20 animate-in zoom-in-95 duration-300 backdrop-blur-sm relative overflow-hidden group"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Animated background elements */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Animated lock icon with sparkles */}
+        <div className="relative mb-6">
+          <div className="text-6xl mb-4 animate-bounce">
+            🔐
+          </div>
+          <div className="absolute -top-2 -right-2 text-2xl animate-ping opacity-75">
+            ✨
+          </div>
+          <div className="absolute -bottom-2 -left-2 text-2xl animate-ping delay-500 opacity-75">
+            ✨
+          </div>
+        </div>
+
+        <h2 className="text-4xl font-bold text-white mb-4 bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text">
+          Access Required
+        </h2>
+
+        <p className="text-gray-300 mb-8 text-lg leading-relaxed">
+          Please sign in to your account or subscribe to access this premium magazine content.
+        </p>
+
+        <div className="flex flex-col gap-4">
+
+          <button
+            onClick={() => navigate("/login")}
+            className="group relative bg-white text-gray-900 px-6 py-4 rounded-xl font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 hover:shadow-xl overflow-hidden"
+          >
+            <span className="relative z-10">Sign In</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </button>
+
+          <button
+            onClick={() => navigate("/subscribe")}
+            className="group relative bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-4 rounded-xl font-bold hover:from-blue-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-purple-500/30 overflow-hidden"
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              Subscribe Now
+              <span className="text-xl group-hover:translate-x-1 transition-transform duration-300">→</span>
+            </span>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </button>
+
+          <button
+            onClick={() => setShowAccessPopup(false)}
+            className="text-gray-400 hover:text-white transition-all duration-300 hover:scale-105 py-2 relative group"
+          >
+            <span className="relative">
+              Maybe later
+              <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-white group-hover:w-full group-hover:left-0 transition-all duration-300"></span>
+            </span>
+          </button>
+
+        </div>
+
+        {/* Small decorative elements */}
+        <div className="flex justify-center gap-2 mt-6">
+          <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse"></div>
+          <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse delay-150"></div>
+          <div className="w-1 h-1 bg-purple-400 rounded-full animate-pulse delay-300"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       </div>
 
       {/* Custom Scrollbar Styles */}
